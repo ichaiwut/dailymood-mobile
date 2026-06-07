@@ -466,6 +466,23 @@ export function SmartLogSheet({
           {/* AI result */}
           {step === 'result' && suggestion ? (
             <View style={{ gap: space.md }}>
+              {/* the note the user wrote — read-only, kept for context */}
+              {note.trim() ? (
+                <View
+                  style={{
+                    backgroundColor: colors.surface2,
+                    borderRadius: radius.md,
+                    borderWidth: 1,
+                    borderColor: colors.hairline,
+                    padding: space.lg,
+                    gap: 6,
+                  }}
+                >
+                  <Text variant="eyebrow" color={colors.ink3}>{t('smartlog.yourNote')}</Text>
+                  <Text variant="body">{note.trim()}</Text>
+                </View>
+              ) : null}
+
               {suggestion.aiSummary ? (
                 <View
                   style={{
@@ -546,12 +563,17 @@ export function SmartLogSheet({
             </View>
           ) : (
             <View style={{ flexDirection: 'row', gap: space.sm, marginTop: space.xs }}>
-              <Button variant="paper" label={t('common.cancel')} onPress={close} style={{ flex: 1 }} />
+              <Button
+                variant="paper"
+                label={t('smartlog.writeMyself')}
+                onPress={() => setStep('input')}
+                style={{ flex: 1, paddingHorizontal: 8 }}
+              />
               <Button
                 label={t('common.save')}
                 onPress={() => save({ aiSource: 'nlp' })}
                 loading={confirm.isPending}
-                style={{ flex: 1.5 }}
+                style={{ flex: 1.3 }}
               />
             </View>
           )}

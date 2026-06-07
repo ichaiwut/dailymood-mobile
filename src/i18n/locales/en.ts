@@ -223,6 +223,8 @@ export default {
     stepTrigger: 'Spotting what mattered',
     stepSummary: 'Writing a short recap',
     detectedMood: 'Mood',
+    yourNote: 'What you wrote',
+    writeMyself: 'Write myself',
     tags: 'Themes',
     summary: 'Summary',
     save: 'Save',

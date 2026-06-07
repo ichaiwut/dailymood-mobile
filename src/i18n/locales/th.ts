@@ -224,6 +224,8 @@ const th: typeof en = {
     stepTrigger: 'มองหาสิ่งที่สำคัญ',
     stepSummary: 'เขียนสรุปสั้นๆ',
     detectedMood: 'อารมณ์',
+    yourNote: 'สิ่งที่คุณเขียน',
+    writeMyself: 'เขียนเอง',
     tags: 'ประเด็น',
     summary: 'สรุป',
     save: 'บันทึก',

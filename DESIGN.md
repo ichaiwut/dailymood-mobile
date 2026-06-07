@@ -138,8 +138,11 @@ not pixel-pinned.
   routes to subscription. Never hidden.
 - **Activity chips:** horizontal scroll, single-select; selected = ink fill.
 - **Footer:** `[ยกเลิก paper] [✦ วิเคราะห์ purple] [บันทึก peach]` — chunky button shadows.
-- **States:** `input` → `analyzing` (`SLAnalyzing`) → `result` (AI summary + editable
-  tags) → `rateLimit` (free out of quota: offer Quick Save + Go Pro, never a raw error).
+- **States:** `input` → `analyzing` (`SLAnalyzing`) → `result` → `rateLimit` (free out of
+  quota: offer Quick Save + Go Pro, never a raw error). The **result** view keeps the
+  user's note **read-only** at the top ("สิ่งที่คุณเขียน") so their words don't vanish, then
+  AI summary + editable tags; footer is **"เขียนเอง"** (back to `input`, note preserved) ·
+  **บันทึก**.
 
 ---
 
