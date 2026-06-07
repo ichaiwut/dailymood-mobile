@@ -19,6 +19,7 @@ import { PASticker } from '../../src/components/paper/PASticker';
 import { LocationPill } from '../../src/components/paper/LocationPill';
 import { SparkleIcon } from '../../src/components/icons/Glyphs';
 import { useToast } from '../../src/components/Toast';
+import { useGoBack } from '../../src/hooks/useGoBack';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useActivities, useDeleteEntry } from '../../src/hooks/queries';
 import { findMood, moodLabel } from '../../src/lib/mood';
@@ -50,6 +51,8 @@ export default function EntryDetailScreen() {
   const del = useDeleteEntry();
   const [confirmDelete, setConfirmDelete] = useState(false);
 
+  const goBack = useGoBack();
+
   const d = entry.data;
   const mood = findMood(moods.data, d?.moodTypeId);
   const accent = mood?.color ?? colors.primary;
@@ -63,7 +66,7 @@ export default function EntryDetailScreen() {
     }
     try {
       await del.mutateAsync(id);
-      router.back();
+      goBack();
       toast.show(t('entry.deleted'));
     } catch (e) {
       toast.show(t(errorMessageKey(e)), 'error');
@@ -74,7 +77,7 @@ export default function EntryDetailScreen() {
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 80 }}>
       {/* top bar */}
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Pressable onPress={() => router.back()} hitSlop={10} accessibilityRole="button">
+        <Pressable onPress={goBack} hitSlop={10} accessibilityRole="button">
           <Text variant="label" weight="bold" color={colors.ink2}>← {t('common.back')}</Text>
         </Pressable>
         {d ? (

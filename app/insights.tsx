@@ -5,7 +5,6 @@
  */
 import { useState } from 'react';
 import { View, Pressable, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../src/components/Screen';
@@ -15,6 +14,7 @@ import { WashiTape } from '../src/components/paper/WashiTape';
 import { useTheme } from '../src/theme/ThemeProvider';
 import { useInsights, useInsightFeedback } from '../src/hooks/queries';
 import { useToast } from '../src/components/Toast';
+import { useGoBack } from '../src/hooks/useGoBack';
 import { stripBold } from '../src/lib/text';
 import { errorMessageKey } from '../src/api/errors';
 import type { InsightPattern, InsightReaction } from '../src/api/types';
@@ -22,10 +22,10 @@ import type { InsightPattern, InsightReaction } from '../src/api/types';
 export default function InsightsScreen() {
   const { t } = useTranslation();
   const { colors, radius, space, brand } = useTheme();
-  const router = useRouter();
   const insights = useInsights();
   const feedback = useInsightFeedback();
   const toast = useToast();
+  const goBack = useGoBack();
   const [reacted, setReacted] = useState<InsightReaction | null>(null);
 
   const d = insights.data;
@@ -48,7 +48,7 @@ export default function InsightsScreen() {
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 60 }}>
       <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={goBack} hitSlop={10}>
           <Text variant="title" color={colors.ink}>‹</Text>
         </Pressable>
         <Text variant="title">{t('insights.title')}</Text>

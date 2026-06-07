@@ -6,7 +6,6 @@
  */
 import { useState } from 'react';
 import { View, Pressable, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../../src/components/Screen';
@@ -15,6 +14,7 @@ import { Notice } from '../../src/components/Notice';
 import { PASticker } from '../../src/components/paper/PASticker';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useAchievements } from '../../src/hooks/queries';
+import { useGoBack } from '../../src/hooks/useGoBack';
 import { formatDateKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
 import type { BadgeSummary } from '../../src/api/types';
@@ -24,8 +24,8 @@ type Filter = 'all' | 'earned' | 'in_progress' | 'locked';
 export default function AchievementsScreen() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
-  const router = useRouter();
   const ach = useAchievements();
+  const goBack = useGoBack();
   const [filter, setFilter] = useState<Filter>('all');
 
   const data = ach.data;
@@ -35,7 +35,7 @@ export default function AchievementsScreen() {
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 60 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={goBack} hitSlop={10}>
           <Text variant="title" color={colors.ink}>‹</Text>
         </Pressable>
         <Text variant="title">{t('profile.achievements')}</Text>

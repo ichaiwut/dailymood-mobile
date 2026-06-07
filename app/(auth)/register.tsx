@@ -17,11 +17,13 @@ import { Notice } from '../../src/components/Notice';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { register } from '../../src/api/auth';
 import { errorMessageKey } from '../../src/api/errors';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 export default function RegisterScreen() {
   const { t } = useTranslation();
   const { colors } = useTheme();
   const router = useRouter();
+  const goBack = useGoBack('/(auth)/login');
   const params = useLocalSearchParams<{ email?: string }>();
 
   const [name, setName] = useState('');
@@ -76,7 +78,7 @@ export default function RegisterScreen() {
         autoComplete="new-password"
       />
       <Button label={t('auth.register')} onPress={onSubmit} loading={busy} />
-      <Pressable onPress={() => router.back()} hitSlop={8}>
+      <Pressable onPress={goBack} hitSlop={8}>
         <View style={{ alignItems: 'center' }}>
           <Text variant="label" color={colors.ink3}>
             {t('common.back')}

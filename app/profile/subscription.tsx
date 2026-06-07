@@ -6,7 +6,6 @@
  */
 import { useState } from 'react';
 import { View, Pressable, Linking, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../../src/components/Screen';
@@ -19,14 +18,15 @@ import { createCheckout, createPortal } from '../../src/api/subscription';
 import { formatDateKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
 import { useToast } from '../../src/components/Toast';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 export default function SubscriptionScreen() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space, brand } = useTheme();
-  const router = useRouter();
   const sub = useSubscription();
   const activate = useActivateTrial();
   const toast = useToast();
+  const goBack = useGoBack();
 
   const onActivateTrial = async () => {
     try {
@@ -59,7 +59,7 @@ export default function SubscriptionScreen() {
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 60 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={goBack} hitSlop={10}>
           <Text variant="title" color={colors.ink}>‹</Text>
         </Pressable>
         <Text variant="title">{t('subscription.title')}</Text>

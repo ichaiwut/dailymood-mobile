@@ -17,6 +17,7 @@ import { MoodPicker } from '../../../src/components/MoodPicker';
 import { BottomSheet } from '../../../src/components/BottomSheet';
 import { LocationField, type LocationValue } from '../../../src/components/paper/LocationField';
 import { useToast } from '../../../src/components/Toast';
+import { useGoBack } from '../../../src/hooks/useGoBack';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useUpdateEntry, useDeleteEntry } from '../../../src/hooks/queries';
 import { formatDateKey } from '../../../src/lib/time';
@@ -27,6 +28,7 @@ export default function EditEntryScreen() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
   const router = useRouter();
+  const goBack = useGoBack();
   const toast = useToast();
 
   const entry = useEntry(id);
@@ -74,7 +76,7 @@ export default function EditEntryScreen() {
         locationLat: location?.lat ?? null,
         locationLng: location?.lng ?? null,
       });
-      router.back();
+      goBack();
       toast.show(t('entry.saved'));
     } catch (e) {
       setError(t(errorMessageKey(e)));
@@ -98,7 +100,7 @@ export default function EditEntryScreen() {
     <>
       <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 60 }}>
         <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Pressable onPress={() => router.back()} hitSlop={10}>
+          <Pressable onPress={goBack} hitSlop={10}>
             <Text variant="title" color={colors.ink}>‹</Text>
           </Pressable>
           <Text variant="title">{t('entry.edit')}</Text>

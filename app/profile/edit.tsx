@@ -19,6 +19,7 @@ import { pickImage, optimizeImage } from '../../src/lib/image';
 import { initials } from '../../src/lib/avatar';
 import { errorMessageKey } from '../../src/api/errors';
 import { useToast } from '../../src/components/Toast';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 const ACCENTS = ['#A673F1', '#FCA45B', '#85ECCB', '#FDCB56', '#9ACDE2', '#D4BEE4'];
 
@@ -27,6 +28,7 @@ export default function EditProfileScreen() {
   const { colors, radius, space } = useTheme();
   const router = useRouter();
   const toast = useToast();
+  const goBack = useGoBack();
   const profile = useProfile();
   const update = useUpdateProfile();
   const upload = useUploadAvatar();
@@ -65,7 +67,7 @@ export default function EditProfileScreen() {
     setError(null);
     try {
       await update.mutateAsync({ name: name.trim(), bio: bio.trim(), accentColor: accent });
-      router.back();
+      goBack();
       toast.show(t('profile.saved'));
     } catch (e) {
       setError(t(errorMessageKey(e)));
@@ -76,7 +78,7 @@ export default function EditProfileScreen() {
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 60 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={goBack} hitSlop={10}>
           <Text variant="title" color={colors.ink}>‹</Text>
         </Pressable>
         <Text variant="title">{t('profile.editProfile')}</Text>

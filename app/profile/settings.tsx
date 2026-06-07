@@ -4,7 +4,6 @@
  * toggles are deferred (the documented PATCH covers name/bio/accent/locale).
  */
 import { View, Pressable, Linking, ActivityIndicator } from 'react-native';
-import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../../src/components/Screen';
@@ -15,14 +14,15 @@ import { setAppLanguage } from '../../src/i18n';
 import { API_BASE_URL } from '../../src/config';
 import { errorMessageKey } from '../../src/api/errors';
 import { useToast } from '../../src/components/Toast';
+import { useGoBack } from '../../src/hooks/useGoBack';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
-  const router = useRouter();
   const profile = useProfile();
   const update = useUpdateProfile();
   const toast = useToast();
+  const goBack = useGoBack();
 
   const current = (profile.data?.user.locale ?? i18n.language) as 'th' | 'en';
 
@@ -40,7 +40,7 @@ export default function SettingsScreen() {
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 60 }}>
       <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
-        <Pressable onPress={() => router.back()} hitSlop={10}>
+        <Pressable onPress={goBack} hitSlop={10}>
           <Text variant="title" color={colors.ink}>‹</Text>
         </Pressable>
         <Text variant="title">{t('profile.settings')}</Text>
