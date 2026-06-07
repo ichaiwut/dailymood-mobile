@@ -72,3 +72,11 @@ export function formatDateKey(
 export function isFutureKey(dateKey: string): boolean {
   return dateKey > todayKey();
 }
+
+/** i18n key for the time-of-day greeting (ICT). */
+export function greetingKey(): 'goodMorning' | 'goodAfternoon' | 'goodEvening' {
+  const h = ictHour(new Date());
+  if (h < 12) return 'goodMorning';
+  if (h < 17) return 'goodAfternoon';
+  return 'goodEvening';
+}

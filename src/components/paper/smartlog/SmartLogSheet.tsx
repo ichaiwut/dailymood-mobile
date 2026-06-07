@@ -37,9 +37,20 @@ export interface SmartLogSheetProps {
   initialMoodId?: string | null;
   /** Target date (ICT YYYY-MM-DD) for retroactive logging; defaults to today. */
   initialDate?: string;
+  /** Prefill the note (e.g. handed off from the inline composer). */
+  initialNote?: string;
+  /** Run AI analyze immediately on open (when a note is prefilled). */
+  autoAnalyze?: boolean;
 }
 
-export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: SmartLogSheetProps) {
+export function SmartLogSheet({
+  visible,
+  onClose,
+  initialMoodId,
+  initialDate,
+  initialNote,
+  autoAnalyze,
+}: SmartLogSheetProps) {
   const { t } = useTranslation();
   const { colors, space, radius } = useTheme();
   const router = useRouter();
@@ -61,14 +72,23 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
     if (visible) {
       setStep('input');
       setMoodId(initialMoodId ?? null);
-      setNote('');
+      setNote(initialNote ?? '');
       setTags([]);
       setNewTag('');
       setSuggestion(null);
       setImageUri(null);
       setError(null);
     }
-  }, [visible, initialMoodId]);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
+
+  // Auto-analyze a handed-off note (from the inline composer) once on open.
+  useEffect(() => {
+    if (visible && autoAnalyze && initialNote?.trim() && moodList.length) {
+      analyze(initialNote);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible]);
 
   const moodList = moods.data ?? [];
   const effectiveMoodId = moodId ?? moodList[0]?.id ?? null;
@@ -111,8 +131,9 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
     }
   };
 
-  const analyze = async () => {
-    if (!note.trim()) return;
+  const analyze = async (textArg?: string) => {
+    const text = (textArg ?? note).trim();
+    if (!text) return;
     if (!premium && !hasAiQuota(ai.data)) {
       setStep('rateLimit');
       return;
@@ -121,7 +142,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
     setStep('analyzing');
     try {
       const result = await analyzeSmart({
-        text: note.trim(),
+        text,
         locale: i18n.language,
         imageUri: imageUri ?? undefined,
       });
@@ -318,7 +339,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
             <View style={{ gap: space.md, marginTop: space.xs }}>
               <Button
                 label={t('smartlog.analyze')}
-                onPress={analyze}
+                onPress={() => analyze()}
                 disabled={!note.trim()}
               />
               <Button

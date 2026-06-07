@@ -1,9 +1,9 @@
 /**
- * Today dashboard (M2): greeting folder with mood picker → AI composer →
- * today's entries (folder cards) or empty state → streak. The mood picker,
- * composer, and FAB all open the Smart Log sheet.
+ * Today dashboard (web-matched): trial promo bar → top bar → greeting folder
+ * (paperclip + highlighted question + mood disc grid) → inline AI composer →
+ * today's entries → streak. Sections stagger in.
  */
-import { View, Pressable } from 'react-native';
+import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../../src/components/Screen';
@@ -11,11 +11,13 @@ import { Text } from '../../src/components/Text';
 import { Notice } from '../../src/components/Notice';
 import { Appear } from '../../src/components/Appear';
 import { Skeleton } from '../../src/components/Skeleton';
+import { TopBar } from '../../src/components/paper/today/TopBar';
+import { TrialPromoBar } from '../../src/components/paper/today/TrialPromoBar';
 import { GreetingFolder } from '../../src/components/paper/today/GreetingFolder';
+import { AiComposer } from '../../src/components/paper/today/AiComposer';
 import { StreakCard } from '../../src/components/paper/today/StreakCard';
 import { EmptyToday } from '../../src/components/paper/today/EmptyToday';
 import { EntryFolderCard } from '../../src/components/paper/EntryFolderCard';
-import { useSmartLog } from '../../src/components/paper/smartlog/SmartLogProvider';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useProfile, useTodayEntries, useMoods } from '../../src/hooks/queries';
 import { findMood } from '../../src/lib/mood';
@@ -23,38 +25,23 @@ import { errorMessageKey } from '../../src/api/errors';
 
 export default function TodayScreen() {
   const { t } = useTranslation();
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space } = useTheme();
   const profile = useProfile();
   const entries = useTodayEntries();
   const moods = useMoods();
-  const smartLog = useSmartLog();
+  const u = profile.data?.user;
 
   return (
-    <Screen scroll contentStyle={{ gap: space.xl, paddingBottom: 120 }}>
+    <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 120 }}>
+      <TrialPromoBar />
+      <TopBar name={u?.name} email={u?.email} accent={u?.accentColor} />
+
       <Appear>
-        <GreetingFolder name={profile.data?.user.name} />
+        <GreetingFolder />
       </Appear>
 
-      {/* AI composer card */}
       <Appear delay={60}>
-        <Pressable
-          onPress={() => smartLog.open()}
-          style={{
-            backgroundColor: colors.surface,
-            borderRadius: radius.lg,
-            borderWidth: 1.5,
-            borderColor: brand.purple,
-            padding: space.lg,
-            flexDirection: 'row',
-            alignItems: 'center',
-            gap: space.md,
-          }}
-        >
-          <Text style={{ fontSize: 22 }}>✦</Text>
-          <Text variant="body" color={colors.ink3} style={{ flex: 1 }}>
-            {t('today.composerPlaceholder')}
-          </Text>
-        </Pressable>
+        <AiComposer />
       </Appear>
 
       {/* today's entries */}

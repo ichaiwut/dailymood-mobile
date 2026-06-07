@@ -19,6 +19,18 @@ export interface TokenPair {
   user: AuthUser;
 }
 
+/** An activity chip (GET /api/activities) — 10 system defaults + custom. */
+export interface Activity {
+  id: string;
+  userId: string | null;
+  emoji: string;
+  label: string;
+  labelTh: string;
+  order: number;
+  isDefault: boolean;
+  createdAt: string;
+}
+
 /** A mood type from GET /api/moods. Never hardcode these — always fetch. */
 export interface Mood {
   id: string;

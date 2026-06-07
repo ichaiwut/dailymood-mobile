@@ -1,14 +1,18 @@
 /**
- * Greeting folder — a date-tab paper folder with the greeting and the mood
- * picker. Tapping a mood opens the Smart Log sheet with that mood preselected.
+ * Greeting folder — a date-tab paper folder with a paperclip, the time-of-day
+ * greeting, the highlighted "how are you feeling?" question, and the mood grid
+ * (circular sticker discs). Tapping a mood opens Smart Log preselected.
  */
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../../Text';
+import { MarkSentence } from '../../Mark';
 import { MoodPicker } from '../../MoodPicker';
+import { PAClip } from '../PAClip';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useMoods } from '../../../hooks/queries';
 import { useSmartLog } from '../smartlog/SmartLogProvider';
+import { greetingKey } from '../../../lib/time';
 import { APP_TIMEZONE } from '../../../config';
 
 function todayLabel(locale: string): string {
@@ -16,7 +20,7 @@ function todayLabel(locale: string): string {
     return new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-US', {
       weekday: 'long',
       day: 'numeric',
-      month: 'long',
+      month: 'short',
       timeZone: APP_TIMEZONE,
     }).format(new Date());
   } catch {
@@ -24,7 +28,7 @@ function todayLabel(locale: string): string {
   }
 }
 
-export function GreetingFolder({ name }: { name?: string | null }) {
+export function GreetingFolder() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
   const moods = useMoods();
@@ -32,6 +36,7 @@ export function GreetingFolder({ name }: { name?: string | null }) {
 
   return (
     <View>
+      {/* folder tab */}
       <View
         style={{
           alignSelf: 'flex-start',
@@ -43,10 +48,9 @@ export function GreetingFolder({ name }: { name?: string | null }) {
           marginBottom: -2,
         }}
       >
-        <Text variant="eyebrow" color="#fff">
-          {todayLabel(i18n.language)}
-        </Text>
+        <Text variant="eyebrow" color="#fff">{todayLabel(i18n.language)}</Text>
       </View>
+
       <View
         style={{
           backgroundColor: colors.surface,
@@ -63,10 +67,20 @@ export function GreetingFolder({ name }: { name?: string | null }) {
           elevation: 6,
         }}
       >
-        <Text variant="h2">
-          {name ? `${t('today.greeting').replace(/[?？]/, '')}, ${name}?` : t('today.greeting')}
-        </Text>
+        {/* paperclip overhang */}
+        <View style={{ position: 'absolute', right: 18, top: -14 }}>
+          <PAClip />
+        </View>
+
+        <View style={{ gap: 4 }}>
+          <Text variant="label" weight="bold" color={colors.primary}>
+            {t(`today.${greetingKey()}`)}
+          </Text>
+          <MarkSentence pre={t('today.qPre')} mark={t('today.qMark')} post={t('today.qPost')} />
+        </View>
+
         <MoodPicker
+          layout="grid"
           moods={moods.data ?? []}
           onSelect={(m) => smartLog.open({ moodId: m.id })}
         />

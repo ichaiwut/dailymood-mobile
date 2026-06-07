@@ -4,6 +4,7 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchMoods } from '../api/moods';
+import { fetchActivities } from '../api/activities';
 import {
   fetchProfile,
   updateProfile,
@@ -45,6 +46,10 @@ export function useMoods() {
     queryFn: fetchMoods,
     staleTime: 5 * 60_000, // moods rarely change
   });
+}
+
+export function useActivities() {
+  return useQuery({ queryKey: ['activities'], queryFn: fetchActivities, staleTime: 5 * 60_000 });
 }
 
 export function useProfile() {

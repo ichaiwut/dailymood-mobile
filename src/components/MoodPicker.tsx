@@ -1,7 +1,7 @@
 /**
- * Horizontal row of rounded-square mood tiles (Paper Desk). Tapping selects a
- * mood; the selected tile gets an ink ring. Used in the Smart Log sheet and the
- * greeting picker.
+ * Mood picker. Two layouts:
+ *  - 'scroll' (default): horizontal rounded-square tiles (Smart Log, Edit).
+ *  - 'grid': wrapping circular sticker discs + labels (Today greeting, web-style).
  */
 import { ScrollView, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
@@ -15,11 +15,44 @@ export interface MoodPickerProps {
   moods: Mood[];
   selectedId?: string | null;
   onSelect: (mood: Mood) => void;
+  layout?: 'scroll' | 'grid';
 }
 
-export function MoodPicker({ moods, selectedId, onSelect }: MoodPickerProps) {
+export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: MoodPickerProps) {
   const { i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
+
+  if (layout === 'grid') {
+    return (
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md, justifyContent: 'space-between' }}>
+        {moods.map((m) => {
+          const selected = m.id === selectedId;
+          return (
+            <Pressable
+              key={m.id}
+              accessibilityRole="button"
+              accessibilityLabel={moodLabel(m, i18n.language)}
+              onPress={() => onSelect(m)}
+              style={{ width: '18%', minWidth: 60, alignItems: 'center', gap: 5 }}
+            >
+              <View
+                style={
+                  selected
+                    ? { borderRadius: 999, borderWidth: 2, borderColor: colors.ink, padding: 2 }
+                    : { padding: 2 }
+                }
+              >
+                <PASticker color={m.color} emoji={m.emoji} size={52} />
+              </View>
+              <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
+                {moodLabel(m, i18n.language)}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
+    );
+  }
 
   return (
     <ScrollView horizontal showsHorizontalScrollIndicator={false}>
