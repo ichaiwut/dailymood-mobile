@@ -27,13 +27,17 @@ export interface PAStickerProps {
 export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji, size = 56, halo }: PAStickerProps) {
   const { shadow } = useTheme();
 
+  // Badges (emoji) keep a full-color disc. Mood stickers show the pack face on
+  // a SOFT tint of the mood color (a gentle ring), matching the design — the
+  // saturated API colors as a full ring read as neon.
+  const isMood = !emoji;
   let content: React.ReactNode;
   if (emoji) {
     content = <Text style={{ fontSize: size * 0.46 }}>{emoji}</Text>;
   } else if (face) {
-    content = <MoodFace face={face} size={size * 0.8} />;
+    content = <MoodFace face={face} size={size * 0.84} />;
   } else if (moodId != null) {
-    content = <MoodIcon moodId={moodId} pack={pack} size={size * 0.82} />;
+    content = <MoodIcon moodId={moodId} pack={pack} size={size * 0.88} />;
   } else {
     content = null;
   }
@@ -44,7 +48,7 @@ export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: color,
+        backgroundColor: isMood ? color + '40' : color,
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 4,
