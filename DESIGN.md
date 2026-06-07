@@ -180,10 +180,12 @@ not pixel-pinned.
 ## 4b. Entry Detail — `app/entry/[id].tsx`
 
 Single-column Paper Desk stack (handoff entry-detail spec). Top bar (← back ghost +
-✎ edit paper pill) → **mood hero folder** (lav `PaperSheet` tab = long date, paperclip,
-64px `PASticker` rotated -6°, mood name + day·time·period, big day
-number + italic month + year, "Entry #N" + activity chip) → **note** (washi peach) →
-**AI insight** (washi yellow, sparkle + "AI noticed" + disclaimer) → **flashback**
+✎ edit paper pill) → **mood hero folder** (lav tab = long date, paperclip, a **subtle
+mood-color corner glow** via clipped `LinearGradient`, 64px `PASticker` rotated -6°, mood
+name + day·time·period, big day number + italic month + year, "Entry #N" + activity chip;
+built as a custom clipped sheet so the glow stays inside the rounded corner) → **note**
+(washi peach) → **AI insight** (lavender `#F3ECF9` tint card, washi yellow, sparkle +
+"AI noticed" + **bold-preserving** text via `RichText` + disclaimer) → **flashback**
 (premium: washi-lav; free: dashed teaser → Pro) → **photo** (clip) → **location** pill →
 **tags** → rail: **nearby days** (ink tab, sticker + date + "this entry" badge + note
 preview), **last month** (mint tab), **streak** (washi peach, 🔥 + day count) → **2-step

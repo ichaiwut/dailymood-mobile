@@ -6,13 +6,15 @@
  */
 import { useState } from 'react';
 import { View, Pressable, ActivityIndicator, Image } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../../src/components/Screen';
 import { Text } from '../../src/components/Text';
 import { Notice } from '../../src/components/Notice';
-import { PaperSheet } from '../../src/components/paper/PaperSheet';
+import { PaperSheet, FolderTab } from '../../src/components/paper/PaperSheet';
+import { PAClip } from '../../src/components/paper/PAClip';
 import { PASticker } from '../../src/components/paper/PASticker';
 import { LocationPill } from '../../src/components/paper/LocationPill';
 import { SparkleIcon } from '../../src/components/icons/Glyphs';
@@ -21,7 +23,6 @@ import { useTheme } from '../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useActivities, useDeleteEntry } from '../../src/hooks/queries';
 import { findMood, moodLabel } from '../../src/lib/mood';
 import { ictClock, timeOfDay } from '../../src/lib/time';
-import { stripBold } from '../../src/lib/text';
 import { APP_TIMEZONE } from '../../src/config';
 import { errorMessageKey } from '../../src/api/errors';
 import type { Mood } from '../../src/api/types';
@@ -40,7 +41,7 @@ function fmt(dateKey: string, locale: string, opts: Intl.DateTimeFormatOptions):
 export default function EntryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, i18n } = useTranslation();
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space, brand, sheetRadius, shadow } = useTheme();
   const router = useRouter();
   const toast = useToast();
   const entry = useEntry(id);
@@ -101,14 +102,24 @@ export default function EntryDetailScreen() {
       ) : d ? (
         <>
           {/* mood hero folder */}
-          <PaperSheet
-            tab={fmt(d.date, lang, { weekday: 'long', day: 'numeric', month: 'short' })}
-            tabColor={brand.lavender}
-            tabTextColor={colors.ink}
-            clip
-            clipSide="right"
-          >
-            <View style={{ gap: space.md }}>
+          <View>
+            <FolderTab
+              label={fmt(d.date, lang, { weekday: 'long', day: 'numeric', month: 'short' })}
+              bg={brand.lavender}
+              fg={colors.ink}
+            />
+            {/* shadow wrapper */}
+            <View style={{ backgroundColor: colors.surface, ...sheetRadius, borderTopLeftRadius: 0, boxShadow: shadow.md }}>
+              {/* clip layer holds the soft mood glow */}
+              <View style={{ overflow: 'hidden', ...sheetRadius, borderTopLeftRadius: 0 }}>
+                <LinearGradient
+                  colors={[accent + '40', accent + '00']}
+                  start={{ x: 1, y: 0 }}
+                  end={{ x: 0.1, y: 0.95 }}
+                  style={{ position: 'absolute', top: 0, right: 0, width: 220, height: 200 }}
+                  pointerEvents="none"
+                />
+                <View style={{ padding: space.xl, gap: space.md }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                 <View style={{ transform: [{ rotate: '-6deg' }] }}>
                   <PASticker color={accent} moodId={mood?.id} pack={undefined} size={64} />
@@ -169,8 +180,14 @@ export default function EntryDetailScreen() {
                   </View>
                 ) : null}
               </View>
+                </View>
+              </View>
+              {/* paperclip — above the clip layer so it isn't cropped */}
+              <View style={{ position: 'absolute', top: -20, right: 26, zIndex: 6 }}>
+                <PAClip />
+              </View>
             </View>
-          </PaperSheet>
+          </View>
 
           {/* note */}
           {d.note ? (
@@ -184,31 +201,31 @@ export default function EntryDetailScreen() {
 
           {/* AI insight */}
           {d.aiSummary ? (
-            <PaperSheet washi washiColor={'rgba(253,203,86,0.65)'} style={{ marginTop: space.xs }}>
+            <TintCard washiColor={'rgba(253,203,86,0.65)'}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6, marginBottom: 8 }}>
                 <SparkleIcon size={14} color={brand.purpleStrong} />
                 <Text variant="label" weight="bold" color={brand.purpleStrong} style={{ textTransform: 'uppercase', letterSpacing: 0.6 }}>
                   {t('entry.aiNoticed')}
                 </Text>
               </View>
-              <Text variant="body" style={{ lineHeight: 24 }}>{stripBold(d.aiSummary)}</Text>
+              <RichText text={d.aiSummary} />
               <Text variant="label" color={colors.ink3} style={{ marginTop: 8 }}>
                 {t('insights.disclaimer')}
               </Text>
-            </PaperSheet>
+            </TintCard>
           ) : null}
 
           {/* flashback (premium) / teaser */}
           {d.flashback ? (
-            <PaperSheet washi washiColor={'rgba(212,190,228,0.75)'}>
+            <TintCard washiColor={'rgba(212,190,228,0.75)'}>
               <Text variant="label" weight="bold" color={'#5B8FA8'} style={{ marginBottom: 6 }}>
                 🕰 {t('entry.lookBack')}
               </Text>
-              <Text variant="body" style={{ lineHeight: 24 }}>{stripBold(d.flashback.message)}</Text>
+              <RichText text={d.flashback.message} />
               <Text variant="label" color={colors.ink3} style={{ marginTop: 6 }}>
                 {fmt(d.flashback.pastDate, lang, { day: 'numeric', month: 'short', year: 'numeric' })}
               </Text>
-            </PaperSheet>
+            </TintCard>
           ) : !d.isPremium ? (
             <View
               style={{
@@ -319,6 +336,46 @@ export default function EntryDetailScreen() {
         </>
       ) : null}
     </Screen>
+  );
+}
+
+/** Render AI text keeping **bold** segments bold (matches web). */
+function RichText({ text }: { text: string }) {
+  const parts = text.split(/(\*\*[^*]+\*\*)/g).filter(Boolean);
+  return (
+    <Text variant="body" style={{ lineHeight: 24 }}>
+      {parts.map((p, i) =>
+        p.startsWith('**') && p.endsWith('**') ? (
+          <Text key={i} weight="bold">
+            {p.slice(2, -2)}
+          </Text>
+        ) : (
+          p
+        ),
+      )}
+    </Text>
+  );
+}
+
+/** Lavender-tinted paper card (AI insight / flashback) with washi tape + clip seam. */
+function TintCard({ washiColor, children }: { washiColor: string; children: React.ReactNode }) {
+  const { colors, sheetRadius, space, shadow } = useTheme();
+  return (
+    <View style={{ marginTop: space.xs }}>
+      <View
+        style={{
+          backgroundColor: '#F3ECF9',
+          ...sheetRadius,
+          padding: space.xl,
+          boxShadow: shadow.md,
+        }}
+      >
+        <View style={{ position: 'absolute', top: -12, alignSelf: 'center', left: 0, right: 0, alignItems: 'center', zIndex: 6 }}>
+          <View style={{ width: 96, height: 26, borderRadius: 2, backgroundColor: washiColor, transform: [{ rotate: '-3deg' }] }} />
+        </View>
+        {children}
+      </View>
+    </View>
   );
 }
 
