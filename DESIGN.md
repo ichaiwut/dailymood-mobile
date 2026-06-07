@@ -222,9 +222,9 @@ Month nav (‹ month-year › paper buttons) → segmented **calendar / timeline
 - **AI cards above the grid** (`CalendarAi.tsx`): premium → monthly summary (RichText bold +
   best/hard-day & top-tag chips) + patterns feed (pastel icon discs) + **ask-AI bar**
   (`/api/calendar/ask`, 429 → toast, answer + matching-date chips open the day); free →
-  upsell card → subscription (never hidden). **Sparse months** (`tooFewEntries`) fall back
-  to another month's AI — the card is **labeled with that fallback month** + a note (per
-  product decision: show fallback, labeled — not hidden).
+  upsell card → subscription (never hidden). **Sparse months:** the backend returns
+  another month's AI via `fallbackMonth`; the client **suppresses it** (`tooFewEntries` ||
+  `fallbackMonth` → "log more this month" prompt) so a month never shows another month's AI.
 - **Day-cell indicators:** special-day dot top-left (holiday `#F43F5E` / personal `#3B82F6`,
   from `/api/events`, all tiers) · ★ best-day top-right · recurring (purple) / anomaly (lav)
   dot bottom-center (from `/api/calendar/ai`, premium).

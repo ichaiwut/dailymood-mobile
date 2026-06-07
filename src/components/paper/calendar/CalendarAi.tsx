@@ -102,8 +102,9 @@ export function CalendarAiPanel({
 
   return (
     <View style={{ gap: space.lg }}>
-      {/* monthly summary card (fallback months are labeled with their month) */}
-      {d?.summary ? (
+      {/* monthly summary — only the CURRENT month's own AI (never the backend's
+          cross-month fallback) */}
+      {d?.summary && !d.tooFewEntries && !d.fallbackMonth ? (
         <View style={{ marginTop: space.xs }}>
           <View style={{ backgroundColor: AI_TINT, ...sheetRadius, padding: space.xl, gap: space.md, boxShadow: shadow.md }}>
             {/* washi tape */}
@@ -141,14 +142,14 @@ export function CalendarAiPanel({
             <Text variant="label" color={colors.ink3}>{t('calendar.aiDisclaimer')}</Text>
           </View>
         </View>
-      ) : d?.tooFewEntries ? (
+      ) : d?.tooFewEntries || d?.fallbackMonth ? (
         <View style={{ backgroundColor: colors.surface2, borderRadius: radius.lg, borderWidth: 1.5, borderColor: colors.hairline2, borderStyle: 'dashed', padding: space.lg }}>
           <Text variant="label" color={colors.ink3}>{t('calendar.aiTooFew')}</Text>
         </View>
       ) : null}
 
-      {/* patterns feed */}
-      {d?.patterns?.length ? (
+      {/* patterns feed (current month only) */}
+      {d?.patterns?.length && !d.tooFewEntries && !d.fallbackMonth ? (
         <View style={{ gap: space.sm }}>
           <Text variant="eyebrow">{t('calendar.patterns')}</Text>
           {d.patterns.map((p, i) => (
