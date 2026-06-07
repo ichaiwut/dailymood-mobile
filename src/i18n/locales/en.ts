@@ -78,6 +78,9 @@ export default {
     futureDay: "That day hasn't happened yet",
     allMoods: 'All',
     emptyMonth: 'No entries this month yet',
+    legend: 'Legend',
+    consecutive: 'consecutive days',
+    vsLastMonth: 'vs last month',
   },
   profile: {
     memberSince: 'Member since {{date}}',

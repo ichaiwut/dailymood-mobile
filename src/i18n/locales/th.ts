@@ -79,6 +79,9 @@ const th: typeof en = {
     futureDay: 'วันนั้นยังมาไม่ถึง',
     allMoods: 'ทั้งหมด',
     emptyMonth: 'เดือนนี้ยังไม่มีบันทึก',
+    legend: 'คำอธิบายสี',
+    consecutive: 'วันติดต่อกัน',
+    vsLastMonth: 'จากเดือนก่อน',
   },
   profile: {
     memberSince: 'สมาชิกตั้งแต่ {{date}}',

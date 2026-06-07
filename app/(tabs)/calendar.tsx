@@ -14,8 +14,10 @@ import { Notice } from '../../src/components/Notice';
 import { MoodGrid } from '../../src/components/paper/calendar/MoodGrid';
 import { TimelineFeed } from '../../src/components/paper/calendar/TimelineFeed';
 import { DaySheet } from '../../src/components/paper/calendar/DaySheet';
+import { PaperSheet, FolderTab } from '../../src/components/paper/PaperSheet';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useCalendarMonth, useMoods } from '../../src/hooks/queries';
+import { moodLabel } from '../../src/lib/mood';
 import { todayKey, formatDateKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
 
@@ -25,7 +27,7 @@ const [TODAY_Y, TODAY_M] = todayKey().split('-').map(Number);
 
 export default function CalendarScreen() {
   const { t, i18n } = useTranslation();
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space, brand, shadow, sheetRadius } = useTheme();
   const router = useRouter();
 
   const [year, setYear] = useState(TODAY_Y);
@@ -83,6 +85,7 @@ export default function CalendarScreen() {
                 paddingVertical: 9,
                 borderRadius: radius.pill,
                 backgroundColor: view === v ? colors.surface : 'transparent',
+                boxShadow: view === v ? shadow.sm : undefined,
               }}
             >
               <Text variant="label" weight={view === v ? 'bold' : 'medium'} color={view === v ? colors.ink : colors.ink3}>
@@ -99,14 +102,16 @@ export default function CalendarScreen() {
             <Notice message={t(errorMessageKey(cal.error))} tone="error" />
           ) : (
             <View style={{ gap: space.lg }}>
-              <MoodGrid
-                year={year}
-                month={month}
-                days={cal.data?.entries ?? []}
-                moods={moods.data ?? []}
-                locale={i18n.language}
-                onDayPress={setSelectedDate}
-              />
+              <PaperSheet clip clipSide="right">
+                <MoodGrid
+                  year={year}
+                  month={month}
+                  days={cal.data?.entries ?? []}
+                  moods={moods.data ?? []}
+                  locale={i18n.language}
+                  onDayPress={setSelectedDate}
+                />
+              </PaperSheet>
               {cal.data ? (
                 <View style={{ flexDirection: 'row', gap: space.md }}>
                   <Stat label={t('calendar.avgMood')} value={cal.data.stats.avgMood.toFixed(1)} accent={colors.primary} />
@@ -114,6 +119,7 @@ export default function CalendarScreen() {
                   <Stat label={t('calendar.logged')} value={`${cal.data.stats.loggedDays}`} accent={brand.mint} />
                 </View>
               ) : null}
+              {moods.data?.length ? <Legend /> : null}
             </View>
           )
         ) : (
@@ -134,10 +140,9 @@ export default function CalendarScreen() {
           height: 44,
           borderRadius: radius.md,
           backgroundColor: colors.surface,
-          borderWidth: 1,
-          borderColor: colors.hairline2,
           alignItems: 'center',
           justifyContent: 'center',
+          boxShadow: shadow.sm,
         }}
       >
         <Text variant="title" color={colors.ink}>
@@ -156,14 +161,39 @@ export default function CalendarScreen() {
           borderRadius: radius.md,
           borderLeftWidth: 4,
           borderLeftColor: accent,
-          borderWidth: 1,
-          borderColor: colors.hairline,
           padding: space.md,
           gap: 2,
+          boxShadow: shadow.sm,
         }}
       >
         <Text variant="eyebrow">{label}</Text>
         <Text variant="h2">{value}</Text>
+      </View>
+    );
+  }
+
+  function Legend() {
+    return (
+      <View>
+        <FolderTab label={t('calendar.legend')} bg={colors.ink} fg="#fff" />
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            ...sheetRadius,
+            borderTopLeftRadius: 0,
+            padding: space.lg,
+            boxShadow: shadow.sm,
+          }}
+        >
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
+            {(moods.data ?? []).map((m) => (
+              <View key={m.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: m.color }} />
+                <Text variant="label" color={colors.ink2}>{moodLabel(m, i18n.language)}</Text>
+              </View>
+            ))}
+          </View>
+        </View>
       </View>
     );
   }

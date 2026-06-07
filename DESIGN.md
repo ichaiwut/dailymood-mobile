@@ -204,6 +204,15 @@ quota-gated: free 3/day with counter, Pro unlimited; persists `aiSummary`/`senti
 (1.5px `#FCA5A5` border, `#DC2626` delete) → **fixed bottom bar** (Cancel paper + Save
 peach, safe-area padded). Delete uses the confirm `BottomSheet`.
 
+## 4d. Calendar — `app/(tabs)/calendar.tsx`
+
+(No handoff doc — followed the web calendar + Paper Desk language.) Month nav (‹ month-year
+› with paper nav buttons) → segmented **calendar / timeline** toggle (selected pill gets a
+soft shadow) → **calendar view**: the `MoodGrid` (7-col, mood-color cells, today ring)
+wrapped in a `PaperSheet` (clip) + a 3-up **stats row** (Avg / Streak / Logged, accent
+left-border cards with `shadow.sm`) + a **mood Legend** folder card (ink tab, color dots +
+labels). **Timeline view** = `TimelineFeed`. Tapping a day → `DaySheet`; an entry → detail.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
