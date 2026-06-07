@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="th" data-dir="desk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DailyMood — บันทึกอารมณ์ทุกวัน ด้วย AI · Manila Desk</title>
+<meta name="description" content="DailyMood mood journal — track how you feel in 10 seconds with AI. Paper-desk visual direction.">
+<meta name="theme-color" content="#F1E5CF">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='2' y='2' width='28' height='28' rx='9' fill='%23FCA45B'/%3E%3Ccircle cx='12' cy='14' r='1.6' fill='%231A1320'/%3E%3Ccircle cx='20' cy='14' r='1.6' fill='%231A1320'/%3E%3Cpath d='M 11 20 Q 16 24 21 20' stroke='%231A1320' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="paper.css">
+<script>window.DM_DIR = 'desk';</script>
+</head>
+<body>
+<div id="root"></div>
+
+<script src="https://unpkg.com/react@18.3.1/umd/react.development.js" integrity="sha384-hD6/rw4ppMLGNu3tX5cjIb+uRZ7UkRJ6BPkLpg4hAu/6onKUg4lLsHAs9EBPT82L" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.development.js" integrity="sha384-u6aeetuaXnQ38mYT8rp6sbXaQe3NL9t+IBXmnYxwkUI2Hw4bsp2Wvmx4yRQF1uAm" crossorigin="anonymous"></script>
+<script src="https://unpkg.com/@babel/standalone@7.29.0/babel.min.js" integrity="sha384-m08KidiNqLdpJqLq95G/LEi8Qvjl/xUYll3QILypMoQ65QorJ9Lvtp2RXYGBFj1y" crossorigin="anonymous"></script>
+
+<script type="text/babel" src="i18n.jsx"></script>
+<script type="text/babel" src="pp-parts.jsx"></script>
+<script type="text/babel" src="pp-sections.jsx"></script>
+<script type="text/babel" data-presets="react">
+function Landing() {
+  return (
+    <LangProvider>
+      <Nav/>
+      <Hero/>
+      <ByNumbers/>
+      <AIShowcase/>
+      <DayTimeline/>
+      <YearInPixels/>
+      <FeaturesGrid/>
+      <Articles/>
+      <Testimonials/>
+      <Pricing/>
+      <FAQ/>
+      <CTABanner/>
+      <Footer/>
+    </LangProvider>
+  );
+}
+ReactDOM.createRoot(document.getElementById('root')).render(<Landing/>);
+</script>
+</body>
+</html>

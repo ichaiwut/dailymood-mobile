@@ -1,21 +1,28 @@
 /**
- * Mood sticker — a colored disc with the mood face, the Paper Desk signature
- * for moods. Mirrors the web `PASticker`: a vivid mood-colour disc + white ring
- * + the mood emoji. (Pack/custom SVG icons via R2 are a later enhancement;
- * emoji on the mood colour is the reliable native interpretation for now.)
+ * Mood sticker — a colored disc with a white border and a soft "peel" shadow
+ * (handoff `.sticker`). Renders the brand MoodFace when a `face` is given
+ * (mood contexts), or an emoji glyph otherwise (e.g. achievement badges).
  */
 import { View } from 'react-native';
 import { Text } from '../Text';
+import { MoodFace, faceForMood, type FaceType } from './MoodFace';
+import { useTheme } from '../../theme/ThemeProvider';
 
 export interface PAStickerProps {
   color: string;
-  emoji: string;
+  /** Brand mood face. Pass `moodId` instead and it's derived. */
+  face?: FaceType;
+  moodId?: string | null;
+  /** Emoji fallback when no face (badges etc.). */
+  emoji?: string;
   size?: number;
-  /** Soft colored halo behind the disc (used in empty states / heroes). */
   halo?: boolean;
 }
 
-export function PASticker({ color, emoji, size = 56, halo }: PAStickerProps) {
+export function PASticker({ color, face, moodId, emoji, size = 56, halo }: PAStickerProps) {
+  const { shadow } = useTheme();
+  const resolvedFace = face ?? (moodId !== undefined ? faceForMood(moodId) : undefined);
+
   const disc = (
     <View
       style={{
@@ -25,16 +32,16 @@ export function PASticker({ color, emoji, size = 56, halo }: PAStickerProps) {
         backgroundColor: color,
         alignItems: 'center',
         justifyContent: 'center',
-        borderWidth: 3,
+        borderWidth: 4,
         borderColor: '#fff',
-        shadowColor: 'rgba(26,19,32,0.25)',
-        shadowOffset: { width: 0, height: 3 },
-        shadowOpacity: 1,
-        shadowRadius: 4,
-        elevation: 3,
+        boxShadow: shadow.sticker,
       }}
     >
-      <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text>
+      {resolvedFace ? (
+        <MoodFace face={resolvedFace} size={size * 0.78} />
+      ) : (
+        <Text style={{ fontSize: size * 0.46 }}>{emoji ?? ''}</Text>
+      )}
     </View>
   );
 

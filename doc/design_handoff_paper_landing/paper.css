@@ -1,0 +1,251 @@
+/* ============================================================
+   DailyMood — "Paper Desk" landing aesthetic
+   Folder tabs · paperclips · washi tape · stickers · layered paper
+   Themed per direction via html[data-dir="desk|pop|scrapbook"]
+   Relies on tokens.css for --peach, --purple, --mint, etc.
+   ============================================================ */
+
+:root {
+  --kraft:    #E9D6B4;   /* manila folder back */
+  --kraft-2:  #DCC59A;
+  --kraft-edge: #CBB07F;
+  --paper:    #FFFFFF;
+  --paper-2:  #FCF7EE;
+  --desk:     #F2E7D2;   /* desk surface (overridden per dir) */
+  --desk-2:   #EADFC8;
+  --ink:      #1A1320;
+  --ink-2:    #5A4E62;
+  --ink-3:    #8C8497;
+  --plum:     #1A1320;   /* deep dark folder */
+  --plum-2:   #2A1F33;
+  --tab:      var(--peach);  /* primary tab color */
+  --clip:     #B7B2BC;       /* paperclip metal */
+  --line:     rgba(26,19,32,.10);
+  --tape:     rgba(252,164,91,.45);
+  --shadow-sm: 0 6px 16px -8px rgba(60,40,20,.30);
+  --shadow-md: 0 18px 40px -18px rgba(60,40,20,.40);
+  --shadow-lg: 0 36px 70px -30px rgba(40,20,10,.45);
+}
+
+/* ---- direction themes ---- */
+html[data-dir="desk"]      { --desk:#F1E5CF; --desk-2:#E8DABF; --tab:var(--peach); }
+html[data-dir="pop"]       { --desk:#FBF1E2; --desk-2:#FCA45B; --tab:#1A1320; }
+html[data-dir="scrapbook"] { --desk:#FBF7F0; --desk-2:#F4EEE3; --tab:var(--purple); --kraft:#FFFFFF; --kraft-2:#FBF5EB; }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; }
+body {
+  margin: 0; background: var(--desk); color: var(--ink);
+  font-family: var(--font); font-size: 17px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+/* paper grain on the desk */
+body::before {
+  content:''; position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: .5;
+  background-image:
+    radial-gradient(rgba(120,90,50,.06) 1px, transparent 1.4px);
+  background-size: 7px 7px;
+}
+.thai { font-family: 'Noto Sans Thai','Urbanist',system-ui,sans-serif; }
+
+.container { max-width: 1180px; margin: 0 auto; padding: 0 32px; position: relative; }
+@media (max-width: 720px){ .container { padding: 0 18px; } }
+.section { padding: 100px 0; position: relative; }
+@media (max-width: 720px){ .section { padding: 64px 0; } }
+
+/* ---------------- display type ---------------- */
+.display {
+  font-family: var(--font); font-weight: 800;
+  letter-spacing: -0.03em; line-height: .98; color: var(--ink);
+  text-wrap: balance;
+}
+.thai.display, .display .thai { letter-spacing: -0.01em; line-height: 1.05; }
+
+/* marker highlighter behind a word */
+.mark {
+  position: relative; white-space: nowrap; z-index: 0;
+  padding: 0 .12em;
+}
+.mark::before {
+  content:''; position: absolute; left: 0; right: 0; bottom: .04em; top: .18em;
+  background: var(--peach); z-index: -1; transform: rotate(-1.2deg);
+  border-radius: 6px 10px 7px 9px; opacity: .9;
+}
+.mark.mint::before   { background: var(--mint); }
+.mark.lav::before    { background: var(--lavender); }
+.mark.yellow::before { background: var(--yellow); }
+.mark.purple::before { background: var(--purple); }
+
+/* puffy sticker wordmark (used in pop dir) */
+.wordmark {
+  font-family: var(--font); font-weight: 800; letter-spacing: -0.02em;
+  display: inline-flex; align-items: center; gap: 9px;
+}
+
+/* ---------------- folder tab + body ---------------- */
+.folder { position: relative; }
+.tab {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 11px 26px 13px; border-radius: 16px 16px 0 0;
+  background: var(--tab); color: #fff; font-weight: 800;
+  font-size: 19px; letter-spacing: -0.01em; line-height: 1;
+  position: relative; z-index: 2; margin-bottom: -8px;
+  box-shadow: 0 -2px 0 rgba(0,0,0,.04) inset;
+}
+.tab.ink   { background: var(--ink); color:#fff; }
+.tab.mint  { background: var(--mint); color: var(--ink); }
+.tab.lav   { background: var(--lavender); color: var(--ink); }
+.tab.yellow{ background: var(--yellow); color: var(--ink); }
+.tab.purple{ background: var(--purple); color:#fff; }
+.tab.plum  { background: var(--plum); color:#fff; }
+.tab.paper { background: var(--paper); color: var(--ink); }
+/* small folded corner on the tab */
+.tab::after {
+  content:''; position: absolute; top: 0; right: -14px; width: 16px; height: 100%;
+  background: inherit; border-radius: 0 16px 0 0;
+  transform: skewX(20deg); transform-origin: bottom left; z-index: -1;
+}
+
+.sheet {
+  background: var(--paper); border-radius: 4px 20px 20px 20px;
+  box-shadow: var(--shadow-md);
+  position: relative;
+}
+.sheet.kraft { background: var(--kraft); }
+.sheet.plum  { background: linear-gradient(155deg, var(--plum-2), var(--plum)); color:#fff; }
+.sheet.peach { background: var(--peach); color:#fff; }
+
+/* layered paper stack behind a card */
+.stacked { position: relative; }
+.stacked::before, .stacked::after {
+  content:''; position: absolute; inset: 0; z-index: -1;
+  background: var(--paper); border-radius: 14px;
+  box-shadow: var(--shadow-sm);
+}
+.stacked::before { transform: rotate(-2.2deg) translateY(6px); background: var(--paper-2); }
+.stacked::after  { transform: rotate(1.8deg) translateY(3px); background: #fff; }
+
+/* ---------------- paperclip ---------------- */
+.clip {
+  position: absolute; top: -16px; left: 28px; z-index: 6;
+  filter: drop-shadow(0 3px 4px rgba(0,0,0,.22));
+  transform: rotate(-8deg);
+}
+
+/* ---------------- washi tape ---------------- */
+.washi {
+  position: absolute; z-index: 6; height: 30px; width: 116px;
+  top: -13px; left: 50%; transform: translateX(-50%) rotate(-3deg);
+  background: var(--tape);
+  box-shadow: 0 2px 8px rgba(0,0,0,.10);
+  -webkit-mask: repeating-linear-gradient(90deg,#000 0 5px, transparent 5px 7px) left/100% 4px no-repeat,
+                repeating-linear-gradient(90deg,#000 0 5px, transparent 5px 7px) bottom/100% 4px no-repeat,
+                linear-gradient(#000,#000);
+          mask: repeating-linear-gradient(90deg,#000 0 5px, transparent 5px 7px) left/100% 4px no-repeat,
+                repeating-linear-gradient(90deg,#000 0 5px, transparent 5px 7px) bottom/100% 4px no-repeat,
+                linear-gradient(#000,#000);
+}
+.washi::after {
+  content:''; position: absolute; inset: 0;
+  background-image: repeating-linear-gradient(90deg, rgba(255,255,255,.35) 0 2px, transparent 2px 10px);
+  opacity:.6;
+}
+.washi.mint   { background: rgba(133,236,203,.6); }
+.washi.lav    { background: rgba(212,190,228,.7); }
+.washi.yellow { background: rgba(253,203,86,.6); }
+.washi.purple { background: rgba(166,115,241,.5); }
+
+/* ---------------- sticker (mood face peel) ---------------- */
+.sticker {
+  position: absolute; z-index: 7; border-radius: 50%;
+  display: grid; place-items: center; background:#fff;
+  border: 4px solid #fff;
+  box-shadow: 0 10px 22px -8px rgba(0,0,0,.30);
+}
+
+/* ---------------- chips / eyebrow ---------------- */
+.eyebrow {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 6px 13px; border-radius: 100px; background: var(--ink);
+  color: #fff; font-weight: 800; font-size: 11px;
+  letter-spacing: .12em; text-transform: uppercase;
+}
+.eyebrow.light { background:#fff; color: var(--ink); box-shadow: var(--shadow-sm); }
+
+.chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 6px 12px; border-radius: 100px; font-size: 13px; font-weight: 700;
+  background:#fff; color: var(--ink); box-shadow: var(--shadow-sm);
+}
+
+/* ---------------- buttons ---------------- */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 9px;
+  height: 54px; padding: 0 26px; border-radius: 14px;
+  font-family: var(--font); font-weight: 800; font-size: 16px;
+  border: none; cursor: pointer; text-decoration: none;
+  transition: transform .14s ease, box-shadow .2s ease, filter .15s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-peach { background: var(--peach); color:#fff; box-shadow: 0 10px 0 -2px #d97f3b, 0 18px 30px -14px rgba(217,127,59,.7); }
+.btn-peach:hover { filter: brightness(1.03); transform: translateY(-2px); box-shadow: 0 12px 0 -2px #d97f3b, 0 22px 34px -14px rgba(217,127,59,.75); }
+.btn-ink { background: var(--ink); color:#fff; box-shadow: 0 9px 0 -2px #000, 0 18px 30px -16px rgba(0,0,0,.6); }
+.btn-ink:hover { transform: translateY(-2px); }
+.btn-white { background:#fff; color: var(--ink); box-shadow: 0 9px 0 -2px #d9cdb8, 0 18px 30px -16px rgba(0,0,0,.3); }
+.btn-white:hover { transform: translateY(-2px); }
+.btn-ghost { background: transparent; color: var(--ink); border: 2px solid var(--ink); }
+.btn-ghost:hover { background: var(--ink); color:#fff; }
+
+/* nav link */
+.navlink { color: var(--ink); text-decoration: none; font-weight: 700; font-size: 15px; opacity:.85; }
+.navlink:hover { opacity: 1; }
+
+/* focal 14-day trial callout */
+.trial-focal {
+  display: inline-flex; align-items: center; gap: 15px; text-decoration: none; color: var(--ink);
+  background: #fff; border: 2.5px solid var(--ink); border-radius: 16px;
+  padding: 11px 16px 11px 11px; max-width: 470px;
+  box-shadow: 0 8px 0 -1px var(--ink), 0 18px 30px -16px rgba(0,0,0,.4);
+  transition: transform .14s ease, box-shadow .2s ease;
+}
+.trial-focal:hover { transform: translateY(-2px); box-shadow: 0 10px 0 -1px var(--ink), 0 22px 34px -16px rgba(0,0,0,.45); }
+.trial-focal:focus-visible { outline: 3px solid var(--purple); outline-offset: 3px; }
+.trial-badge {
+  flex: none; width: 54px; height: 54px; border-radius: 12px; display: grid; place-items: center;
+  font-weight: 800; font-size: 27px; color: #fff; line-height: 1;
+  background: linear-gradient(135deg, var(--peach), var(--purple));
+  box-shadow: 0 6px 14px -4px rgba(166,115,241,.6);
+}
+.trial-txt { display: flex; flex-direction: column; line-height: 1.2; }
+.trial-txt b { font-size: 17px; font-weight: 800; white-space: nowrap; }
+.trial-txt small { font-size: 12.5px; color: var(--ink-3); font-weight: 700; margin-top: 3px; white-space: nowrap; }
+.trial-arrow { margin-left: auto; padding-left: 6px; color: var(--ink); display: inline-flex; }
+
+/* misc */
+.cc-no-scrollbar::-webkit-scrollbar{ display:none; }
+.cc-no-scrollbar{ scrollbar-width:none; }
+
+@keyframes floaty { 0%,100%{ transform: translateY(0) rotate(var(--r,0deg)); } 50%{ transform: translateY(-12px) rotate(var(--r,0deg)); } }
+.floaty { animation: floaty 6s ease-in-out infinite; }
+@keyframes bouncy { 0%,100%{ transform: translateY(0) rotate(var(--r,0deg)); } 50%{ transform: translateY(-16px) rotate(calc(var(--r,0deg) + 4deg)); } }
+.bouncy { animation: bouncy 3.2s cubic-bezier(.5,0,.5,1) infinite; }
+
+@keyframes risein { from{ opacity:0; transform: translateY(26px); } to{ opacity:1; transform: translateY(0); } }
+.risein { animation: risein .7s cubic-bezier(.2,.7,.2,1) both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .floaty, .bouncy, .risein { animation: none !important; }
+}
+
+/* ---------------- responsive ---------------- */
+@media (max-width: 980px){
+  .grid-2 { grid-template-columns: 1fr !important; }
+  .grid-3 { grid-template-columns: 1fr 1fr !important; }
+  .grid-4 { grid-template-columns: 1fr 1fr !important; }
+  .hero-grid { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 640px){
+  .nav-links { display: none !important; }
+  .hide-sm { display: none !important; }
+  .grid-3, .grid-4 { grid-template-columns: 1fr !important; }
+}

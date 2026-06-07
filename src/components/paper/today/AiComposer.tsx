@@ -18,7 +18,7 @@ import { useSmartLog } from '../smartlog/SmartLogProvider';
 
 export function AiComposer() {
   const { t, i18n } = useTranslation();
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space, brand, sheetRadius, shadow } = useTheme();
   const activities = useActivities();
   const smartLog = useSmartLog();
 
@@ -32,16 +32,10 @@ export function AiComposer() {
     <View
       style={{
         backgroundColor: colors.surface,
-        borderRadius: radius.lg,
-        borderWidth: 1,
-        borderColor: colors.hairline,
+        ...sheetRadius,
         padding: space.xl,
         gap: space.lg,
-        shadowColor: colors.paperShadow,
-        shadowOffset: { width: 6, height: 8 },
-        shadowOpacity: 1,
-        shadowRadius: 0,
-        elevation: 6,
+        boxShadow: shadow.md,
       }}
     >
       {/* header */}

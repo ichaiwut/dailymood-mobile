@@ -1,14 +1,14 @@
 /**
- * Greeting folder — a date-tab paper folder with a paperclip, the time-of-day
- * greeting, the highlighted "how are you feeling?" question, and the mood grid
- * (circular sticker discs). Tapping a mood opens Smart Log preselected.
+ * Greeting folder — date-tab folder with a paperclip, the time-of-day greeting,
+ * the highlighted "how are you feeling?" question, and the mood disc grid.
+ * Tapping a mood opens Smart Log preselected.
  */
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../../Text';
 import { MarkSentence } from '../../Mark';
 import { MoodPicker } from '../../MoodPicker';
-import { PAClip } from '../PAClip';
+import { PaperSheet } from '../PaperSheet';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useMoods } from '../../../hooks/queries';
 import { useSmartLog } from '../smartlog/SmartLogProvider';
@@ -30,49 +30,14 @@ function todayLabel(locale: string): string {
 
 export function GreetingFolder() {
   const { t, i18n } = useTranslation();
-  const { colors, radius, space } = useTheme();
+  const { colors, space } = useTheme();
   const moods = useMoods();
   const smartLog = useSmartLog();
 
   return (
-    <View>
-      {/* folder tab */}
-      <View
-        style={{
-          alignSelf: 'flex-start',
-          backgroundColor: colors.primary,
-          borderTopLeftRadius: radius.md,
-          borderTopRightRadius: radius.md,
-          paddingHorizontal: space.lg,
-          paddingVertical: 6,
-          marginBottom: -2,
-        }}
-      >
-        <Text variant="eyebrow" color="#fff">{todayLabel(i18n.language)}</Text>
-      </View>
-
-      <View
-        style={{
-          backgroundColor: colors.surface,
-          borderTopLeftRadius: 0,
-          borderRadius: radius.lg,
-          borderWidth: 1,
-          borderColor: colors.hairline,
-          padding: space.xl,
-          gap: space.lg,
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 6, height: 8 },
-          shadowOpacity: 1,
-          shadowRadius: 0,
-          elevation: 6,
-        }}
-      >
-        {/* paperclip overhang */}
-        <View style={{ position: 'absolute', right: 18, top: -14 }}>
-          <PAClip />
-        </View>
-
-        <View style={{ gap: 4 }}>
+    <PaperSheet tab={todayLabel(i18n.language)} clip>
+      <View style={{ gap: space.lg }}>
+        <View style={{ gap: 6 }}>
           <Text variant="label" weight="bold" color={colors.primary}>
             {t(`today.${greetingKey()}`)}
           </Text>
@@ -85,6 +50,6 @@ export function GreetingFolder() {
           onSelect={(m) => smartLog.open({ moodId: m.id })}
         />
       </View>
-    </View>
+    </PaperSheet>
   );
 }

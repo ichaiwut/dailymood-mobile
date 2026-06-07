@@ -1,14 +1,16 @@
 /**
- * Chunky offset-shadow button (Paper Desk). Variants:
- *   - primary: peach fill (the main CTA)
- *   - ink: dark fill
- *   - paper: white/outline (used for Google/secondary)
+ * Chunky offset-shadow button (Paper Desk signature). Variants:
+ *   - primary: peach fill + peach hard-shadow (main CTA)
+ *   - ink: dark fill + black hard-shadow
+ *   - paper: white fill + warm hard-shadow (secondary / Google)
+ *   - ghost: outline
+ * Pressing settles the button down (translateY).
  */
 import { Pressable, ActivityIndicator, View, type ViewStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 import { Text } from './Text';
 
-type Variant = 'primary' | 'ink' | 'paper';
+type Variant = 'primary' | 'ink' | 'paper' | 'ghost';
 
 export interface ButtonProps {
   label: string;
@@ -16,7 +18,6 @@ export interface ButtonProps {
   variant?: Variant;
   loading?: boolean;
   disabled?: boolean;
-  /** Optional leading element (e.g. a Google glyph). */
   leading?: React.ReactNode;
   style?: ViewStyle;
 }
@@ -30,13 +31,27 @@ export function Button({
   leading,
   style,
 }: ButtonProps) {
-  const { colors, radius, space } = useTheme();
+  const { colors, shadow, brand } = useTheme();
   const isDisabled = disabled || loading;
 
   const bg =
-    variant === 'primary' ? colors.accent : variant === 'ink' ? colors.ink : colors.surface;
-  const fg = variant === 'paper' ? colors.ink : '#fff';
-  const border = variant === 'paper' ? colors.hairline2 : 'transparent';
+    variant === 'primary'
+      ? brand.peach
+      : variant === 'ink'
+        ? colors.ink
+        : variant === 'paper'
+          ? colors.surface
+          : 'transparent';
+  const fg = variant === 'primary' || variant === 'ink' ? '#fff' : colors.ink;
+  const boxShadow =
+    variant === 'primary'
+      ? shadow.btnPeach
+      : variant === 'ink'
+        ? shadow.btnInk
+        : variant === 'paper'
+          ? shadow.btnWhite
+          : undefined;
+  const border = variant === 'ghost' ? colors.ink : variant === 'paper' ? colors.hairline : 'transparent';
 
   return (
     <Pressable
@@ -46,22 +61,18 @@ export function Button({
       style={({ pressed }) => [
         {
           backgroundColor: bg,
-          borderRadius: radius.md,
-          borderWidth: 1,
+          borderRadius: 14,
+          borderWidth: variant === 'ghost' || variant === 'paper' ? 2 : 0,
           borderColor: border,
-          paddingVertical: 16,
-          paddingHorizontal: space.xl,
+          height: 54,
+          paddingHorizontal: 24,
           flexDirection: 'row',
           alignItems: 'center',
           justifyContent: 'center',
-          gap: space.sm,
-          opacity: isDisabled ? 0.55 : 1,
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 0, height: pressed ? 1 : 4 },
-          shadowOpacity: 1,
-          shadowRadius: 0,
-          elevation: pressed ? 1 : 4,
-          transform: [{ translateY: pressed ? 3 : 0 }],
+          gap: 9,
+          opacity: isDisabled ? 0.5 : 1,
+          boxShadow: pressed ? undefined : boxShadow,
+          transform: [{ translateY: pressed ? 2 : 0 }],
         },
         style,
       ]}
@@ -71,7 +82,7 @@ export function Button({
       ) : (
         <>
           {leading ? <View>{leading}</View> : null}
-          <Text variant="label" color={fg}>
+          <Text variant="label" weight="extrabold" color={fg}>
             {label}
           </Text>
         </>

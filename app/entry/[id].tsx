@@ -25,7 +25,7 @@ import { errorMessageKey } from '../../src/api/errors';
 export default function EntryDetailScreen() {
   const { id } = useLocalSearchParams<{ id: string }>();
   const { t, i18n } = useTranslation();
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space, brand, sheetRadius, shadow } = useTheme();
   const router = useRouter();
   const entry = useEntry(id);
   const moods = useMoods();
@@ -86,21 +86,15 @@ export default function EntryDetailScreen() {
               <View
                 style={{
                   backgroundColor: colors.surface,
+                  ...sheetRadius,
                   borderTopLeftRadius: 0,
-                  borderRadius: radius.lg,
-                  borderWidth: 1,
-                  borderColor: colors.hairline,
                   padding: space.xl,
                   gap: space.md,
                   alignItems: 'center',
-                  shadowColor: colors.paperShadow,
-                  shadowOffset: { width: 6, height: 8 },
-                  shadowOpacity: 1,
-                  shadowRadius: 0,
-                  elevation: 6,
+                  boxShadow: shadow.md,
                 }}
               >
-                <PASticker color={accent} emoji={mood?.emoji ?? '🙂'} size={72} halo />
+                <PASticker color={accent} moodId={mood?.id} size={72} halo />
                 <Text variant="title">{moodLabel(mood, i18n.language)}</Text>
                 <Text variant="body" color={colors.ink2}>
                   {formatDateKey(entry.data.date, i18n.language)}

@@ -15,7 +15,7 @@ import { findMood } from '../../../lib/mood';
 
 export function EmptyToday() {
   const { t } = useTranslation();
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space, brand, shadow } = useTheme();
   const smartLog = useSmartLog();
   const moods = useMoods();
   // a calm/happy face for the empty state
@@ -30,21 +30,15 @@ export function EmptyToday() {
         style={{
           backgroundColor: colors.surface,
           borderRadius: radius.lg,
-          borderWidth: 1,
-          borderColor: colors.hairline,
           padding: space.x2,
           alignItems: 'center',
           gap: space.md,
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 6, height: 8 },
-          shadowOpacity: 1,
-          shadowRadius: 0,
-          elevation: 6,
+          boxShadow: shadow.md,
         }}
       >
         <PASticker
           color={happy?.color ?? brand.mint}
-          emoji={happy?.emoji ?? '🙂'}
+          moodId={happy?.id ?? 'happy'}
           size={64}
           halo
         />

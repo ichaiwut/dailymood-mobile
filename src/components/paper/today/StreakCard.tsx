@@ -7,7 +7,7 @@ import { WashiTape } from '../WashiTape';
 import { useTheme } from '../../../theme/ThemeProvider';
 
 export function StreakCard({ streak }: { streak: number }) {
-  const { colors, radius, space, brand } = useTheme();
+  const { colors, radius, space, brand, shadow } = useTheme();
   const bars = Array.from({ length: 14 }, (_, i) => i < Math.min(streak, 14));
 
   return (
@@ -19,15 +19,9 @@ export function StreakCard({ streak }: { streak: number }) {
         style={{
           backgroundColor: colors.surface,
           borderRadius: radius.lg,
-          borderWidth: 1,
-          borderColor: colors.hairline,
           padding: space.xl,
           gap: space.md,
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 6, height: 8 },
-          shadowOpacity: 1,
-          shadowRadius: 0,
-          elevation: 6,
+          boxShadow: shadow.md,
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>

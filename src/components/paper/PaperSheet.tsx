@@ -1,67 +1,116 @@
 /**
- * A sheet of paper: rounded surface with a chunky offset shadow — the core
- * Paper Desk surface. `tab` renders a folder-tab label on the top-left.
+ * Paper Desk folder = a tab (rounded top + folded corner) sitting over a sheet
+ * body (asymmetric radius — the 4px top-left corner reads as a folder seam —
+ * with a soft warm shadow). Ported from the handoff `.tab` / `.sheet`.
  */
 import type { ReactNode } from 'react';
-import { View, StyleSheet, type ViewStyle } from 'react-native';
+import { View, type ViewStyle } from 'react-native';
 import { useTheme } from '../../theme/ThemeProvider';
 import { Text } from '../Text';
+import { PAClip } from './PAClip';
+import { WashiTape } from './WashiTape';
+
+type SheetVariant = 'paper' | 'kraft' | 'plum' | 'peach';
+
+/** A folder tab with a skewed folded corner. */
+export function FolderTab({ label, bg, fg }: { label: string; bg: string; fg?: string }) {
+  const { space } = useTheme();
+  return (
+    <View style={{ alignSelf: 'flex-start', zIndex: 2, marginBottom: -8 }}>
+      <View
+        style={{
+          backgroundColor: bg,
+          borderTopLeftRadius: 16,
+          borderTopRightRadius: 16,
+          paddingHorizontal: 24,
+          paddingTop: 10,
+          paddingBottom: 13,
+        }}
+      >
+        <Text style={{ fontFamily: 'Urbanist_800ExtraBold', fontSize: 18, color: fg ?? '#fff', letterSpacing: -0.2 }}>
+          {label}
+        </Text>
+      </View>
+      {/* folded corner */}
+      <View
+        style={{
+          position: 'absolute',
+          top: 0,
+          right: -11,
+          width: 16,
+          height: '100%',
+          backgroundColor: bg,
+          borderTopRightRadius: 16,
+          transform: [{ skewX: '20deg' }],
+          zIndex: -1,
+        }}
+      />
+    </View>
+  );
+}
 
 export interface PaperSheetProps {
   children: ReactNode;
   tab?: string;
   tabColor?: string;
+  tabTextColor?: string;
+  variant?: SheetVariant;
+  clip?: boolean;
+  washi?: boolean;
+  washiColor?: string;
   style?: ViewStyle;
-  /** Slight rotation in degrees for the scrapbook feel. */
   rotate?: number;
 }
 
-export function PaperSheet({ children, tab, tabColor, style, rotate = 0 }: PaperSheetProps) {
-  const { colors, radius, space } = useTheme();
+export function PaperSheet({
+  children,
+  tab,
+  tabColor,
+  tabTextColor,
+  variant = 'paper',
+  clip,
+  washi,
+  washiColor,
+  style,
+  rotate = 0,
+}: PaperSheetProps) {
+  const { colors, sheetRadius, space, shadow, brand } = useTheme();
+
+  const bg =
+    variant === 'kraft'
+      ? colors.kraft
+      : variant === 'plum'
+        ? colors.plum2
+        : variant === 'peach'
+          ? brand.peach
+          : colors.surface;
+  const onDark = variant === 'plum' || variant === 'peach';
+
   return (
     <View style={[rotate ? { transform: [{ rotate: `${rotate}deg` }] } : null, style]}>
-      {tab ? (
-        <View
-          style={[
-            styles.tab,
-            {
-              backgroundColor: tabColor ?? colors.primary,
-              borderTopLeftRadius: radius.md,
-              borderTopRightRadius: radius.md,
-              paddingHorizontal: space.lg,
-            },
-          ]}
-        >
-          <Text variant="eyebrow" color="#fff">
-            {tab}
-          </Text>
-        </View>
-      ) : null}
+      {tab ? <FolderTab label={tab} bg={tabColor ?? colors.primary} fg={tabTextColor} /> : null}
       <View
         style={{
-          backgroundColor: colors.surface,
-          borderRadius: radius.lg,
-          borderTopLeftRadius: tab ? 0 : radius.lg,
+          backgroundColor: bg,
+          ...sheetRadius,
+          // when a tab sits on top, keep the seam tight at top-left
+          borderTopLeftRadius: tab ? 0 : sheetRadius.borderTopLeftRadius,
           padding: space.xl,
-          borderWidth: 1,
-          borderColor: colors.hairline,
-          // chunky offset shadow
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 6, height: 8 },
-          shadowOpacity: 1,
-          shadowRadius: 0,
-          elevation: 6,
+          boxShadow: shadow.md,
         }}
       >
-        {children}
+        {clip ? (
+          <View style={{ position: 'absolute', top: -14, left: 24, zIndex: 6 }}>
+            <PAClip />
+          </View>
+        ) : null}
+        {washi ? (
+          <View style={{ position: 'absolute', top: -12, alignSelf: 'center', zIndex: 6 }}>
+            <WashiTape color={washiColor ?? colors.washi} />
+          </View>
+        ) : null}
+        <View style={onDark ? undefined : undefined}>{children}</View>
       </View>
     </View>
   );
 }
-
-const styles = StyleSheet.create({
-  tab: {
-    alignSelf: 'flex-start',
-    paddingVertical: 6,
-  },
-});

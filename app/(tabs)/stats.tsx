@@ -120,7 +120,7 @@ export default function StatsScreen() {
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                 <PASticker
                   color={findMood(moods.data, stats.data.bestDay.moodId)?.color ?? colors.primary}
-                  emoji={findMood(moods.data, stats.data.bestDay.moodId)?.emoji ?? '🙂'}
+                  moodId={stats.data.bestDay.moodId}
                   size={44}
                 />
                 <View>

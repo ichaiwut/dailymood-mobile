@@ -1,6 +1,6 @@
 /**
- * Theme context. Resolves the active color scheme from the OS (userInterfaceStyle
- * is "automatic") and exposes the Paper Desk palette + scales to the tree.
+ * Theme context. Dark mode is force-disabled for now (M6); flip FORCE_LIGHT to
+ * follow the OS scheme once the dark Paper Desk palette is tuned.
  */
 import { createContext, useContext, useMemo, type ReactNode } from 'react';
 import { useColorScheme } from 'react-native';
@@ -8,8 +8,10 @@ import {
   palettes,
   space,
   radius,
+  sheetRadius,
   fontSize,
   brand,
+  shadow,
   type ColorScheme,
   type ThemeColors,
 } from './tokens';
@@ -19,23 +21,21 @@ export interface Theme {
   colors: ThemeColors;
   space: typeof space;
   radius: typeof radius;
+  sheetRadius: typeof sheetRadius;
   fontSize: typeof fontSize;
   brand: typeof brand;
+  shadow: typeof shadow;
 }
 
 const ThemeContext = createContext<Theme | null>(null);
 
-/**
- * Dark mode is intentionally disabled for now — the Paper Desk dark palette
- * isn't tuned yet (M6 polish). Flip to false to follow the OS color scheme.
- */
 const FORCE_LIGHT = true;
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
   const osScheme = useColorScheme();
   const scheme: ColorScheme = FORCE_LIGHT ? 'light' : osScheme === 'dark' ? 'dark' : 'light';
   const theme = useMemo<Theme>(
-    () => ({ scheme, colors: palettes[scheme], space, radius, fontSize, brand }),
+    () => ({ scheme, colors: palettes[scheme], space, radius, sheetRadius, fontSize, brand, shadow }),
     [scheme],
   );
   return <ThemeContext.Provider value={theme}>{children}</ThemeContext.Provider>;

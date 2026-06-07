@@ -28,7 +28,7 @@ export interface EntryFolderCardProps {
 
 export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolderCardProps) {
   const { t, i18n } = useTranslation();
-  const { colors, radius, space } = useTheme();
+  const { colors, radius, space, sheetRadius, shadow } = useTheme();
   const tod = timeOfDay(entry.createdAt);
   const accent = mood?.color ?? colors.primary;
 
@@ -61,22 +61,16 @@ export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolde
         accessibilityRole={onPress ? 'button' : undefined}
         style={{
           backgroundColor: colors.surface,
+          ...sheetRadius,
           borderTopLeftRadius: 0,
-          borderRadius: radius.lg,
-          borderWidth: 1,
-          borderColor: colors.hairline,
           padding: space.lg,
           flexDirection: 'row',
           gap: space.md,
           alignItems: 'flex-start',
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 4, height: 6 },
-          shadowOpacity: 1,
-          shadowRadius: 0,
-          elevation: 4,
+          boxShadow: shadow.sm,
         }}
       >
-        <PASticker color={accent} emoji={mood?.emoji ?? '🙂'} size={44} />
+        <PASticker color={accent} moodId={mood?.id} size={44} />
         <View style={{ flex: 1, gap: 6 }}>
           <Text variant="label" color={colors.ink2}>
             {moodLabel(mood, i18n.language)}

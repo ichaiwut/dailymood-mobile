@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="th" data-dir="desk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DailyMood Landing — 3 Directions</title>
+<link rel="stylesheet" href="tokens.css">
+<link rel="stylesheet" href="paper.css">
+<style>
+  body { padding: 0; }
+  .wrap { max-width: 1240px; margin: 0 auto; padding: 56px 32px 90px; position: relative; z-index: 1; }
+  .head { max-width: 720px; margin-bottom: 48px; }
+  .cards { display: grid; grid-template-columns: repeat(3, 1fr); gap: 28px; }
+  @media (max-width: 1040px){ .cards { grid-template-columns: 1fr; max-width: 560px; margin: 0 auto; } }
+  .pv {
+    position: relative; height: 300px; border-radius: 12px; overflow: hidden;
+    background: #fff; box-shadow: var(--shadow-md); border: 1px solid var(--line);
+    --pvs: .42;
+  }
+  @media (min-width: 1040px){ .pv { --pvs: .265; } }
+  .pv iframe {
+    width: 1280px; height: 1700px; border: 0; transform: scale(var(--pvs)); transform-origin: top left;
+    pointer-events: none;
+  }
+  .pv .veil { position: absolute; inset: 0; cursor: pointer; }
+  .num { font-size: 13px; font-weight: 800; letter-spacing: .12em; color: var(--ink-3); text-transform: uppercase; }
+  .meta { display: flex; gap: 8px; flex-wrap: wrap; margin: 14px 0 16px; }
+  .swatch { width: 22px; height: 22px; border-radius: 6px; box-shadow: inset 0 0 0 1px rgba(0,0,0,.06); }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <div class="head">
+    <span class="eyebrow">DailyMood · Landing redesign</span>
+    <h1 class="display thai" style="font-size:clamp(34px,5vw,60px); margin:18px 0 14px;">3 ทิศทางสไตล์ “กระดาษ–แฟ้ม”</h1>
+    <p class="thai" style="font-size:18px; color:var(--ink-2); margin:0; max-width:640px;">
+      ปรับลุคจากเว็บทีมชัชชาติมาเป็นโทนสีของ DailyMood — แฟ้มเอกสาร แท็บ คลิปหนีบ เทปกระดาษ และสติกเกอร์หน้าอารมณ์ คลิกเปิดดูฉบับเต็มได้เลย แล้วบอกได้ว่าชอบอันไหน หรือจะผสมกัน
+    </p>
+  </div>
+
+  <div class="cards">
+    <!-- D1 -->
+    <div class="folder">
+      <div class="tab" style="background:var(--peach);">01 · Manila Desk</div>
+      <div class="sheet" style="background:#fff; border-radius:4px 18px 18px 18px; padding:18px;">
+        <div class="pv"><iframe src="Landing-Manila-Desk.html" scrolling="no" title="Manila Desk"></iframe><a class="veil" href="Landing-Manila-Desk.html"></a></div>
+        <div class="meta">
+          <span class="swatch" style="background:#F1E5CF"></span>
+          <span class="swatch" style="background:var(--peach)"></span>
+          <span class="swatch" style="background:var(--kraft)"></span>
+          <span class="swatch" style="background:var(--plum)"></span>
+        </div>
+        <p class="thai" style="font-size:15px; color:var(--ink-2); margin:0 0 18px; line-height:1.55;">
+          อบอุ่นแบบโต๊ะทำงานกระดาษคราฟท์ ใช้พีชเป็นสีหลัก คลิปหนีบโลหะ กระดาษซ้อนเอียงเล็กน้อย โซนเข้มเป็นสีพลัม
+        </p>
+        <a class="btn btn-peach" style="width:100%;" href="Landing-Manila-Desk.html">เปิดฉบับเต็ม →</a>
+      </div>
+    </div>
+
+    <!-- D2 -->
+    <div class="folder">
+      <div class="tab" style="background:var(--ink);">02 · Highlighter Pop</div>
+      <div class="sheet" style="background:#fff; border-radius:4px 18px 18px 18px; padding:18px;">
+        <div class="pv"><iframe src="Landing-Highlighter-Pop.html" scrolling="no" title="Highlighter Pop"></iframe><a class="veil" href="Landing-Highlighter-Pop.html"></a></div>
+        <div class="meta">
+          <span class="swatch" style="background:var(--peach)"></span>
+          <span class="swatch" style="background:#fff"></span>
+          <span class="swatch" style="background:var(--ink)"></span>
+          <span class="swatch" style="background:var(--yellow)"></span>
+        </div>
+        <p class="thai" style="font-size:15px; color:var(--ink-2); margin:0 0 18px; line-height:1.55;">
+          เสียงดังสุด แถบสีพีชเต็มบล็อกสลับครีม การ์ดขาวลอยเด่น สติกเกอร์หน้าอารมณ์เด้งดึ๋ง พลังเยอะ สะดุดตา
+        </p>
+        <a class="btn btn-ink" style="width:100%;" href="Landing-Highlighter-Pop.html">เปิดฉบับเต็ม →</a>
+      </div>
+    </div>
+
+    <!-- D3 -->
+    <div class="folder">
+      <div class="tab" style="background:var(--purple); color:#fff;">03 · Soft Scrapbook</div>
+      <div class="sheet" style="background:#fff; border-radius:4px 18px 18px 18px; padding:18px;">
+        <div class="pv"><iframe src="Landing-Soft-Scrapbook.html" scrolling="no" title="Soft Scrapbook"></iframe><a class="veil" href="Landing-Soft-Scrapbook.html"></a></div>
+        <div class="meta">
+          <span class="swatch" style="background:#FBF7F0"></span>
+          <span class="swatch" style="background:var(--lavender)"></span>
+          <span class="swatch" style="background:var(--mint)"></span>
+          <span class="swatch" style="background:var(--purple)"></span>
+        </div>
+        <p class="thai" style="font-size:15px; color:var(--ink-2); margin:0 0 18px; line-height:1.55;">
+          เบาสบาย พรีเมียม โทนพาสเทล ใช้เทปกระดาษ (washi) แทนคลิป เงานุ่ม เว้นที่ว่างเยอะ เหมาะกับอารมณ์สงบ ๆ
+        </p>
+        <a class="btn btn-ghost" style="width:100%; border-color:var(--purple); color:var(--purple);" href="Landing-Soft-Scrapbook.html">เปิดฉบับเต็ม →</a>
+      </div>
+    </div>
+  </div>
+</div>
+</body>
+</html>
