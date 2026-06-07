@@ -51,7 +51,7 @@ function ToastView({ message, tone, onHide }: { message: string; tone: Tone; onH
   return (
     <View
       pointerEvents="box-none"
-      style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 104, alignItems: 'center', paddingHorizontal: 24 }}
+      style={{ position: 'absolute', left: 0, right: 0, top: insets.top + 12, alignItems: 'center', paddingHorizontal: 24 }}
     >
       <Pressable
         onPress={onHide}

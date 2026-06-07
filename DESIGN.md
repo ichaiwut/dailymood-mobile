@@ -71,8 +71,9 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
 
 - **`Text`** — font routing + ≥14px floor. Variants: label/body/title/h2/h1/display.
 - **`Toast`** — `ToastProvider` (mounted in root `_layout`) + `useToast().show(msg, tone)`.
-  Brief confirmation pill above the bottom nav (white sheet, soft shadow, check/✕ glyph),
-  auto-dismiss ~2.6s. Fired on entry save (drawer + edit). Success/error tones.
+  Brief confirmation pill at **top-center** (below the status bar; white sheet, soft
+  shadow, check/✕ glyph), auto-dismiss ~2.6s. Fired on entry save (drawer + edit).
+  Success/error tones.
 - **`Button`** (`src/components/Button.tsx`) — variants `primary`(peach) / `ink` /
   `paper`(white) / `ghost` / `purple`, each with its chunky `boxShadow`. Height 54,
   radius 14, settles `translateY(2)` on press.
