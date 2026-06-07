@@ -1,0 +1,139 @@
+# DailyMood Mobile — Design System ("Paper Desk")
+
+> **Living doc — keep it current.** Whenever you change or add anything visual
+> (tokens, a component's look, a screen, an icon, a shadow), update this file in
+> the **same commit**. This is the design source of truth for future sessions.
+> Incoming references (do not edit): `handover-doc/mobile-handoff/` and
+> `doc/design_handoff_paper_landing/`. **This file** records what is actually built.
+
+The aesthetic is **"Paper Desk"**: a kraft-cream desk, white paper sheets with an
+asymmetric folder-seam radius, washi tape, paperclips, mood-face stickers, soft
+warm shadows on paper, and chunky offset shadows on buttons.
+
+---
+
+## 1. Tokens — `src/theme/tokens.ts`
+
+Exposed via `useTheme()` (`src/theme/ThemeProvider.tsx`). Dark mode is
+**force-disabled** (`FORCE_LIGHT = true`) but the palette is kept for later.
+
+### Colors (light)
+| Token | Value | Use |
+|---|---|---|
+| `bg` | `#F1E5CF` | kraft-cream desk background |
+| `surface` | `#FFFFFF` | paper (sheets, tiles, bottom sheet, cancel button) |
+| `surface2` | `#FCF7EE` | inset paper (textarea fill) |
+| `surface3` | `#F2F0F5` | neutral tint (unselected mood disc, close button) |
+| `kraft` | `#E9D6B4` | manila folder back |
+| `ink` | `#1A1320` | primary text, selected borders |
+| `ink2` | `#5A4E62` | secondary text, labels, dates |
+| `ink3` | `#8C8497` | eyebrows, hints, AI-remaining counter |
+| `clip` | `#B7B2BC` | paperclip stroke |
+| `hairline` | `rgba(26,19,32,.10)` | tile borders (unselected) |
+| `hairline2` | `rgba(26,19,32,.16)` | stronger hairline, chips |
+| `danger` `#E2483D` · `success` `#1EA672` · `primary` = `brand.purple` · `accent` = `brand.peach` | | |
+
+### Brand hues (`brand`)
+purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D97F3B`
+· mint `#85ECCB` · yellow `#FDCB56` · blue `#9ACDE2` · lavender `#D4BEE4`.
+**Mood entry colors come from the API**, not these — brand hues are for chrome only.
+
+### Shadows (CSS `boxShadow` strings — RN 0.85 new arch supports them)
+- Paper (soft/warm): `sm` `md` `lg`, plus `sticker` `0 10px 22px -8px rgba(0,0,0,.30)`.
+- **Buttons only** (chunky two-layer offset = the signature):
+  `btnPeach`, `btnInk`, `btnWhite`, `btnPurple` — pattern is
+  `0 9-10px 0 -2px <darker solid edge>, 0 18px 30px -14px <soft drop>`.
+
+### Geometry
+- `space`: xs4 sm8 md12 lg16 xl24 x2 32 x3 48
+- `radius`: sm8 md14 lg20 pill999
+- `sheetRadius`: **4 / 20 / 20 / 20** (sharp top-left = folder seam) — `PaperSheet`.
+- `fontSize`: label14 body16 title20 h2 26 h1 32 display44. **`MIN_FONT_SIZE = 14`.**
+
+---
+
+## 2. Hard rules (product, not just visual)
+
+- **Font floor ≥ 14px** for all content. `Text` (`src/components/Text.tsx`) enforces it.
+  *Exception:* purely decorative chrome micro-labels (e.g. the "PRO" badge) may use
+  raw RN `Text` below the floor — never for content/copy.
+- **Thai routes to Noto Sans Thai, Latin to Urbanist** (auto-detected in `Text`).
+  Noto tops out at weight 700, so extrabold Thai falls back to bold.
+- **No system emoji in chrome.** Use the brand SVG glyphs (see §5). Emoji are only
+  acceptable as data the API/user supplies (mood-pack fallback, activity chips).
+- **Premium features are never hidden** — show a teaser / PRO badge that routes to
+  subscription instead of removing the control.
+- Human TH/EN copy only; map API error codes to gentle sentences (`i18n` `errors.*`).
+
+---
+
+## 3. Core components
+
+- **`Text`** — font routing + ≥14px floor. Variants: label/body/title/h2/h1/display.
+- **`Button`** (`src/components/Button.tsx`) — variants `primary`(peach) / `ink` /
+  `paper`(white) / `ghost` / `purple`, each with its chunky `boxShadow`. Height 54,
+  radius 14, settles `translateY(2)` on press.
+- **`PaperSheet`** — folder tab + folded corner, `sheetRadius`, soft `shadow.md`;
+  optional paperclip (`PAClip`) and washi.
+- **`PASticker`** — mood disc: white 4px border + `shadow.sticker`. Disc background:
+  emoji badges = full color; moods = **soft tint `color+'40'`** by default, but the
+  `discBg` prop overrides it (used by the Smart Log tiles, see §4).
+- **`PAClip`** — real SVG paperclip (not emoji).
+- **`MoodFace`** — line-art fallback faces; `MoodIcon` renders the user's R2 pack SVG
+  via `SvgUri`, falling back to `MoodFace`.
+- **`MoodPicker`** — two layouts:
+  - `grid` (Today greeting): 5-col circular discs, soft tinted rings (kept soft per
+    user feedback — full saturation read as neon).
+  - `scroll` (Smart Log / Edit): white rounded-square tiles, **unselected disc =
+    `surface3` neutral; selected = full mood color** + 2px ink border + `translateY(-1)`.
+- **`BottomSheet`** — backdrop + white (`surface`) paper sheet, top radius `lg+6`,
+  drag handle, keyboard avoidance, scroll. `maxHeight = 90%`. Content has bottom
+  padding (`space.x2`) so chunky footer-button shadows are not clipped. Optional
+  `decoration` slot renders over the top edge (used for washi tape).
+
+---
+
+## 4. Smart Log "Add entry" drawer — `src/components/paper/smartlog/SmartLogSheet.tsx`
+
+Built to `docs/mobile-handoff/add-entry-drawer.md` (FE spec). Native interpretation —
+not pixel-pinned.
+
+- **Sheet:** white paper, washi tape (lavender `rgba(212,190,228,.75)`, 128×26,
+  `rotate(-3deg)`) on the top edge via `BottomSheet.decoration`.
+- **Header:** purple 34×34 r10 square w/ white `SparkleIcon`; title `บันทึกด้วย AI` (h2);
+  close = 36 circle on `surface3` w/ `CloseIcon`. Date row = `CalendarIcon` (ink3) +
+  full date incl. year (ink2, bold).
+- **Mood tiles:** `MoodPicker` scroll layout (see §3).
+- **Note:** `TextField` multiline, min-height **120**, fill `surface2`.
+- **Toolbar:** `PaperIconButton` ×3 — Mic / Camera / Pin (SVG glyphs). Camera is gated:
+  free users see a **"PRO" badge + 0.55 opacity** (still tappable → routes to
+  `/profile/subscription`). Right-aligned AI-remaining counter for free tier.
+- **PRO teaser** (free only): lavender `#ECE3F4` box, sparkle + copy + "อัปเกรด →",
+  routes to subscription. Never hidden.
+- **Activity chips:** horizontal scroll, single-select; selected = ink fill.
+- **Footer:** `[ยกเลิก paper] [✦ วิเคราะห์ purple] [บันทึก peach]` — chunky button shadows.
+- **States:** `input` → `analyzing` (`SLAnalyzing`) → `result` (AI summary + editable
+  tags) → `rateLimit` (free out of quota: offer Quick Save + Go Pro, never a raw error).
+
+---
+
+## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
+
+Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
+`stroke = currentColor`, color/size props. Available: `SparkleIcon`, `CalendarIcon`,
+`CameraIcon`, `PinIcon`, `PinFilledIcon` (location-chosen state), `CloseIcon`, `MicIcon`.
+**Use these instead of system emoji for all chrome.**
+
+---
+
+## 6. Known deviations / deferred
+
+- **No `expo-linear-gradient`** installed → the sparkle square & PRO teaser use solid
+  `brand.purple` instead of the spec's `135deg #A673F1→#C9A6F5` gradient. Add the lib if
+  real gradients are wanted (native dep → rebuild).
+- The footer **`✦` is a typographic dingbat** in the label string (not the SVG sparkle).
+- Live API mood set/colors differ from the design mock (backend data, not fixable here).
+- Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:
+  insights, profile, subscription screens. Bottom-nav icons are placeholder glyphs.
+- Deferred features: native Google/Apple sign-in (needs dev build), voice input,
+  location/Maps, reminder & privacy toggles, dark mode, share cards.
