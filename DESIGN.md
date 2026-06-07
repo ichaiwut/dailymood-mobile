@@ -204,14 +204,23 @@ quota-gated: free 3/day with counter, Pro unlimited; persists `aiSummary`/`senti
 (1.5px `#FCA5A5` border, `#DC2626` delete) → **fixed bottom bar** (Cancel paper + Save
 peach, safe-area padded). Delete uses the confirm `BottomSheet`.
 
-## 4d. Calendar — `app/(tabs)/calendar.tsx`
+## 4d. Calendar — `app/(tabs)/calendar.tsx` (per handoff "Calendar (complete)")
 
-(No handoff doc — followed the web calendar + Paper Desk language.) Month nav (‹ month-year
-› with paper nav buttons) → segmented **calendar / timeline** toggle (selected pill gets a
-soft shadow) → **calendar view**: the `MoodGrid` (7-col, mood-color cells, today ring)
-wrapped in a `PaperSheet` (clip) + a 3-up **stats row** (Avg / Streak / Logged, accent
-left-border cards with `shadow.sm`) + a **mood Legend** folder card (ink tab, color dots +
-labels). **Timeline view** = `TimelineFeed`. Tapping a day → `DaySheet`; an entry → detail.
+Month nav (‹ month-year › paper buttons) → segmented **calendar / timeline** toggle
+(selected pill soft shadow) → **calendar view**: `MoodGrid` in a `PaperSheet` (clip) +
+3-up **stats row** (Avg [with ↑/↓ delta] / Streak / Logged, accent cards + `shadow.sm`) +
+**mood Legend** folder card (ink tab, 14×14 rounded swatches). **Timeline view** =
+`TimelineFeed`. Day → `DaySheet`; entry → detail.
+- **Day cell:** radius 12; mood day = mood color + number `rgba(0,0,0,.55)`; empty = `surface2`
+  + ink3; **today** = 2.5px purple ring; **selected** = 2.5px ink ring (wins over today);
+  **future** = 0.4 opacity + tap → "future day" toast (not loggable).
+- **`EntryFolderCard` folder tab = time of day** (morning peach · afternoon mint · evening
+  lav, ink text) — *not* the mood color. Used on Home + Timeline + Day Sheet.
+- **Timeline filter chips:** inactive = soft paper shadow; active = ink fill + chunky
+  `0 6px 0 -2px #000` offset shadow.
+- **Deferred (need endpoints / data):** Year-in-Pixels Pro page (`/year-in-pixels`) + its
+  3rd toggle pill; premium AI cards (monthly summary / patterns / ask-AI) + free upsell;
+  day-cell indicators (★ best-day, recurring/anomaly/special-day dots).
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

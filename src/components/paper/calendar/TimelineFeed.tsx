@@ -110,10 +110,10 @@ export function TimelineFeed({
           gap: 6,
           backgroundColor: active ? colors.ink : colors.surface,
           borderRadius: radius.pill,
-          borderWidth: 1,
-          borderColor: active ? colors.ink : colors.hairline2,
           paddingHorizontal: 14,
-          paddingVertical: 7,
+          paddingVertical: 8,
+          // active = chunky solid offset; inactive = soft paper shadow.
+          boxShadow: active ? '0 6px 0 -2px #000' : '0 5px 14px -8px rgba(60,40,20,0.4)',
         }}
       >
         {dot ? <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: dot }} /> : null}

@@ -110,11 +110,21 @@ export default function CalendarScreen() {
                   moods={moods.data ?? []}
                   locale={i18n.language}
                   onDayPress={setSelectedDate}
+                  selectedDate={selectedDate}
                 />
               </PaperSheet>
               {cal.data ? (
                 <View style={{ flexDirection: 'row', gap: space.md }}>
-                  <Stat label={t('calendar.avgMood')} value={cal.data.stats.avgMood.toFixed(1)} accent={colors.primary} />
+                  <Stat
+                    label={t('calendar.avgMood')}
+                    value={cal.data.stats.avgMood.toFixed(1)}
+                    accent={colors.primary}
+                    sub={
+                      cal.data.stats.avgMoodDelta != null && cal.data.stats.avgMoodDelta !== 0
+                        ? `${cal.data.stats.avgMoodDelta > 0 ? '↑' : '↓'} ${Math.abs(cal.data.stats.avgMoodDelta).toFixed(1)}`
+                        : undefined
+                    }
+                  />
                   <Stat label={t('calendar.streak')} value={`${cal.data.stats.streak}`} accent={colors.accent} />
                   <Stat label={t('calendar.logged')} value={`${cal.data.stats.loggedDays}`} accent={brand.mint} />
                 </View>
@@ -152,7 +162,7 @@ export default function CalendarScreen() {
     );
   }
 
-  function Stat({ label, value, accent }: { label: string; value: string; accent: string }) {
+  function Stat({ label, value, accent, sub }: { label: string; value: string; accent: string; sub?: string }) {
     return (
       <View
         style={{
@@ -168,6 +178,7 @@ export default function CalendarScreen() {
       >
         <Text variant="eyebrow">{label}</Text>
         <Text variant="h2">{value}</Text>
+        {sub ? <Text variant="label" color={colors.ink3}>{sub}</Text> : null}
       </View>
     );
   }

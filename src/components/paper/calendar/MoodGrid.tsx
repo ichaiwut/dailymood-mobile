@@ -4,10 +4,12 @@
  * Tapping a day opens the Day Sheet.
  */
 import { View, Pressable } from 'react-native';
+import { useTranslation } from 'react-i18next';
 import { Text } from '../../Text';
+import { useToast } from '../../Toast';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { findMood } from '../../../lib/mood';
-import { todayKey } from '../../../lib/time';
+import { todayKey, isFutureKey } from '../../../lib/time';
 import type { CalendarDay, Mood } from '../../../api/types';
 
 const WEEKDAYS: Record<string, string[]> = {
@@ -26,10 +28,13 @@ export interface MoodGridProps {
   moods: Mood[];
   locale: string;
   onDayPress: (dateKey: string) => void;
+  selectedDate?: string | null;
 }
 
-export function MoodGrid({ year, month, days, moods, locale, onDayPress }: MoodGridProps) {
-  const { colors, radius, space } = useTheme();
+export function MoodGrid({ year, month, days, moods, locale, onDayPress, selectedDate }: MoodGridProps) {
+  const { colors, space, brand } = useTheme();
+  const { t } = useTranslation();
+  const toast = useToast();
   const today = todayKey();
 
   const moodByDate = new Map(days.map((d) => [d.date, d.moodTypeId]));
@@ -61,25 +66,30 @@ export function MoodGrid({ year, month, days, moods, locale, onDayPress }: MoodG
           const moodId = moodByDate.get(dateKey);
           const mood = findMood(moods, moodId);
           const isToday = dateKey === today;
+          const isSelected = dateKey === selectedDate;
+          const isFuture = isFutureKey(dateKey);
+          // selected ring (ink) wins over today ring (purple).
+          const ringColor = isSelected ? colors.ink : isToday ? brand.purple : 'transparent';
           return (
             <View key={dateKey} style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 3 }}>
               <Pressable
-                onPress={() => onDayPress(dateKey)}
+                onPress={() => (isFuture ? toast.show(t('calendar.futureDay'), 'error') : onDayPress(dateKey))}
                 accessibilityRole="button"
                 style={{
                   flex: 1,
-                  borderRadius: radius.sm,
+                  borderRadius: 12,
                   backgroundColor: mood ? mood.color : colors.surface2,
                   alignItems: 'center',
                   justifyContent: 'center',
-                  borderWidth: isToday ? 2 : 0,
-                  borderColor: colors.primary,
+                  borderWidth: ringColor === 'transparent' ? 0 : 2.5,
+                  borderColor: ringColor,
+                  opacity: isFuture ? 0.4 : 1,
                 }}
               >
                 <Text
                   variant="label"
-                  weight={isToday ? 'bold' : 'medium'}
-                  color={mood ? '#fff' : colors.ink3}
+                  weight={isToday || isSelected ? 'bold' : 'medium'}
+                  color={mood ? 'rgba(0,0,0,0.55)' : colors.ink3}
                 >
                   {day}
                 </Text>

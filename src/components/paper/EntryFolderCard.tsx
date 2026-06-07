@@ -29,9 +29,12 @@ export interface EntryFolderCardProps {
 
 export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolderCardProps) {
   const { t, i18n } = useTranslation();
-  const { colors, radius, space, sheetRadius, shadow } = useTheme();
+  const { colors, radius, space, sheetRadius, shadow, brand } = useTheme();
   const tod = timeOfDay(entry.createdAt);
   const accent = mood?.color ?? colors.primary;
+  // Folder tab color = time of day (handoff): morning peach · afternoon mint · evening lav.
+  const tabColor =
+    tod === 'morning' ? brand.peach : tod === 'afternoon' ? brand.mint : brand.lavender;
 
   const title =
     stripBold(entry.aiSummary)?.split('\n')[0] ||
@@ -44,7 +47,7 @@ export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolde
       <View
         style={{
           alignSelf: 'flex-start',
-          backgroundColor: accent,
+          backgroundColor: tabColor,
           borderTopLeftRadius: radius.md,
           borderTopRightRadius: radius.md,
           paddingHorizontal: space.md,
@@ -52,7 +55,7 @@ export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolde
           marginBottom: -2,
         }}
       >
-        <Text variant="eyebrow" color="#fff">
+        <Text variant="eyebrow" color={colors.ink}>
           {t(`timeOfDay.${tod}`)} · {ictClock(entry.createdAt)}
         </Text>
       </View>
