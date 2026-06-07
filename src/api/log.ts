@@ -33,6 +33,18 @@ export async function analyzeSmart(params: {
   return apiFetch<SmartSuggestion>('/api/log/smart', { method: 'POST', body: form });
 }
 
+/**
+ * POST /api/upload — multipart image → R2, returns its imageKey. Used for a
+ * manual save with a photo (the AI Analyze path uploads via /api/log/smart).
+ * Premium-only (server-enforced).
+ */
+export async function uploadImage(imageUri: string): Promise<string> {
+  const form = new FormData();
+  await appendImagePart(form, 'image', imageUri);
+  const res = await apiFetch<{ imageKey: string }>('/api/upload', { method: 'POST', body: form });
+  return res.imageKey;
+}
+
 /** POST /api/log/confirm — save the final entry. Returns the new id. */
 export function confirmEntry(input: ConfirmEntryInput): Promise<{ id: string }> {
   return apiFetch<{ id: string }>('/api/log/confirm', { method: 'POST', body: input });

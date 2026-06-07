@@ -123,6 +123,10 @@ not pixel-pinned.
 - **Toolbar:** `PaperIconButton` ×3 — Mic / Camera / Pin (SVG glyphs). Camera is gated:
   free users see a **"PRO" badge + 0.55 opacity** (still tappable → routes to
   `/profile/subscription`). Right-aligned AI-remaining counter for free tier.
+  - **Photo upload:** the AI Analyze path uploads the photo via `/api/log/smart` (→
+    `suggestion.imageKey`). On a **manual** save the photo is uploaded via `uploadImage()`
+    → `POST /api/upload` (premium-only) before confirm — otherwise the picked image would
+    be silently dropped. Edit Entry does **not** support photos yet (deferred).
   - **Location (Pin):** taps the pin → toggles a **place-name search field** (web parity):
     `SearchIcon` + text input ("พิมพ์ชื่อสถานที่…") + dark "Add" button, plus a
     "ใช้ตำแหน่งปัจจุบัน" GPS shortcut row beneath. Typed name → `geocodePlace()` resolves

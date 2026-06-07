@@ -26,7 +26,7 @@ import {
   useJournalPrompt,
   useActivities,
 } from '../../../hooks/queries';
-import { analyzeSmart } from '../../../api/log';
+import { analyzeSmart, uploadImage } from '../../../api/log';
 import { hasAiQuota } from '../../../api/ai';
 import { pickImage, optimizeImage } from '../../../lib/image';
 import { ApiError, errorMessageKey } from '../../../api/errors';
@@ -141,6 +141,11 @@ export function SmartLogSheet({
     if (!effectiveMoodId) return;
     setError(null);
     try {
+      // AI path already uploaded the photo (→ suggestion.imageKey). On a manual
+      // save we must upload the picked photo here, or it would be discarded.
+      let imageKey = params.aiSource === 'nlp' ? suggestion?.imageKey ?? undefined : undefined;
+      if (!imageKey && imageUri) imageKey = await uploadImage(imageUri);
+
       await confirm.mutateAsync({
         moodTypeId: effectiveMoodId,
         note: note.trim() || undefined,
@@ -151,7 +156,7 @@ export function SmartLogSheet({
         activityId:
           activityId ??
           (params.aiSource === 'nlp' ? suggestion?.suggestedActivityId ?? undefined : undefined),
-        imageKey: params.aiSource === 'nlp' ? suggestion?.imageKey ?? undefined : undefined,
+        imageKey,
         date: initialDate,
         location: location?.name ?? undefined,
         locationLat: location?.lat ?? undefined,
