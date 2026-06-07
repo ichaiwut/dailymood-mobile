@@ -82,10 +82,14 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
 - **`LocationPill`** — pin (`#A673F1`) + place name, `surface3` pill. Read-only by
   default; opens the device map when `lat`/`lng` are present. Pass `onRemove` for an
   editable × (compose surfaces).
-- **`LocationField`** — full location editor: "เพิ่มสถานที่" chip → place-name search
-  field + Add + "ใช้ตำแหน่งปัจจุบัน" GPS shortcut → collapses to `LocationPill`. Parent
-  holds the `{name, lat?, lng?}` value. Used by Edit Entry (the drawer has its own
-  toolbar-bound variant).
+- **`PlaceSearchBox`** — shared place input: text field + **live autocomplete
+  suggestions** (debounced 400ms, tap a suggestion to pick) + "Add" for the typed text
+  + "ใช้ตำแหน่งปัจจุบัน" GPS shortcut. Calls `onPick({name, lat?, lng?})`. Provider is
+  `searchPlaces()` in `src/lib/location.ts` — currently **OpenStreetMap Nominatim**
+  (free, no key); swap for Google Places New when a mobile Maps key exists.
+- **`LocationField`** — "เพิ่มสถานที่" chip → `PlaceSearchBox` → collapses to
+  `LocationPill`. Parent holds the `{name, lat?, lng?}` value. Used by Edit Entry; the
+  Smart Log drawer wires `PlaceSearchBox` directly under its toolbar pin.
 - **`MoodFace`** — line-art fallback faces; `MoodIcon` renders the user's R2 pack SVG
   via `SvgUri`, falling back to `MoodFace`.
 - **`MoodPicker`** — two layouts:

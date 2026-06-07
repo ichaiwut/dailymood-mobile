@@ -21,6 +21,47 @@ function placeName(g: Location.LocationGeocodedAddress | undefined): string | nu
   return area && area !== primary ? `${primary}, ${area}` : primary;
 }
 
+export interface PlaceSuggestion {
+  name: string;
+  lat: number;
+  lng: number;
+}
+
+/**
+ * Place-name autocomplete via OpenStreetMap Nominatim (free, no API key).
+ * Returns named suggestions with coords. Respects Nominatim's policy: identify
+ * the client, keep volume low (the caller debounces). Swallows errors → [].
+ * (Swap for Google Places New when a mobile Maps key is available.)
+ */
+export async function searchPlaces(query: string, locale = 'en'): Promise<PlaceSuggestion[]> {
+  const q = query.trim();
+  if (q.length < 2) return [];
+  try {
+    const url =
+      'https://nominatim.openstreetmap.org/search?format=jsonv2&limit=5' +
+      `&accept-language=${encodeURIComponent(locale)}&q=${encodeURIComponent(q)}`;
+    const res = await fetch(url, {
+      headers: { 'User-Agent': 'DailyMood/1.0 (https://dailymood.me)' },
+    });
+    if (!res.ok) return [];
+    const rows = (await res.json()) as Array<{
+      name?: string;
+      display_name?: string;
+      lat: string;
+      lon: string;
+    }>;
+    return rows
+      .map((r) => ({
+        name: (r.name || r.display_name?.split(',')[0] || '').slice(0, 200),
+        lat: Number(r.lat),
+        lng: Number(r.lon),
+      }))
+      .filter((r) => r.name && Number.isFinite(r.lat) && Number.isFinite(r.lng));
+  } catch {
+    return [];
+  }
+}
+
 /** Resolve a typed place name to coords (native only); name-only on web/failure. */
 export async function geocodePlace(
   name: string,
