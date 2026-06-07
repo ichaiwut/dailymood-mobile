@@ -71,7 +71,12 @@ export function BottomSheet({ visible, onClose, children, decoration }: BottomSh
             <ScrollView
               keyboardShouldPersistTaps="handled"
               showsVerticalScrollIndicator={false}
-              contentContainerStyle={{ paddingHorizontal: space.xl, paddingTop: space.xs }}
+              contentContainerStyle={{
+                paddingHorizontal: space.xl,
+                paddingTop: space.xs,
+                // room for the last row's chunky button shadow (not clipped).
+                paddingBottom: space.x2,
+              }}
             >
               {children}
             </ScrollView>
