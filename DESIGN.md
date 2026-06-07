@@ -218,9 +218,22 @@ Month nav (‹ month-year › paper buttons) → segmented **calendar / timeline
   lav, ink text) — *not* the mood color. Used on Home + Timeline + Day Sheet.
 - **Timeline filter chips:** inactive = soft paper shadow; active = ink fill + chunky
   `0 6px 0 -2px #000` offset shadow.
-- **Deferred (need endpoints / data):** Year-in-Pixels Pro page (`/year-in-pixels`) + its
-  3rd toggle pill; premium AI cards (monthly summary / patterns / ask-AI) + free upsell;
-  day-cell indicators (★ best-day, recurring/anomaly/special-day dots).
+- **3rd toggle "Year"** → `/year-in-pixels` (🔒 prefix for free).
+- **In progress (endpoints confirmed live):** premium AI cards (monthly summary / patterns
+  / ask-AI, `/api/calendar/ai` + `/api/calendar/ask`) + free upsell; day-cell indicators
+  (★ best-day, recurring/anomaly dots from `/api/calendar/ai`; special-day dots from
+  `/api/events`).
+
+## 4e. Year in Pixels — `app/year-in-pixels.tsx` (Pro, `/api/year-in-pixels`)
+
+Pro-gated page (free → 🎨 gate card + "Upgrade to Pro" → subscription). Header (← back +
+year ◀▶) + eyebrow. Premium: **AI year-summary** card (lavender + yellow washi, RichText
+bold + 🏷️ theme), **pixel grid transposed for mobile** (31 day-rows × 12 month-columns,
+narrow month-letter header + day-number gutter; cell = mood color / `surface2` empty /
+blank for invalid dates; today = purple ring, selected = ink ring), a **selected-cell
+tooltip** (sticker + date + mood), and **stat cards** (dominant mood + %, longest streak,
+days-logged %). Data from `useYearInPixels` (enabled only when premium).
+**Deferred:** PNG/PDF export (needs `react-native-view-shot`); year-over-year compare.
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

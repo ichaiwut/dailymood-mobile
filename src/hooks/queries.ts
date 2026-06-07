@@ -15,7 +15,14 @@ import {
 import { fetchSubscription, activateTrial } from '../api/subscription';
 import { listEntries, confirmEntry, getEntry, updateEntry, deleteEntry } from '../api/log';
 import { fetchAiRemaining, fetchJournalPrompt } from '../api/ai';
-import { fetchCalendarMonth, fetchTimeline } from '../api/calendar';
+import {
+  fetchCalendarMonth,
+  fetchTimeline,
+  fetchYearInPixels,
+  fetchCalendarAi,
+  askCalendar,
+  fetchEvents,
+} from '../api/calendar';
 import { fetchStats, fetchInsights, sendInsightFeedback } from '../api/stats';
 import { todayKey } from '../lib/time';
 import type {
@@ -32,6 +39,9 @@ export const queryKeys = {
   aiRemaining: ['ai', 'remaining'] as const,
   entriesByDate: (date: string) => ['log', date] as const,
   calendarMonth: (y: number, m: number) => ['calendar', y, m] as const,
+  calendarAi: (y: number, m: number) => ['calendar-ai', y, m] as const,
+  events: (y: number, m: number) => ['events', y, m] as const,
+  yearInPixels: (y: number) => ['year-in-pixels', y] as const,
   timeline: (y: number, m: number) => ['timeline', y, m] as const,
   entry: (id: string) => ['entry', id] as const,
   stats: (period: StatsPeriod) => ['stats', period] as const,
@@ -97,6 +107,42 @@ export function useTimeline(year: number, month: number) {
   return useQuery({
     queryKey: queryKeys.timeline(year, month),
     queryFn: () => fetchTimeline(year, month),
+  });
+}
+
+/** Year-in-Pixels (Pro). Pass enabled=false for free users to skip the call. */
+export function useYearInPixels(year: number, locale: string, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.yearInPixels(year),
+    queryFn: () => fetchYearInPixels(year, locale),
+    enabled,
+  });
+}
+
+/** Monthly calendar AI (Pro): summary + highlights + patterns. */
+export function useCalendarAi(year: number, month: number, locale: string, enabled = true) {
+  return useQuery({
+    queryKey: queryKeys.calendarAi(year, month),
+    queryFn: () => fetchCalendarAi(year, month, locale),
+    enabled,
+    staleTime: 5 * 60_000, // cached server-side
+  });
+}
+
+/** Special days (holidays + personal) for a month. */
+export function useEvents(year: number, month: number) {
+  return useQuery({
+    queryKey: queryKeys.events(year, month),
+    queryFn: () => fetchEvents(year, month),
+    staleTime: 60 * 60_000,
+  });
+}
+
+/** Ask-AI over a month (Pro, 10/hr — handle 429 at the call site). */
+export function useAskCalendar() {
+  return useMutation({
+    mutationFn: (body: { query: string; year: number; month: number; locale: string }) =>
+      askCalendar(body),
   });
 }
 

@@ -16,7 +16,7 @@ import { TimelineFeed } from '../../src/components/paper/calendar/TimelineFeed';
 import { DaySheet } from '../../src/components/paper/calendar/DaySheet';
 import { PaperSheet, FolderTab } from '../../src/components/paper/PaperSheet';
 import { useTheme } from '../../src/theme/ThemeProvider';
-import { useCalendarMonth, useMoods } from '../../src/hooks/queries';
+import { useCalendarMonth, useMoods, useAiRemaining } from '../../src/hooks/queries';
 import { moodLabel } from '../../src/lib/mood';
 import { todayKey, formatDateKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
@@ -37,6 +37,8 @@ export default function CalendarScreen() {
 
   const cal = useCalendarMonth(year, month);
   const moods = useMoods();
+  const ai = useAiRemaining();
+  const premium = ai.data?.tier === 'premium';
 
   const shiftMonth = (delta: number) => {
     let m = month + delta;
@@ -93,6 +95,15 @@ export default function CalendarScreen() {
               </Text>
             </Pressable>
           ))}
+          {/* Year (Year-in-Pixels) — separate Pro page; 🔒 for free */}
+          <Pressable
+            onPress={() => router.push('/year-in-pixels')}
+            style={{ flex: 1, alignItems: 'center', paddingVertical: 9, borderRadius: radius.pill }}
+          >
+            <Text variant="label" weight="medium" color={colors.ink3}>
+              {premium ? t('calendar.viewYear') : `🔒 ${t('calendar.viewYear')}`}
+            </Text>
+          </Pressable>
         </View>
 
         {view === 'calendar' ? (

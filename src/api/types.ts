@@ -215,6 +215,70 @@ export interface CalendarMonth {
   stats: CalendarStats;
 }
 
+/** GET /api/year-in-pixels — a year of dominant moods + AI summary + stats (Pro). */
+export interface YearInPixels {
+  year: number;
+  /** date key (YYYY-MM-DD) → moodId, one mood per logged day. */
+  dayMap: Record<string, string>;
+  totalDays: number;
+  daysInYear: number;
+  bestMonth: { month: number; avg: number } | null;
+  hardMonth: { month: number; avg: number } | null;
+  dominantMood: string | null;
+  dominantPct: number;
+  trendQ4: { pct: number } | null;
+  topTrigger: { tag: string; count: number } | null;
+  streak: { days: number; month: number } | null;
+  aiSummary: {
+    summary: string;
+    summaryShort: string;
+    bestQuarter: string;
+    hardestPeriod: string;
+    yearTheme: string;
+  } | null;
+}
+
+/** GET /api/calendar/ai — monthly summary + highlights + patterns (Pro). */
+export interface CalendarAiPattern {
+  type: 'best' | 'recurring' | 'anomaly' | string;
+  dates: string[];
+  title: string;
+  explanation: string;
+  icon: string;
+}
+export interface CalendarAi {
+  summary?: string;
+  summaryFirstSentence?: string;
+  highlights?: {
+    bestDay: { date: string; emoji: string } | null;
+    hardDay: { date: string; emoji: string } | null;
+    topTag: string | null;
+  };
+  patterns?: CalendarAiPattern[];
+  cached?: boolean;
+  tooFewEntries?: boolean;
+  fallbackMonth?: string;
+}
+
+/** POST /api/calendar/ask result. */
+export interface CalendarAskResult {
+  answer: string;
+  matchingDates: string[];
+}
+
+/** GET /api/events — holidays + personal special days for a month. */
+export interface MonthEvent {
+  id?: string;
+  date: string;
+  type: 'holiday' | 'personal' | string;
+  label: string;
+  labelTh: string;
+  emoji: string;
+}
+export interface MonthEvents {
+  events: MonthEvent[];
+}
+
 /** Lighter entry shape for the timeline feed (GET /api/calendar/timeline). */
 export interface TimelineEntry {
   id: string;
