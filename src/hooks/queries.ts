@@ -8,8 +8,14 @@ import { fetchProfile } from '../api/profile';
 import { listEntries, confirmEntry, getEntry, updateEntry, deleteEntry } from '../api/log';
 import { fetchAiRemaining, fetchJournalPrompt } from '../api/ai';
 import { fetchCalendarMonth, fetchTimeline } from '../api/calendar';
+import { fetchStats, fetchInsights, sendInsightFeedback } from '../api/stats';
 import { todayKey } from '../lib/time';
-import type { ConfirmEntryInput, UpdateEntryInput } from '../api/types';
+import type {
+  ConfirmEntryInput,
+  UpdateEntryInput,
+  StatsPeriod,
+  InsightReaction,
+} from '../api/types';
 
 export const queryKeys = {
   moods: ['moods'] as const,
@@ -19,6 +25,8 @@ export const queryKeys = {
   calendarMonth: (y: number, m: number) => ['calendar', y, m] as const,
   timeline: (y: number, m: number) => ['timeline', y, m] as const,
   entry: (id: string) => ['entry', id] as const,
+  stats: (period: StatsPeriod) => ['stats', period] as const,
+  insights: ['insights'] as const,
 };
 
 export function useMoods() {
@@ -115,5 +123,20 @@ export function useDeleteEntry() {
   return useMutation({
     mutationFn: (id: string) => deleteEntry(id),
     onSuccess: () => invalidateEntryViews(qc),
+  });
+}
+
+export function useStats(period: StatsPeriod) {
+  return useQuery({ queryKey: queryKeys.stats(period), queryFn: () => fetchStats(period) });
+}
+
+export function useInsights() {
+  return useQuery({ queryKey: queryKeys.insights, queryFn: fetchInsights });
+}
+
+export function useInsightFeedback() {
+  return useMutation({
+    mutationFn: (body: { weekKey: string; suggestionTitle: string; reaction: InsightReaction }) =>
+      sendInsightFeedback(body),
   });
 }

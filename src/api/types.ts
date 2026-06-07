@@ -182,6 +182,68 @@ export interface UpdateEntryInput {
   location?: string | null;
 }
 
+// --- Stats (GET /api/stats?period=) ---
+export type StatsPeriod = 'week' | 'month' | 'year';
+
+export interface MoodTrendPoint {
+  date: string;
+  moodId: string | null;
+  avgScore?: number | null;
+}
+
+export interface BestDay {
+  date: string;
+  moodId: string | null;
+  score: number;
+  entries: number;
+}
+
+export interface StatsData {
+  streak: number;
+  todayMood: { moodId: string; createdAt: number } | null;
+  last7: { date: string; moodId: string | null }[];
+  moodTrend: MoodTrendPoint[];
+  /** moodId → count */
+  distribution: Record<string, number>;
+  total: number;
+  total30d: number;
+  period: StatsPeriod;
+  avgScore: number;
+  avgScoreDelta: number | null;
+  bestDay: BestDay | null;
+  /** Tag-mood correlation; shape varies and may be empty — rendered defensively. */
+  activityImpact: unknown[];
+  activityInsight: unknown[];
+  /** AI chart annotations (premium); may be empty. */
+  annotations: unknown[];
+}
+
+// --- Insights (GET /api/insights) ---
+export interface InsightPattern {
+  title: string;
+  description: string;
+  tag: 'pattern' | 'correlation' | 'alert' | string;
+  miniVizData?: number[];
+}
+
+export interface InsightSuggestion {
+  title: string;
+  description: string;
+}
+
+export interface InsightsData {
+  headline: string;
+  previewHeadline: string;
+  summary: string;
+  patterns: InsightPattern[];
+  suggestion: InsightSuggestion | null;
+  tier: 'free' | 'premium' | string;
+  weekKey: string;
+  streak: number;
+}
+
+export type InsightReaction = 'up' | 'down' | 'routine';
+
 /**
  * Error codes the API returns in `{ error }`. We map these to human TH/EN copy
  * before they reach the UI (handover rule §6.1) — raw codes must never be shown.
