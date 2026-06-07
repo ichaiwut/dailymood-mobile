@@ -30,11 +30,14 @@ function RootNav() {
 
   useEffect(() => {
     if (status === 'loading') return;
-    const inAuthGroup = segments[0] === '(auth)';
-    const inTabsGroup = segments[0] === '(tabs)';
+    const segs = segments as string[];
+    const inAuthGroup = segs[0] === '(auth)';
+    const atRoot = segs.length === 0; // the '/' loader
     if (status === 'unauthenticated' && !inAuthGroup) {
       router.replace('/(auth)/login');
-    } else if (status === 'authenticated' && !inTabsGroup) {
+    } else if (status === 'authenticated' && (inAuthGroup || atRoot)) {
+      // Only bounce authenticated users off the auth screens / root loader —
+      // NOT off legitimate stack routes like /entry/[id], /insights, /profile/*.
       router.replace('/(tabs)');
     }
   }, [status, segments, router]);
