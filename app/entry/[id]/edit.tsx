@@ -16,6 +16,7 @@ import { Notice } from '../../../src/components/Notice';
 import { MoodPicker } from '../../../src/components/MoodPicker';
 import { BottomSheet } from '../../../src/components/BottomSheet';
 import { LocationField, type LocationValue } from '../../../src/components/paper/LocationField';
+import { useToast } from '../../../src/components/Toast';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useUpdateEntry, useDeleteEntry } from '../../../src/hooks/queries';
 import { formatDateKey } from '../../../src/lib/time';
@@ -26,6 +27,7 @@ export default function EditEntryScreen() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
   const router = useRouter();
+  const toast = useToast();
 
   const entry = useEntry(id);
   const moods = useMoods();
@@ -73,6 +75,7 @@ export default function EditEntryScreen() {
         locationLng: location?.lng ?? null,
       });
       router.back();
+      toast.show(t('entry.saved'));
     } catch (e) {
       setError(t(errorMessageKey(e)));
     }

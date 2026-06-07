@@ -17,6 +17,7 @@ import { Text } from '../../Text';
 import { Button } from '../../Button';
 import { TextField } from '../../TextField';
 import { Notice } from '../../Notice';
+import { useToast } from '../../Toast';
 import { MoodPicker } from '../../MoodPicker';
 import { useTheme } from '../../../theme/ThemeProvider';
 import {
@@ -72,6 +73,7 @@ export function SmartLogSheet({
 }: SmartLogSheetProps) {
   const { t } = useTranslation();
   const { colors, space, radius, brand } = useTheme();
+  const toast = useToast();
   const router = useRouter();
   const moods = useMoods();
   const ai = useAiRemaining();
@@ -163,6 +165,7 @@ export function SmartLogSheet({
         locationLng: location?.lng ?? undefined,
       });
       onClose();
+      toast.show(t('entry.saved'));
     } catch (e) {
       setError(t(errorMessageKey(e)));
     }

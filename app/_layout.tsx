@@ -13,6 +13,7 @@ import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
 
 import { ThemeProvider } from '../src/theme/ThemeProvider';
+import { ToastProvider } from '../src/components/Toast';
 import { AuthProvider, useAuth } from '../src/auth/AuthContext';
 import { fontMap } from '../src/theme/typography';
 import '../src/i18n';
@@ -60,8 +61,10 @@ export default function RootLayout() {
         <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              <StatusBar style="dark" />
-              <RootNav />
+              <ToastProvider>
+                <StatusBar style="dark" />
+                <RootNav />
+              </ToastProvider>
             </AuthProvider>
           </QueryClientProvider>
         </ThemeProvider>

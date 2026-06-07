@@ -106,7 +106,9 @@ export function useEntry(id: string) {
 
 /** Invalidate every list/aggregate that an entry write can affect. */
 function invalidateEntryViews(qc: ReturnType<typeof useQueryClient>) {
-  qc.invalidateQueries({ queryKey: queryKeys.entriesByDate(todayKey()) });
+  // refetchType 'all' so the list updates even if the Today screen is momentarily
+  // inactive behind the Smart Log modal.
+  qc.invalidateQueries({ queryKey: ['log'], refetchType: 'all' });
   qc.invalidateQueries({ queryKey: queryKeys.profile });
   qc.invalidateQueries({ queryKey: queryKeys.aiRemaining });
   qc.invalidateQueries({ queryKey: ['calendar'] });
