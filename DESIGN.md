@@ -127,6 +127,10 @@ not pixel-pinned.
     `suggestion.imageKey`). On a **manual** save the photo is uploaded via `uploadImage()`
     → `POST /api/upload` (premium-only) before confirm — otherwise the picked image would
     be silently dropped. Edit Entry does **not** support photos yet (deferred).
+  - **Photo read display:** entries with a photo show the image in **Entry Detail** (full
+    220px) and as an 80px **banner in `EntryFolderCard`** (Today / Timeline / Day Sheet).
+    `GET /api/log[/id]` returns a signed R2 URL (TTL 1h) — render it directly, don't cache
+    across the hour.
   - **Location (Pin):** taps the pin → toggles a **place-name search field** (web parity):
     `SearchIcon` + text input ("พิมพ์ชื่อสถานที่…") + dark "Add" button, plus a
     "ใช้ตำแหน่งปัจจุบัน" GPS shortcut row beneath. Typed name → `geocodePlace()` resolves

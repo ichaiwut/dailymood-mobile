@@ -3,7 +3,7 @@
  * (เช้า/บ่าย/เย็น), the mood sticker, a note/summary preview, and tag chips.
  * Shared by the Today dashboard and the Calendar timeline (M3).
  */
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../Text';
 import { PASticker } from './PASticker';
@@ -18,7 +18,7 @@ import type { Mood, MoodEntry } from '../../api/types';
 export type CardEntry = Pick<
   MoodEntry,
   'id' | 'moodTypeId' | 'note' | 'aiSummary' | 'tags' | 'createdAt'
-> & { location?: string | null };
+> & { location?: string | null; imageUrl?: string | null };
 
 export interface EntryFolderCardProps {
   entry: CardEntry;
@@ -76,6 +76,13 @@ export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolde
           <Text variant="label" color={colors.ink2}>
             {moodLabel(mood, i18n.language)}
           </Text>
+          {entry.imageUrl ? (
+            <Image
+              source={{ uri: entry.imageUrl }}
+              style={{ width: '100%', height: 80, borderRadius: radius.sm, marginTop: 2 }}
+              resizeMode="cover"
+            />
+          ) : null}
           {title ? (
             <Text variant="body" numberOfLines={2}>
               {title}
