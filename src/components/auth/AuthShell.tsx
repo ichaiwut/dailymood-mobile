@@ -6,6 +6,7 @@ import type { ReactNode } from 'react';
 import { View } from 'react-native';
 import { Screen } from '../Screen';
 import { Text } from '../Text';
+import { BrandLogo } from '../BrandLogo';
 import { PaperSheet } from '../paper/PaperSheet';
 import { WashiTape } from '../paper/WashiTape';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -22,9 +23,7 @@ export function AuthShell({ tab, title, subtitle, children }: AuthShellProps) {
   return (
     <Screen scroll contentStyle={{ justifyContent: 'center', flexGrow: 1, gap: space.xl }}>
       <View style={{ alignItems: 'center', gap: space.xs }}>
-        <Text variant="display" color={colors.primary}>
-          DailyMood
-        </Text>
+        <BrandLogo variant="wordmark" width={220} />
       </View>
 
       <View>

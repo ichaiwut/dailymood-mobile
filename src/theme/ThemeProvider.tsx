@@ -25,8 +25,15 @@ export interface Theme {
 
 const ThemeContext = createContext<Theme | null>(null);
 
+/**
+ * Dark mode is intentionally disabled for now — the Paper Desk dark palette
+ * isn't tuned yet (M6 polish). Flip to false to follow the OS color scheme.
+ */
+const FORCE_LIGHT = true;
+
 export function ThemeProvider({ children }: { children: ReactNode }) {
-  const scheme: ColorScheme = useColorScheme() === 'dark' ? 'dark' : 'light';
+  const osScheme = useColorScheme();
+  const scheme: ColorScheme = FORCE_LIGHT ? 'light' : osScheme === 'dark' ? 'dark' : 'light';
   const theme = useMemo<Theme>(
     () => ({ scheme, colors: palettes[scheme], space, radius, fontSize, brand }),
     [scheme],
