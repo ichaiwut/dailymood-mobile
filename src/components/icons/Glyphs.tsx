@@ -90,6 +90,79 @@ export function CloseIcon({ size = 24, color = INK, strokeWidth = 1.8 }: GlyphPr
   );
 }
 
+// --- bottom-nav icons (handoff Floating-nav spec §2) ---
+
+interface NavGlyphProps extends GlyphProps {
+  /** Soft interior fill when the tab is active (home/profile). */
+  fill?: string;
+}
+
+export function HomeNavIcon({ size = 22, color = INK, fill = 'none', strokeWidth = 1.8 }: NavGlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3 11l9-8 9 8M5 9v12h14V9"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        fill={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function CalendarNavIcon({ size = 22, color = INK, strokeWidth = 1.8 }: NavGlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M3 7h18M3 7v13h18V7M3 7l3-4M21 7l-3-4M8 11h2M14 11h2M8 15h2M14 15h2"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function StatsNavIcon({ size = 22, color = INK, strokeWidth = 1.8 }: NavGlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M4 20V10M9 20V4M14 20V14M19 20V8"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function UserNavIcon({ size = 22, color = INK, fill = 'none', strokeWidth = 1.8 }: NavGlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        fill={fill}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}
+
+export function PlusIcon({ size = 26, color = '#fff', strokeWidth = 2.5 }: GlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M12 5v14M5 12h14" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
 export function SearchIcon({ size = 24, color = INK, strokeWidth = 2 }: GlyphProps) {
   return (
     <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">

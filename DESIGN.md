@@ -96,6 +96,12 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
   ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
   as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
+- **`FloatingNav`** (`paper/`) — mobile bottom nav: white pill (76px tall, radius 38, soft
+  float shadow `0 14px 40px rgba(0,0,0,.10)` + 1px hairline), 4 route tabs (Home / Calendar
+  / Stats / Profile, SVG glyphs from `Glyphs`), and a raised peach **FAB** (56px, `-28`
+  margin-top, peach glow) that opens the Smart Log drawer. Active tab = `brand.purple`;
+  home & profile also get a soft `rgba(166,115,241,.15)` interior fill. Sits at
+  `insets.bottom + 18`. (Tab labels use the 14px floor, not web's 11px.)
 - **`StreakCard`** (`paper/today/`) — washi-taped white sheet: **STREAK** eyebrow, big
   number (46px) + "วันติดต่อกัน" + 🔥 (pushed right), and a 14-cell progress row (peach up
   to the streak, `surface3` beyond). Ported from web streak-card.
@@ -184,6 +190,6 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 - The footer **`✦` is a typographic dingbat** in the label string (not the SVG sparkle).
 - Live API mood set/colors differ from the design mock (backend data, not fixable here).
 - Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:
-  insights, profile, subscription screens. Bottom-nav icons are placeholder glyphs.
+  insights, profile, subscription screens.
 - Deferred features: native Google/Apple sign-in (needs dev build), voice input (mic
   button is still a "coming soon" stub), reminder & privacy toggles, dark mode, share cards.

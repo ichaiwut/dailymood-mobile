@@ -1,13 +1,23 @@
 /**
- * Floating-pill bottom nav with a center peach FAB (Paper Desk signature).
- * The 4 tabs are real routes; the center FAB opens the Smart Log sheet.
+ * Floating bottom nav (handoff Floating-nav spec): white pill (76px, radius 38,
+ * soft float shadow + 1px hairline) with 4 route tabs and a raised peach FAB in
+ * the center that opens the Smart Log drawer. Active tab = purple (home/profile
+ * also get a soft interior fill). Mobile-only.
  */
+import type { ComponentType } from 'react';
 import { View, Pressable } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../Text';
 import { useTheme } from '../../theme/ThemeProvider';
 import { useSmartLog } from './smartlog/SmartLogProvider';
+import {
+  HomeNavIcon,
+  CalendarNavIcon,
+  StatsNavIcon,
+  UserNavIcon,
+  PlusIcon,
+} from '../icons/Glyphs';
 
 /** Minimal shape of the props expo-router passes to a custom `tabBar`. */
 interface TabRoute {
@@ -24,22 +34,25 @@ interface TabBarProps {
   };
 }
 
-const GLYPH: Record<string, string> = {
-  index: '◔',
-  calendar: '▦',
-  stats: '◴',
-  profile: '◍',
+type NavIcon = ComponentType<{ size?: number; color?: string; fill?: string }>;
+interface TabMeta {
+  icon: NavIcon;
+  labelKey: string;
+  /** Home & profile get a soft interior fill when active. */
+  fillsWhenActive?: boolean;
+}
+const TABS: Record<string, TabMeta> = {
+  index: { icon: HomeNavIcon, labelKey: 'tabs.today', fillsWhenActive: true },
+  calendar: { icon: CalendarNavIcon, labelKey: 'tabs.calendar' },
+  stats: { icon: StatsNavIcon, labelKey: 'tabs.stats' },
+  profile: { icon: UserNavIcon, labelKey: 'tabs.profile', fillsWhenActive: true },
 };
-const LABEL_KEY: Record<string, string> = {
-  index: 'tabs.today',
-  calendar: 'tabs.calendar',
-  stats: 'tabs.stats',
-  profile: 'tabs.profile',
-};
+
+const ACTIVE_FILL = 'rgba(166,115,241,0.15)';
 
 export function FloatingNav({ state, navigation }: TabBarProps) {
   const { t } = useTranslation();
-  const { colors, radius, brand, space } = useTheme();
+  const { colors, brand } = useTheme();
   const insets = useSafeAreaInsets();
   const smartLog = useSmartLog();
 
@@ -47,10 +60,13 @@ export function FloatingNav({ state, navigation }: TabBarProps) {
   const left = routes.slice(0, 2);
   const right = routes.slice(2);
 
-  const renderTab = (route: (typeof routes)[number]) => {
+  const renderTab = (route: TabRoute) => {
+    const meta = TABS[route.name];
+    if (!meta) return null;
     const idx = routes.findIndex((r) => r.key === route.key);
     const focused = state.index === idx;
-    const color = focused ? colors.primary : colors.ink3;
+    const color = focused ? brand.purple : colors.ink3;
+    const Icon = meta.icon;
     return (
       <Pressable
         key={route.key}
@@ -60,11 +76,11 @@ export function FloatingNav({ state, navigation }: TabBarProps) {
           const event = navigation.emit({ type: 'tabPress', target: route.key, canPreventDefault: true });
           if (!focused && !event.defaultPrevented) navigation.navigate(route.name);
         }}
-        style={{ flex: 1, alignItems: 'center', gap: 2, paddingVertical: 6 }}
+        style={{ flex: 1, alignItems: 'center', gap: 3, paddingVertical: 6, opacity: focused ? 1 : 0.85 }}
       >
-        <Text style={{ fontSize: 20, color }}>{GLYPH[route.name] ?? '•'}</Text>
-        <Text variant="label" weight={focused ? 'bold' : 'medium'} color={color}>
-          {t(LABEL_KEY[route.name] ?? route.name)}
+        <Icon size={22} color={color} fill={meta.fillsWhenActive && focused ? ACTIVE_FILL : 'none'} />
+        <Text variant="label" weight={focused ? 'bold' : 'medium'} color={color} numberOfLines={1}>
+          {t(meta.labelKey)}
         </Text>
       </Pressable>
     );
@@ -73,53 +89,52 @@ export function FloatingNav({ state, navigation }: TabBarProps) {
   return (
     <View
       pointerEvents="box-none"
-      style={{ position: 'absolute', left: 0, right: 0, bottom: insets.bottom + 10, alignItems: 'center' }}
+      style={{
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        bottom: insets.bottom + 18,
+        alignItems: 'center',
+        paddingHorizontal: 16,
+      }}
     >
       <View
         style={{
           flexDirection: 'row',
           alignItems: 'center',
+          justifyContent: 'space-around',
           backgroundColor: colors.surface,
-          borderRadius: radius.pill,
-          paddingHorizontal: space.md,
-          height: 64,
-          width: '92%',
-          maxWidth: 440,
+          borderRadius: 38,
+          paddingHorizontal: 14,
+          height: 76,
+          width: '100%',
+          maxWidth: 736,
           borderWidth: 1,
           borderColor: colors.hairline,
-          shadowColor: colors.paperShadow,
-          shadowOffset: { width: 0, height: 6 },
-          shadowOpacity: 1,
-          shadowRadius: 12,
-          elevation: 10,
+          boxShadow: '0 14px 40px rgba(0,0,0,0.10)',
         }}
       >
         {left.map(renderTab)}
 
-        {/* center FAB */}
+        {/* center FAB — opens Smart Log */}
         <Pressable
           accessibilityRole="button"
           accessibilityLabel="Smart Log"
           onPress={() => smartLog.open()}
-          style={{
-            width: 58,
-            height: 58,
-            borderRadius: 29,
+          style={({ pressed }) => ({
+            width: 56,
+            height: 56,
+            borderRadius: 28,
             backgroundColor: brand.peach,
             alignItems: 'center',
             justifyContent: 'center',
-            marginHorizontal: 4,
-            marginTop: -22,
-            borderWidth: 3,
-            borderColor: colors.bg,
-            shadowColor: colors.paperShadow,
-            shadowOffset: { width: 0, height: 4 },
-            shadowOpacity: 1,
-            shadowRadius: 6,
-            elevation: 8,
-          }}
+            marginHorizontal: 6,
+            marginTop: -28,
+            boxShadow: '0 10px 22px rgba(252,164,91,0.5)',
+            transform: [{ scale: pressed ? 0.95 : 1 }],
+          })}
         >
-          <Text style={{ fontSize: 30, color: '#fff', marginTop: -2 }}>+</Text>
+          <PlusIcon size={26} color="#fff" />
         </Pressable>
 
         {right.map(renderTab)}
