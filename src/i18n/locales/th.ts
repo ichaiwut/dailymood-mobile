@@ -204,6 +204,8 @@ const th: typeof en = {
     pickMood: 'อารมณ์ของคุณ',
     notePlaceholder: 'สองสามคำเกี่ยวกับวันนี้…',
     quickSave: 'บันทึกอารมณ์',
+    addPhoto: 'เพิ่มรูป',
+    photoPremium: 'AI Vision (วิเคราะห์รูป) เป็นฟีเจอร์ Pro',
     analyze: 'วิเคราะห์ด้วย AI',
     analyzing: 'กำลังอ่านบันทึกของคุณ…',
     stepMood: 'รับรู้อารมณ์',

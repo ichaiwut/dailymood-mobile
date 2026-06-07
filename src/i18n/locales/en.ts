@@ -203,6 +203,8 @@ export default {
     pickMood: 'Your mood',
     notePlaceholder: 'A few words about today…',
     quickSave: 'Save mood',
+    addPhoto: 'Add photo',
+    photoPremium: 'AI Vision (photos) is a Pro feature.',
     analyze: 'Analyze with AI',
     analyzing: 'Reading your note…',
     stepMood: 'Sensing the mood',

@@ -37,6 +37,12 @@
           "backgroundColor": "#FBF6EE",
           "imageWidth": 180
         }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "DailyMood uses your photos so you can attach them to your mood entries and profile."
+        }
       ]
     ],
     "experiments": {

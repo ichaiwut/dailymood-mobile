@@ -7,7 +7,7 @@
  * still Quick Save. Premium is server-enforced — we only adapt UX.
  */
 import { useEffect, useState } from 'react';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Image } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 
@@ -22,6 +22,7 @@ import { useTheme } from '../../../theme/ThemeProvider';
 import { useMoods, useAiRemaining, useConfirmEntry, useJournalPrompt } from '../../../hooks/queries';
 import { analyzeSmart } from '../../../api/log';
 import { hasAiQuota } from '../../../api/ai';
+import { pickImage, optimizeImage } from '../../../lib/image';
 import { ApiError, errorMessageKey } from '../../../api/errors';
 import { findMood } from '../../../lib/mood';
 import { stripBold } from '../../../lib/text';
@@ -52,6 +53,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [suggestion, setSuggestion] = useState<SmartSuggestion | null>(null);
+  const [imageUri, setImageUri] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Reset each time the sheet opens.
@@ -63,6 +65,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
       setTags([]);
       setNewTag('');
       setSuggestion(null);
+      setImageUri(null);
       setError(null);
     }
   }, [visible, initialMoodId]);
@@ -99,6 +102,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
         sentiment: params.aiSource === 'nlp' ? suggestion?.sentiment ?? undefined : undefined,
         aiSource: params.aiSource,
         activityId: params.aiSource === 'nlp' ? suggestion?.suggestedActivityId ?? undefined : undefined,
+        imageKey: params.aiSource === 'nlp' ? suggestion?.imageKey ?? undefined : undefined,
         date: initialDate,
       });
       onClose();
@@ -116,7 +120,11 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
     setError(null);
     setStep('analyzing');
     try {
-      const result = await analyzeSmart({ text: note.trim(), locale: i18n.language });
+      const result = await analyzeSmart({
+        text: note.trim(),
+        locale: i18n.language,
+        imageUri: imageUri ?? undefined,
+      });
       setSuggestion(result);
       setMoodId(result.suggestedMoodId || effectiveMoodId);
       setTags(result.tags ?? []);
@@ -130,6 +138,16 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
       setError(t(errorMessageKey(e)));
       setStep('input');
     }
+  };
+
+  const addPhoto = async () => {
+    if (!premium) {
+      onClose();
+      router.push('/profile/subscription');
+      return;
+    }
+    const picked = await pickImage();
+    if (picked) setImageUri(await optimizeImage(picked));
   };
 
   const removeTag = (tag: string) => setTags((ts) => ts.filter((x) => x !== tag));
@@ -194,13 +212,42 @@ export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: 
 
           {/* note */}
           {step === 'input' ? (
-            <TextField
-              placeholder={notePlaceholder}
-              value={note}
-              onChangeText={setNote}
-              multiline
-              style={{ minHeight: 96, textAlignVertical: 'top' }}
-            />
+            <>
+              <TextField
+                placeholder={notePlaceholder}
+                value={note}
+                onChangeText={setNote}
+                multiline
+                style={{ minHeight: 96, textAlignVertical: 'top' }}
+              />
+              {imageUri ? (
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+                  <Image source={{ uri: imageUri }} style={{ width: 64, height: 64, borderRadius: radius.md }} />
+                  <Pressable onPress={() => setImageUri(null)} hitSlop={8}>
+                    <Text variant="label" color={colors.danger}>✕</Text>
+                  </Pressable>
+                </View>
+              ) : (
+                <Pressable
+                  onPress={addPhoto}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: space.sm,
+                    alignSelf: 'flex-start',
+                    backgroundColor: colors.surface2,
+                    borderRadius: radius.pill,
+                    paddingHorizontal: space.md,
+                    paddingVertical: 8,
+                  }}
+                >
+                  <Text style={{ fontSize: 16 }}>📷</Text>
+                  <Text variant="label" weight="medium" color={colors.ink2}>
+                    {t('smartlog.addPhoto')}{premium ? '' : ' ✦'}
+                  </Text>
+                </Pressable>
+              )}
+            </>
           ) : null}
 
           {/* AI result */}

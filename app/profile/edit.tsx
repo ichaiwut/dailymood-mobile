@@ -4,7 +4,7 @@
  * milestone (needs the picker + optimize pipeline).
  */
 import { useState, useEffect } from 'react';
-import { View, Pressable, ActivityIndicator } from 'react-native';
+import { View, Pressable, ActivityIndicator, Image } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 
@@ -14,7 +14,9 @@ import { Button } from '../../src/components/Button';
 import { TextField } from '../../src/components/TextField';
 import { Notice } from '../../src/components/Notice';
 import { useTheme } from '../../src/theme/ThemeProvider';
-import { useProfile, useUpdateProfile } from '../../src/hooks/queries';
+import { useProfile, useUpdateProfile, useUploadAvatar } from '../../src/hooks/queries';
+import { pickImage, optimizeImage } from '../../src/lib/image';
+import { initials } from '../../src/lib/avatar';
 import { errorMessageKey } from '../../src/api/errors';
 
 const ACCENTS = ['#A673F1', '#FCA45B', '#85ECCB', '#FDCB56', '#9ACDE2', '#D4BEE4'];
@@ -25,6 +27,18 @@ export default function EditProfileScreen() {
   const router = useRouter();
   const profile = useProfile();
   const update = useUpdateProfile();
+  const upload = useUploadAvatar();
+  const premium = profile.data?.user.isPremium ?? false;
+  const avatarUrl = profile.data?.user.imageUrl ?? null;
+
+  const onAvatar = async () => {
+    if (!premium) {
+      router.push('/profile/subscription');
+      return;
+    }
+    const picked = await pickImage();
+    if (picked) upload.mutate(await optimizeImage(picked));
+  };
 
   const [name, setName] = useState('');
   const [bio, setBio] = useState('');
@@ -64,6 +78,53 @@ export default function EditProfileScreen() {
       ) : (
         <>
           {error ? <Notice message={error} tone="error" /> : null}
+
+          {/* avatar */}
+          <View style={{ alignItems: 'center', gap: space.sm }}>
+            <Pressable onPress={onAvatar} style={{ position: 'relative' }}>
+              <View
+                style={{
+                  width: 96,
+                  height: 96,
+                  borderRadius: 48,
+                  backgroundColor: accent,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  overflow: 'hidden',
+                }}
+              >
+                {avatarUrl ? (
+                  <Image source={{ uri: avatarUrl }} style={{ width: 96, height: 96 }} />
+                ) : (
+                  <Text variant="h1" color="#fff">{initials(name, profile.data?.user.email)}</Text>
+                )}
+              </View>
+              <View
+                style={{
+                  position: 'absolute',
+                  right: 0,
+                  bottom: 0,
+                  width: 30,
+                  height: 30,
+                  borderRadius: 15,
+                  backgroundColor: colors.accent,
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  borderWidth: 2,
+                  borderColor: colors.bg,
+                }}
+              >
+                {upload.isPending ? (
+                  <ActivityIndicator color="#fff" size="small" />
+                ) : (
+                  <Text style={{ fontSize: 14 }}>📷</Text>
+                )}
+              </View>
+            </Pressable>
+            {!premium ? (
+              <Text variant="label" color={colors.ink3}>✦ {t('subscription.pro')}</Text>
+            ) : null}
+          </View>
 
           <TextField label={t('profile.name')} value={name} onChangeText={setName} maxLength={30} />
           <TextField

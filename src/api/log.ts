@@ -7,6 +7,7 @@
  *   - listEntries: entries for a given ICT date (signed image URLs)
  */
 import { apiFetch } from './client';
+import { appendImagePart } from '../lib/image';
 import type {
   MoodEntry,
   SmartSuggestion,
@@ -16,25 +17,19 @@ import type {
 } from './types';
 
 /**
- * POST /api/log/smart — multipart. `text` and/or `image` (premium AI Vision).
- * Returns a suggestion; nothing is saved yet.
+ * POST /api/log/smart — multipart. `text` and/or `imageUri` (premium AI Vision).
+ * Uploads + analyzes in one call; the returned suggestion carries `imageKey` to
+ * pass to confirm. Nothing is saved yet.
  */
-export function analyzeSmart(params: {
+export async function analyzeSmart(params: {
   text?: string;
   locale?: string;
-  image?: { uri: string; name: string; type: string };
+  imageUri?: string;
 }): Promise<SmartSuggestion> {
   const form = new FormData();
   if (params.text) form.append('text', params.text);
   if (params.locale) form.append('locale', params.locale);
-  if (params.image) {
-    // React Native FormData file part.
-    form.append('image', {
-      uri: params.image.uri,
-      name: params.image.name,
-      type: params.image.type,
-    } as unknown as Blob);
-  }
+  if (params.imageUri) await appendImagePart(form, 'image', params.imageUri);
   return apiFetch<SmartSuggestion>('/api/log/smart', { method: 'POST', body: form });
 }
 

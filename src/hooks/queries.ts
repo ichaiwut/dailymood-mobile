@@ -4,7 +4,13 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchMoods } from '../api/moods';
-import { fetchProfile, updateProfile, fetchAchievements } from '../api/profile';
+import {
+  fetchProfile,
+  updateProfile,
+  fetchAchievements,
+  uploadAvatar,
+  deleteAvatar,
+} from '../api/profile';
 import { fetchSubscription, activateTrial } from '../api/subscription';
 import { listEntries, confirmEntry, getEntry, updateEntry, deleteEntry } from '../api/log';
 import { fetchAiRemaining, fetchJournalPrompt } from '../api/ai';
@@ -157,6 +163,22 @@ export function useUpdateProfile() {
   const qc = useQueryClient();
   return useMutation({
     mutationFn: (input: UpdateProfileInput) => updateProfile(input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.profile }),
+  });
+}
+
+export function useUploadAvatar() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (uri: string) => uploadAvatar(uri),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.profile }),
+  });
+}
+
+export function useDeleteAvatar() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => deleteAvatar(),
     onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.profile }),
   });
 }
