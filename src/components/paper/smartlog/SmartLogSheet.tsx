@@ -193,22 +193,36 @@ export function SmartLogSheet({
   };
 
   return (
-    <BottomSheet visible={visible} onClose={close}>
+    <BottomSheet
+      visible={visible}
+      onClose={close}
+      decoration={
+        <View
+          style={{
+            width: 128,
+            height: 26,
+            borderRadius: 3,
+            backgroundColor: 'rgba(212,190,228,0.75)',
+            transform: [{ rotate: '-3deg' }],
+          }}
+        />
+      }
+    >
       {/* header */}
       <View style={{ marginBottom: space.lg, gap: space.md }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
           <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
             <View
               style={{
-                width: 44,
-                height: 44,
-                borderRadius: radius.md,
+                width: 34,
+                height: 34,
+                borderRadius: 10,
                 backgroundColor: brand.purple,
                 alignItems: 'center',
                 justifyContent: 'center',
               }}
             >
-              <Text style={{ fontSize: 22, color: '#fff' }}>✦</Text>
+              <Text style={{ fontSize: 16, color: '#fff' }}>✦</Text>
             </View>
             <Text variant="h2">{t('smartlog.drawerTitle')}</Text>
           </View>
@@ -220,7 +234,7 @@ export function SmartLogSheet({
               width: 36,
               height: 36,
               borderRadius: 18,
-              backgroundColor: colors.surface2,
+              backgroundColor: colors.surface3,
               alignItems: 'center',
               justifyContent: 'center',
             }}
@@ -283,7 +297,7 @@ export function SmartLogSheet({
                 value={note}
                 onChangeText={setNote}
                 multiline
-                style={{ minHeight: 96, textAlignVertical: 'top' }}
+                style={{ minHeight: 120, textAlignVertical: 'top' }}
               />
               {imageUri ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
@@ -294,11 +308,21 @@ export function SmartLogSheet({
                 </View>
               ) : null}
 
-              {/* toolbar: voice / photo / location */}
-              <View style={{ flexDirection: 'row', gap: space.sm }}>
+              {/* toolbar: voice / photo / location  + AI quota (free) */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
                 <PaperIconButton glyph="🎤" onPress={() => setHint(t('smartlog.comingSoon'))} />
-                <PaperIconButton glyph="📷" onPress={addPhoto} />
+                <PaperIconButton
+                  glyph="📷"
+                  onPress={addPhoto}
+                  badge={premium ? undefined : 'PRO'}
+                  dim={!premium}
+                />
                 <PaperIconButton glyph="📍" onPress={() => setHint(t('smartlog.comingSoon'))} />
+                {!premium ? (
+                  <Text variant="label" color={colors.ink3} style={{ marginLeft: 'auto' }}>
+                    {t('smartlog.quotaLeft', { count: ai.data?.remaining ?? 0 })}
+                  </Text>
+                ) : null}
               </View>
               {hint ? (
                 <Text variant="label" color={colors.ink3}>{hint}</Text>
@@ -338,6 +362,45 @@ export function SmartLogSheet({
                   </View>
                   </ScrollView>
                 </View>
+              ) : null}
+
+              {/* PRO teaser — never hide premium features (handover rule). */}
+              {!premium ? (
+                <Pressable
+                  onPress={() => {
+                    onClose();
+                    router.push('/profile/subscription');
+                  }}
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    gap: space.md,
+                    backgroundColor: '#ECE3F4',
+                    borderRadius: radius.md,
+                    paddingVertical: 14,
+                    paddingHorizontal: space.lg,
+                  }}
+                >
+                  <View
+                    style={{
+                      width: 30,
+                      height: 30,
+                      borderRadius: 9,
+                      backgroundColor: brand.purple,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                    }}
+                  >
+                    <Text style={{ fontSize: 14, color: '#fff' }}>✦</Text>
+                  </View>
+                  <Text variant="label" color={colors.ink2} style={{ flex: 1 }}>
+                    <Text variant="label" weight="bold" color={brand.purpleStrong}>PRO</Text>
+                    {`  ${t('smartlog.proTeaser')}  `}
+                    <Text variant="label" weight="bold" color={brand.purpleStrong}>
+                      {t('smartlog.proUpgrade')}
+                    </Text>
+                  </Text>
+                </Pressable>
               ) : null}
             </>
           ) : null}

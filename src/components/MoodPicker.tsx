@@ -69,19 +69,27 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
               accessibilityLabel={moodLabel(m, i18n.language)}
               onPress={() => onSelect(m)}
               style={{
-                width: 76,
+                width: 74,
                 alignItems: 'center',
                 gap: 6,
-                paddingVertical: space.md,
+                paddingTop: 11,
+                paddingBottom: 9,
                 paddingHorizontal: space.xs,
                 borderRadius: radius.md,
                 backgroundColor: colors.surface,
-                borderWidth: 2,
+                borderWidth: selected ? 2 : 1,
                 borderColor: selected ? colors.ink : colors.hairline,
                 boxShadow: shadow.sm,
+                transform: [{ translateY: selected ? -1 : 0 }],
               }}
             >
-              <PASticker color={m.color} moodId={m.id} pack={pack} size={46} />
+              <PASticker
+                color={m.color}
+                moodId={m.id}
+                pack={pack}
+                size={44}
+                discBg={selected ? m.color : colors.surface3}
+              />
               <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
                 {moodLabel(m, i18n.language)}
               </Text>

@@ -22,9 +22,12 @@ export interface PAStickerProps {
   emoji?: string;
   size?: number;
   halo?: boolean;
+  /** Explicit disc background (overrides the soft mood tint) — used by the
+   *  Smart Log tiles where unselected = neutral and selected = full mood color. */
+  discBg?: string;
 }
 
-export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji, size = 56, halo }: PAStickerProps) {
+export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji, size = 56, halo, discBg }: PAStickerProps) {
   const { shadow } = useTheme();
 
   // Badges (emoji) keep a full-color disc. Mood stickers show the pack face on
@@ -48,7 +51,7 @@ export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji
         width: size,
         height: size,
         borderRadius: size / 2,
-        backgroundColor: isMood ? color + '40' : color,
+        backgroundColor: discBg ?? (isMood ? color + '40' : color),
         alignItems: 'center',
         justifyContent: 'center',
         borderWidth: 4,

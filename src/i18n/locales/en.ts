@@ -229,6 +229,8 @@ export default {
     addTag: 'Add a theme',
     quotaLeft: '{{count}} AI left today',
     quotaUnlimited: 'Unlimited AI',
+    proTeaser: 'AI reads what you write — then sums up your mood, themes and an insight automatically.',
+    proUpgrade: 'Upgrade →',
     rateLimitTitle: "That's all the AI for today",
     rateLimitBody: 'Free includes 3 AI analyses a day. You can still save your mood, or go unlimited with Pro.',
     rateLimitSave: 'Save mood instead',

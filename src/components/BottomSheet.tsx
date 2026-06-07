@@ -22,9 +22,11 @@ export interface BottomSheetProps {
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
+  /** Decoration drawn over the sheet's top edge (e.g. washi tape). */
+  decoration?: ReactNode;
 }
 
-export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
+export function BottomSheet({ visible, onClose, children, decoration }: BottomSheetProps) {
   const { colors, radius, space } = useTheme();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
@@ -56,6 +58,11 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
               paddingBottom: insets.bottom + space.lg,
             }}
           >
+            {decoration ? (
+              <View pointerEvents="none" style={styles.decoration}>
+                {decoration}
+              </View>
+            ) : null}
             <View style={{ alignItems: 'center', paddingVertical: space.md }}>
               <View
                 style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: colors.hairline2 }}
@@ -78,4 +85,5 @@ export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
 const styles = StyleSheet.create({
   fill: { flex: 1, justifyContent: 'flex-end' },
   bottomAnchor: { justifyContent: 'flex-end' },
+  decoration: { position: 'absolute', top: -12, left: 0, right: 0, alignItems: 'center', zIndex: 10 },
 });

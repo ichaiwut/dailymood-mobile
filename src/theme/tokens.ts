@@ -29,6 +29,7 @@ export interface ThemeColors {
   bg: string;
   surface: string; // paper
   surface2: string; // paper-2 (inset)
+  surface3: string; // neutral tint (unselected mood disc, close button)
   kraft: string; // manila folder back
   ink: string;
   ink2: string;
@@ -51,6 +52,7 @@ const light: ThemeColors = {
   bg: '#F1E5CF', // kraft-cream desk
   surface: '#FFFFFF',
   surface2: '#FCF7EE',
+  surface3: '#F2F0F5',
   kraft: '#E9D6B4',
   ink: '#1A1320',
   ink2: '#5A4E62',
@@ -75,6 +77,7 @@ const dark: ThemeColors = {
   bg: '#17121C',
   surface: '#221A29',
   surface2: '#2C2233',
+  surface3: '#2F293B',
   ink: '#F5EFFA',
   ink2: '#C9BFD4',
   hairline: 'rgba(255,255,255,0.10)',

@@ -230,6 +230,8 @@ const th: typeof en = {
     addTag: 'เพิ่มประเด็น',
     quotaLeft: 'เหลือ AI วันนี้ {{count}} ครั้ง',
     quotaUnlimited: 'AI ไม่จำกัด',
+    proTeaser: 'AI อ่านสิ่งที่คุณเขียน แล้วสรุปอารมณ์ แท็ก และ insight ให้อัตโนมัติ',
+    proUpgrade: 'อัปเกรด →',
     rateLimitTitle: 'วันนี้ใช้ AI ครบแล้ว',
     rateLimitBody: 'แบบฟรีใช้ AI ได้วันละ 3 ครั้ง คุณยังบันทึกอารมณ์ได้ หรืออัปเป็น Pro เพื่อใช้ไม่จำกัด',
     rateLimitSave: 'บันทึกอารมณ์แทน',
