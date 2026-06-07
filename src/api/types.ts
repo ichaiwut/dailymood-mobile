@@ -175,6 +175,8 @@ export interface ConfirmEntryInput {
   imageKey?: string | null;
   date?: string;
   location?: string | null;
+  locationLat?: number | null;
+  locationLng?: number | null;
 }
 
 /**
@@ -253,6 +255,8 @@ export interface UpdateEntryInput {
   date?: string;
   activityId?: string | null;
   location?: string | null;
+  locationLat?: number | null;
+  locationLng?: number | null;
 }
 
 // --- Stats (GET /api/stats?period=) ---

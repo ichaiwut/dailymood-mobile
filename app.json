@@ -43,6 +43,12 @@
         {
           "photosPermission": "DailyMood uses your photos so you can attach them to your mood entries and profile."
         }
+      ],
+      [
+        "expo-location",
+        {
+          "locationWhenInUsePermission": "DailyMood uses your location only to tag where a mood entry happened. It stays private to your account."
+        }
       ]
     ],
     "experiments": {

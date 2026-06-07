@@ -40,8 +40,10 @@ import {
   CalendarIcon,
   CameraIcon,
   PinIcon,
+  PinFilledIcon,
   MicIcon,
 } from '../../icons/Glyphs';
+import { getCurrentPlace } from '../../../lib/location';
 import i18n from '../../../i18n';
 import type { SmartSuggestion } from '../../../api/types';
 
@@ -83,6 +85,8 @@ export function SmartLogSheet({
   const [suggestion, setSuggestion] = useState<SmartSuggestion | null>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [activityId, setActivityId] = useState<string | null>(null);
+  const [location, setLocation] = useState<{ name: string; lat: number; lng: number } | null>(null);
+  const [locating, setLocating] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,6 +101,8 @@ export function SmartLogSheet({
       setSuggestion(null);
       setImageUri(null);
       setActivityId(null);
+      setLocation(null);
+      setLocating(false);
       setHint(null);
       setError(null);
     }
@@ -146,6 +152,9 @@ export function SmartLogSheet({
           (params.aiSource === 'nlp' ? suggestion?.suggestedActivityId ?? undefined : undefined),
         imageKey: params.aiSource === 'nlp' ? suggestion?.imageKey ?? undefined : undefined,
         date: initialDate,
+        location: location?.name ?? undefined,
+        locationLat: location?.lat ?? undefined,
+        locationLng: location?.lng ?? undefined,
       });
       onClose();
     } catch (e) {
@@ -191,6 +200,20 @@ export function SmartLogSheet({
     }
     const picked = await pickImage();
     if (picked) setImageUri(await optimizeImage(picked));
+  };
+
+  const tagLocation = async () => {
+    if (locating) return;
+    setLocating(true);
+    setHint(t('smartlog.locationFinding'));
+    const r = await getCurrentPlace();
+    setLocating(false);
+    if (r.ok) {
+      setLocation({ name: r.name, lat: r.lat, lng: r.lng });
+      setHint(null);
+    } else {
+      setHint(t(r.reason === 'denied' ? 'smartlog.locationDenied' : 'smartlog.locationUnavailable'));
+    }
   };
 
   const removeTag = (tag: string) => setTags((ts) => ts.filter((x) => x !== tag));
@@ -332,8 +355,14 @@ export function SmartLogSheet({
                   dim={!premium}
                 />
                 <PaperIconButton
-                  icon={<PinIcon size={20} color={colors.ink2} />}
-                  onPress={() => setHint(t('smartlog.comingSoon'))}
+                  icon={
+                    location ? (
+                      <PinFilledIcon size={20} color={brand.purple} />
+                    ) : (
+                      <PinIcon size={20} color={colors.ink2} />
+                    )
+                  }
+                  onPress={tagLocation}
                 />
                 {!premium ? (
                   <Text variant="label" color={colors.ink3} style={{ marginLeft: 'auto' }}>
@@ -343,6 +372,35 @@ export function SmartLogSheet({
               </View>
               {hint ? (
                 <Text variant="label" color={colors.ink3}>{hint}</Text>
+              ) : null}
+
+              {/* location pill */}
+              {location ? (
+                <View
+                  style={{
+                    flexDirection: 'row',
+                    alignItems: 'center',
+                    alignSelf: 'flex-start',
+                    gap: 6,
+                    backgroundColor: colors.surface3,
+                    borderRadius: radius.pill,
+                    paddingLeft: 10,
+                    paddingRight: 6,
+                    paddingVertical: 6,
+                  }}
+                >
+                  <PinFilledIcon size={14} color={brand.purple} />
+                  <Text variant="label" weight="medium" numberOfLines={1} style={{ maxWidth: 220 }}>
+                    {location.name}
+                  </Text>
+                  <Pressable
+                    onPress={() => setLocation(null)}
+                    hitSlop={8}
+                    accessibilityLabel={t('common.cancel')}
+                  >
+                    <CloseIcon size={14} color={colors.ink3} />
+                  </Pressable>
+                </View>
               ) : null}
 
               {/* activity chips */}

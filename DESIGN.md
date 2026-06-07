@@ -108,6 +108,13 @@ not pixel-pinned.
 - **Toolbar:** `PaperIconButton` ×3 — Mic / Camera / Pin (SVG glyphs). Camera is gated:
   free users see a **"PRO" badge + 0.55 opacity** (still tappable → routes to
   `/profile/subscription`). Right-aligned AI-remaining counter for free tier.
+  - **Location (Pin):** taps → `getCurrentPlace()` (`src/lib/location.ts`, expo-location
+    GPS + reverse geocode, no Maps key). On success shows a **location pill** (filled
+    purple pin + place name + × clear, `surface3` bg); the toolbar pin turns filled/purple.
+    Permission-denied / failure shows a gentle hint, never a raw error. Saved as
+    `location` / `locationLat` / `locationLng` on confirm (sent for manual *and* nlp).
+    Reverse geocoding is unavailable on web → falls back to `lat, lng` text.
+    **Only runs on a dev build / device**, not web preview / Expo Go.
 - **PRO teaser** (free only): lavender `#ECE3F4` box, sparkle + copy + "อัปเกรด →",
   routes to subscription. Never hidden.
 - **Activity chips:** horizontal scroll, single-select; selected = ink fill.
@@ -135,5 +142,5 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 - Live API mood set/colors differ from the design mock (backend data, not fixable here).
 - Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:
   insights, profile, subscription screens. Bottom-nav icons are placeholder glyphs.
-- Deferred features: native Google/Apple sign-in (needs dev build), voice input,
-  location/Maps, reminder & privacy toggles, dark mode, share cards.
+- Deferred features: native Google/Apple sign-in (needs dev build), voice input (mic
+  button is still a "coming soon" stub), reminder & privacy toggles, dark mode, share cards.
