@@ -177,6 +177,18 @@ not pixel-pinned.
 
 ---
 
+## 4b. Entry Detail — `app/entry/[id].tsx`
+
+Single-column Paper Desk stack (handoff entry-detail spec). Top bar (← back ghost +
+✎ edit paper pill) → **mood hero folder** (lav `PaperSheet` tab = long date, paperclip,
+soft mood-color glow, 64px `PASticker` rotated -6°, mood name + day·time·period, big day
+number + italic month + year, "Entry #N" + activity chip) → **note** (washi peach) →
+**AI insight** (washi yellow, sparkle + "AI noticed" + disclaimer) → **flashback**
+(premium: washi-lav; free: dashed teaser → Pro) → **photo** (clip) → **location** pill →
+**tags** → rail: **nearby days** (ink tab, sticker + date + "this entry" badge + note
+preview), **last month** (mint tab), **streak** (washi peach, 🔥 + day count) → **2-step
+delete** (text → red confirm). Uses `PaperSheet` tab colors lav/ink/mint + washi tints.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
