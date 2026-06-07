@@ -219,10 +219,13 @@ Month nav (‹ month-year › paper buttons) → segmented **calendar / timeline
 - **Timeline filter chips:** inactive = soft paper shadow; active = ink fill + chunky
   `0 6px 0 -2px #000` offset shadow.
 - **3rd toggle "Year"** → `/year-in-pixels` (🔒 prefix for free).
-- **In progress (endpoints confirmed live):** premium AI cards (monthly summary / patterns
-  / ask-AI, `/api/calendar/ai` + `/api/calendar/ask`) + free upsell; day-cell indicators
-  (★ best-day, recurring/anomaly dots from `/api/calendar/ai`; special-day dots from
-  `/api/events`).
+- **AI cards above the grid** (`CalendarAi.tsx`): premium → monthly summary (RichText bold +
+  best/hard-day & top-tag chips) + patterns feed (pastel icon discs) + **ask-AI bar**
+  (`/api/calendar/ask`, 429 → toast, answer + matching-date chips open the day); free →
+  upsell card → subscription (never hidden).
+- **Day-cell indicators:** special-day dot top-left (holiday `#F43F5E` / personal `#3B82F6`,
+  from `/api/events`, all tiers) · ★ best-day top-right · recurring (purple) / anomaly (lav)
+  dot bottom-center (from `/api/calendar/ai`, premium).
 
 ## 4e. Year in Pixels — `app/year-in-pixels.tsx` (Pro, `/api/year-in-pixels`)
 

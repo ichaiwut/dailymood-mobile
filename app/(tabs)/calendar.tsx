@@ -3,7 +3,7 @@
  * grid + stats, and a timeline feed, switched by a segmented toggle. Month nav
  * at the top. Tapping a day opens the Day Sheet; tapping an entry opens detail.
  */
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { View, Pressable, ActivityIndicator } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -14,9 +14,10 @@ import { Notice } from '../../src/components/Notice';
 import { MoodGrid } from '../../src/components/paper/calendar/MoodGrid';
 import { TimelineFeed } from '../../src/components/paper/calendar/TimelineFeed';
 import { DaySheet } from '../../src/components/paper/calendar/DaySheet';
+import { CalendarAiPanel, CalendarAiUpsell } from '../../src/components/paper/calendar/CalendarAi';
 import { PaperSheet, FolderTab } from '../../src/components/paper/PaperSheet';
 import { useTheme } from '../../src/theme/ThemeProvider';
-import { useCalendarMonth, useMoods, useAiRemaining } from '../../src/hooks/queries';
+import { useCalendarMonth, useMoods, useAiRemaining, useEvents, useCalendarAi } from '../../src/hooks/queries';
 import { moodLabel } from '../../src/lib/mood';
 import { todayKey, formatDateKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
@@ -39,6 +40,22 @@ export default function CalendarScreen() {
   const moods = useMoods();
   const ai = useAiRemaining();
   const premium = ai.data?.tier === 'premium';
+  const events = useEvents(year, month);
+  const calAi = useCalendarAi(year, month, i18n.language, premium);
+
+  const eventMap = useMemo(
+    () => new Map((events.data?.events ?? []).map((e) => [e.date, e.type])),
+    [events.data],
+  );
+  const bestDate = calAi.data?.highlights?.bestDay?.date ?? null;
+  const recurringDates = useMemo(
+    () => new Set((calAi.data?.patterns ?? []).filter((p) => p.type === 'recurring').flatMap((p) => p.dates)),
+    [calAi.data],
+  );
+  const anomalyDates = useMemo(
+    () => new Set((calAi.data?.patterns ?? []).filter((p) => p.type === 'anomaly').flatMap((p) => p.dates)),
+    [calAi.data],
+  );
 
   const shiftMonth = (delta: number) => {
     let m = month + delta;
@@ -113,6 +130,12 @@ export default function CalendarScreen() {
             <Notice message={t(errorMessageKey(cal.error))} tone="error" />
           ) : (
             <View style={{ gap: space.lg }}>
+              {/* AI cards above the grid (premium) / free upsell (never hidden) */}
+              {premium ? (
+                <CalendarAiPanel year={year} month={month} onPickDate={setSelectedDate} />
+              ) : (
+                <CalendarAiUpsell />
+              )}
               <PaperSheet clip clipSide="right">
                 <MoodGrid
                   year={year}
@@ -122,6 +145,10 @@ export default function CalendarScreen() {
                   locale={i18n.language}
                   onDayPress={setSelectedDate}
                   selectedDate={selectedDate}
+                  events={eventMap}
+                  bestDate={bestDate}
+                  recurringDates={recurringDates}
+                  anomalyDates={anomalyDates}
                 />
               </PaperSheet>
               {cal.data ? (

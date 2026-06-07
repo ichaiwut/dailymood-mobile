@@ -29,9 +29,29 @@ export interface MoodGridProps {
   locale: string;
   onDayPress: (dateKey: string) => void;
   selectedDate?: string | null;
+  /** date → 'holiday' | 'personal' (special-day dot, top-left). */
+  events?: Map<string, string>;
+  /** best-day date (★ top-right). */
+  bestDate?: string | null;
+  /** recurring-pattern dates (purple dot, bottom). */
+  recurringDates?: Set<string>;
+  /** anomaly-pattern dates (lavender dot, bottom). */
+  anomalyDates?: Set<string>;
 }
 
-export function MoodGrid({ year, month, days, moods, locale, onDayPress, selectedDate }: MoodGridProps) {
+export function MoodGrid({
+  year,
+  month,
+  days,
+  moods,
+  locale,
+  onDayPress,
+  selectedDate,
+  events,
+  bestDate,
+  recurringDates,
+  anomalyDates,
+}: MoodGridProps) {
   const { colors, space, brand } = useTheme();
   const { t } = useTranslation();
   const toast = useToast();
@@ -70,6 +90,12 @@ export function MoodGrid({ year, month, days, moods, locale, onDayPress, selecte
           const isFuture = isFutureKey(dateKey);
           // selected ring (ink) wins over today ring (purple).
           const ringColor = isSelected ? colors.ink : isToday ? brand.purple : 'transparent';
+          const special = events?.get(dateKey);
+          const patternColor = recurringDates?.has(dateKey)
+            ? brand.purple
+            : anomalyDates?.has(dateKey)
+              ? brand.lavender
+              : null;
           return (
             <View key={dateKey} style={{ width: `${100 / 7}%`, aspectRatio: 1, padding: 3 }}>
               <Pressable
@@ -93,6 +119,43 @@ export function MoodGrid({ year, month, days, moods, locale, onDayPress, selecte
                 >
                   {day}
                 </Text>
+                {/* special-day dot (top-left) */}
+                {special ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: 4,
+                      left: 4,
+                      width: 7,
+                      height: 7,
+                      borderRadius: 4,
+                      backgroundColor: special === 'holiday' ? '#F43F5E' : '#3B82F6',
+                    }}
+                  />
+                ) : null}
+                {/* best-day ★ (top-right, overflows) */}
+                {bestDate === dateKey ? (
+                  <View
+                    style={{
+                      position: 'absolute',
+                      top: -5,
+                      right: -5,
+                      width: 16,
+                      height: 16,
+                      borderRadius: 8,
+                      backgroundColor: colors.surface,
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 2px 5px -2px rgba(0,0,0,0.4)',
+                    }}
+                  >
+                    <Text style={{ fontSize: 9, color: brand.peach }}>★</Text>
+                  </View>
+                ) : null}
+                {/* recurring / anomaly dot (bottom-center) */}
+                {patternColor ? (
+                  <View style={{ position: 'absolute', bottom: 4, width: 6, height: 6, borderRadius: 3, backgroundColor: patternColor }} />
+                ) : null}
               </Pressable>
             </View>
           );
