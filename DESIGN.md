@@ -96,6 +96,9 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
   ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
   as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
+- **`StreakCard`** (`paper/today/`) — washi-taped white sheet: **STREAK** eyebrow, big
+  number (46px) + "วันติดต่อกัน" + 🔥 (pushed right), and a 14-cell progress row (peach up
+  to the streak, `surface3` beyond). Ported from web streak-card.
 - **`AiWeeklyFolder`** (`paper/today/`) — "✦ AI · สัปดาห์นี้" folder, placed **after** the
   entries list on Today. Dark **plum gradient** (`plum2 → plum`, ~155°, via
   `expo-linear-gradient`) + a soft peach corner glow, matching web. Always shown (never

@@ -212,6 +212,8 @@ export default {
     items_one: '{{count}} entry',
     items_other: '{{count}} entries',
     now: 'Now',
+    streakLabel: 'STREAK',
+    consecutiveDays: 'consecutive days',
   },
   smartlog: {
     title: 'How was your day?',

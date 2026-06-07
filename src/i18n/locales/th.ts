@@ -213,6 +213,8 @@ const th: typeof en = {
     items_one: '{{count}} รายการ',
     items_other: '{{count}} รายการ',
     now: 'ตอนนี้',
+    streakLabel: 'STREAK',
+    consecutiveDays: 'วันติดต่อกัน',
   },
   smartlog: {
     title: 'วันนี้เป็นยังไงบ้าง',
