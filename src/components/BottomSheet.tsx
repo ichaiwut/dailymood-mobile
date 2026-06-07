@@ -51,7 +51,7 @@ export function BottomSheet({ visible, onClose, children, decoration }: BottomSh
         >
           <View
             style={{
-              backgroundColor: colors.bg,
+              backgroundColor: colors.surface,
               borderTopLeftRadius: radius.lg + 6,
               borderTopRightRadius: radius.lg + 6,
               maxHeight: height * 0.9,
