@@ -21,6 +21,21 @@ function placeName(g: Location.LocationGeocodedAddress | undefined): string | nu
   return area && area !== primary ? `${primary}, ${area}` : primary;
 }
 
+/** Resolve a typed place name to coords (native only); name-only on web/failure. */
+export async function geocodePlace(
+  name: string,
+): Promise<{ name: string; lat?: number; lng?: number }> {
+  const trimmed = name.trim().slice(0, 200);
+  if (!trimmed || Platform.OS === 'web') return { name: trimmed };
+  try {
+    const hits = await Location.geocodeAsync(trimmed);
+    if (hits[0]) return { name: trimmed, lat: hits[0].latitude, lng: hits[0].longitude };
+  } catch {
+    // ignore — keep the name without coords.
+  }
+  return { name: trimmed };
+}
+
 export async function getCurrentPlace(): Promise<PlaceResult> {
   try {
     const { status } = await Location.requestForegroundPermissionsAsync();

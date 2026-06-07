@@ -7,7 +7,7 @@
  * still Quick Save. Premium is server-enforced — we only adapt UX.
  */
 import { useEffect, useState } from 'react';
-import { View, Pressable, Image, ScrollView } from 'react-native';
+import { View, Pressable, Image, ScrollView, TextInput } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 
@@ -42,8 +42,9 @@ import {
   PinIcon,
   PinFilledIcon,
   MicIcon,
+  SearchIcon,
 } from '../../icons/Glyphs';
-import { getCurrentPlace } from '../../../lib/location';
+import { getCurrentPlace, geocodePlace } from '../../../lib/location';
 import i18n from '../../../i18n';
 import type { SmartSuggestion } from '../../../api/types';
 
@@ -85,7 +86,9 @@ export function SmartLogSheet({
   const [suggestion, setSuggestion] = useState<SmartSuggestion | null>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [activityId, setActivityId] = useState<string | null>(null);
-  const [location, setLocation] = useState<{ name: string; lat: number; lng: number } | null>(null);
+  const [location, setLocation] = useState<{ name: string; lat?: number; lng?: number } | null>(null);
+  const [locOpen, setLocOpen] = useState(false);
+  const [locQuery, setLocQuery] = useState('');
   const [locating, setLocating] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -102,6 +105,8 @@ export function SmartLogSheet({
       setImageUri(null);
       setActivityId(null);
       setLocation(null);
+      setLocOpen(false);
+      setLocQuery('');
       setLocating(false);
       setHint(null);
       setError(null);
@@ -202,7 +207,24 @@ export function SmartLogSheet({
     if (picked) setImageUri(await optimizeImage(picked));
   };
 
-  const tagLocation = async () => {
+  // Tapping the pin toggles the place-name search field (web parity).
+  const toggleLocation = () => {
+    setHint(null);
+    setLocOpen((o) => !o);
+  };
+
+  // Add a typed place name (geocode for coords when possible).
+  const addTypedLocation = async () => {
+    const name = locQuery.trim();
+    if (!name) return;
+    const place = await geocodePlace(name);
+    setLocation(place);
+    setLocQuery('');
+    setLocOpen(false);
+  };
+
+  // GPS shortcut from inside the field.
+  const useCurrentLocation = async () => {
     if (locating) return;
     setLocating(true);
     setHint(t('smartlog.locationFinding'));
@@ -210,6 +232,7 @@ export function SmartLogSheet({
     setLocating(false);
     if (r.ok) {
       setLocation({ name: r.name, lat: r.lat, lng: r.lng });
+      setLocOpen(false);
       setHint(null);
     } else {
       setHint(t(r.reason === 'denied' ? 'smartlog.locationDenied' : 'smartlog.locationUnavailable'));
@@ -356,13 +379,13 @@ export function SmartLogSheet({
                 />
                 <PaperIconButton
                   icon={
-                    location ? (
+                    location || locOpen ? (
                       <PinFilledIcon size={20} color={brand.purple} />
                     ) : (
                       <PinIcon size={20} color={colors.ink2} />
                     )
                   }
-                  onPress={tagLocation}
+                  onPress={toggleLocation}
                 />
                 {!premium ? (
                   <Text variant="label" color={colors.ink3} style={{ marginLeft: 'auto' }}>
@@ -374,8 +397,60 @@ export function SmartLogSheet({
                 <Text variant="label" color={colors.ink3}>{hint}</Text>
               ) : null}
 
-              {/* location pill */}
-              {location ? (
+              {/* location: search field (open) → pill (set) */}
+              {locOpen ? (
+                <View style={{ gap: space.sm }}>
+                  <View
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: space.sm,
+                      backgroundColor: colors.surface,
+                      borderWidth: 1,
+                      borderColor: colors.hairline,
+                      borderRadius: radius.md,
+                      paddingLeft: 12,
+                      paddingRight: 6,
+                      paddingVertical: 6,
+                    }}
+                  >
+                    <SearchIcon size={16} color={colors.ink3} />
+                    <TextInput
+                      value={locQuery}
+                      onChangeText={setLocQuery}
+                      onSubmitEditing={addTypedLocation}
+                      returnKeyType="done"
+                      placeholder={t('smartlog.locationPlaceholder')}
+                      placeholderTextColor={colors.ink3}
+                      style={{ flex: 1, fontSize: 15, fontWeight: '600', color: colors.ink, padding: 0 }}
+                    />
+                    {locQuery.trim() ? (
+                      <Pressable
+                        onPress={addTypedLocation}
+                        style={{
+                          backgroundColor: colors.ink,
+                          borderRadius: radius.sm,
+                          paddingHorizontal: 12,
+                          paddingVertical: 6,
+                        }}
+                      >
+                        <Text variant="label" weight="bold" color="#fff">
+                          {t('smartlog.locationAdd')}
+                        </Text>
+                      </Pressable>
+                    ) : null}
+                  </View>
+                  <Pressable
+                    onPress={useCurrentLocation}
+                    style={{ flexDirection: 'row', alignItems: 'center', gap: 6, alignSelf: 'flex-start' }}
+                  >
+                    <PinFilledIcon size={14} color={brand.purple} />
+                    <Text variant="label" weight="medium" color={colors.ink2}>
+                      {t('smartlog.locationCurrent')}
+                    </Text>
+                  </Pressable>
+                </View>
+              ) : location ? (
                 <View
                   style={{
                     flexDirection: 'row',

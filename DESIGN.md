@@ -108,13 +108,16 @@ not pixel-pinned.
 - **Toolbar:** `PaperIconButton` ×3 — Mic / Camera / Pin (SVG glyphs). Camera is gated:
   free users see a **"PRO" badge + 0.55 opacity** (still tappable → routes to
   `/profile/subscription`). Right-aligned AI-remaining counter for free tier.
-  - **Location (Pin):** taps → `getCurrentPlace()` (`src/lib/location.ts`, expo-location
-    GPS + reverse geocode, no Maps key). On success shows a **location pill** (filled
-    purple pin + place name + × clear, `surface3` bg); the toolbar pin turns filled/purple.
-    Permission-denied / failure shows a gentle hint, never a raw error. Saved as
-    `location` / `locationLat` / `locationLng` on confirm (sent for manual *and* nlp).
-    Reverse geocoding is unavailable on web → falls back to `lat, lng` text.
-    **Only runs on a dev build / device**, not web preview / Expo Go.
+  - **Location (Pin):** taps the pin → toggles a **place-name search field** (web parity):
+    `SearchIcon` + text input ("พิมพ์ชื่อสถานที่…") + dark "Add" button, plus a
+    "ใช้ตำแหน่งปัจจุบัน" GPS shortcut row beneath. Typed name → `geocodePlace()` resolves
+    coords when possible; GPS → `getCurrentPlace()` (both in `src/lib/location.ts`,
+    expo-location, no Maps key). Once set, the field collapses to a **location pill**
+    (filled purple pin + name + × clear, `surface3` bg); the toolbar pin shows
+    filled/purple while open or set. Permission-denied / failure → gentle hint, never a
+    raw error. Saved as `location` / `locationLat` / `locationLng` on confirm (manual
+    *and* nlp). Geocoding/reverse-geocoding are unavailable on web → name-only / coords
+    text. **Native module — only runs on a dev build / device**, not web preview / Expo Go.
 - **PRO teaser** (free only): lavender `#ECE3F4` box, sparkle + copy + "อัปเกรด →",
   routes to subscription. Never hidden.
 - **Activity chips:** horizontal scroll, single-select; selected = ink fill.
