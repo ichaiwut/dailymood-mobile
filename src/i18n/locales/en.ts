@@ -88,6 +88,8 @@ export default {
     achievements: 'Achievements',
     seeAll: 'See all',
     editProfile: 'Edit profile',
+    saved: 'Profile updated',
+    avatarUpdated: 'Photo updated',
     name: 'Display name',
     bio: 'Bio',
     email: 'Email',
@@ -194,6 +196,7 @@ export default {
     nearby: 'Around this day',
     entryNo: 'Entry #{{n}}',
     saved: 'Saved',
+    deleted: 'Entry deleted',
   },
   today: {
     greeting: 'How is today?',

@@ -18,6 +18,7 @@ import { useSubscription, useActivateTrial } from '../../src/hooks/queries';
 import { createCheckout, createPortal } from '../../src/api/subscription';
 import { formatDateKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
+import { useToast } from '../../src/components/Toast';
 
 export default function SubscriptionScreen() {
   const { t, i18n } = useTranslation();
@@ -25,6 +26,16 @@ export default function SubscriptionScreen() {
   const router = useRouter();
   const sub = useSubscription();
   const activate = useActivateTrial();
+  const toast = useToast();
+
+  const onActivateTrial = async () => {
+    try {
+      await activate.mutateAsync();
+      toast.show(t('subscription.trialActivated'));
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    }
+  };
   const [plan, setPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -97,7 +108,7 @@ export default function SubscriptionScreen() {
             <>
               {!d?.trialActivatedAt ? (
                 <View style={{ gap: space.sm }}>
-                  <Button label={t('subscription.startTrial')} onPress={() => activate.mutate()} loading={activate.isPending} />
+                  <Button label={t('subscription.startTrial')} onPress={onActivateTrial} loading={activate.isPending} />
                   <Text variant="label" center color={colors.ink3}>{t('subscription.noCard')}</Text>
                 </View>
               ) : null}

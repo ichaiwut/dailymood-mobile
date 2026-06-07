@@ -14,6 +14,7 @@ import { Notice } from '../src/components/Notice';
 import { WashiTape } from '../src/components/paper/WashiTape';
 import { useTheme } from '../src/theme/ThemeProvider';
 import { useInsights, useInsightFeedback } from '../src/hooks/queries';
+import { useToast } from '../src/components/Toast';
 import { stripBold } from '../src/lib/text';
 import { errorMessageKey } from '../src/api/errors';
 import type { InsightPattern, InsightReaction } from '../src/api/types';
@@ -24,6 +25,7 @@ export default function InsightsScreen() {
   const router = useRouter();
   const insights = useInsights();
   const feedback = useInsightFeedback();
+  const toast = useToast();
   const [reacted, setReacted] = useState<InsightReaction | null>(null);
 
   const d = insights.data;
@@ -32,10 +34,15 @@ export default function InsightsScreen() {
   const tagColor = (tag: string) =>
     tag === 'alert' ? colors.danger : tag === 'correlation' ? brand.purple : brand.peach;
 
-  const react = (r: InsightReaction) => {
+  const react = async (r: InsightReaction) => {
     if (!d?.suggestion) return;
     setReacted(r);
-    feedback.mutate({ weekKey: d.weekKey, suggestionTitle: d.suggestion.title, reaction: r });
+    try {
+      await feedback.mutateAsync({ weekKey: d.weekKey, suggestionTitle: d.suggestion.title, reaction: r });
+      toast.show(t('insights.thanks'));
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    }
   };
 
   return (

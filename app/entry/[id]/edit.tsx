@@ -87,8 +87,10 @@ export default function EditEntryScreen() {
       setConfirming(false);
       router.dismissAll?.();
       router.replace('/(tabs)/calendar');
-    } catch {
+      toast.show(t('entry.deleted'));
+    } catch (e) {
       setConfirming(false);
+      toast.show(t(errorMessageKey(e)), 'error');
     }
   };
 

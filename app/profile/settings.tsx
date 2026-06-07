@@ -13,6 +13,8 @@ import { useTheme } from '../../src/theme/ThemeProvider';
 import { useProfile, useUpdateProfile } from '../../src/hooks/queries';
 import { setAppLanguage } from '../../src/i18n';
 import { API_BASE_URL } from '../../src/config';
+import { errorMessageKey } from '../../src/api/errors';
+import { useToast } from '../../src/components/Toast';
 
 export default function SettingsScreen() {
   const { t, i18n } = useTranslation();
@@ -20,13 +22,19 @@ export default function SettingsScreen() {
   const router = useRouter();
   const profile = useProfile();
   const update = useUpdateProfile();
+  const toast = useToast();
 
   const current = (profile.data?.user.locale ?? i18n.language) as 'th' | 'en';
 
-  const setLocale = (locale: 'th' | 'en') => {
+  const setLocale = async (locale: 'th' | 'en') => {
     if (locale === current) return;
     setAppLanguage(locale);
-    update.mutate({ locale });
+    try {
+      await update.mutateAsync({ locale });
+      toast.show(t('profile.saved'));
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    }
   };
 
   return (

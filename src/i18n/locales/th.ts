@@ -89,6 +89,8 @@ const th: typeof en = {
     achievements: 'ความสำเร็จ',
     seeAll: 'ดูทั้งหมด',
     editProfile: 'แก้ไขโปรไฟล์',
+    saved: 'อัปเดตโปรไฟล์แล้ว',
+    avatarUpdated: 'อัปเดตรูปแล้ว',
     name: 'ชื่อที่แสดง',
     bio: 'แนะนำตัว',
     email: 'อีเมล',
@@ -195,6 +197,7 @@ const th: typeof en = {
     nearby: 'วันใกล้เคียง',
     entryNo: 'บันทึกที่ {{n}}',
     saved: 'บันทึกแล้ว',
+    deleted: 'ลบรายการแล้ว',
   },
   today: {
     greeting: 'วันนี้เป็นยังไงบ้าง',

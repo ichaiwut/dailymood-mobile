@@ -18,6 +18,7 @@ import { useProfile, useUpdateProfile, useUploadAvatar } from '../../src/hooks/q
 import { pickImage, optimizeImage } from '../../src/lib/image';
 import { initials } from '../../src/lib/avatar';
 import { errorMessageKey } from '../../src/api/errors';
+import { useToast } from '../../src/components/Toast';
 
 const ACCENTS = ['#A673F1', '#FCA45B', '#85ECCB', '#FDCB56', '#9ACDE2', '#D4BEE4'];
 
@@ -25,6 +26,7 @@ export default function EditProfileScreen() {
   const { t } = useTranslation();
   const { colors, radius, space } = useTheme();
   const router = useRouter();
+  const toast = useToast();
   const profile = useProfile();
   const update = useUpdateProfile();
   const upload = useUploadAvatar();
@@ -37,7 +39,13 @@ export default function EditProfileScreen() {
       return;
     }
     const picked = await pickImage();
-    if (picked) upload.mutate(await optimizeImage(picked));
+    if (!picked) return;
+    try {
+      await upload.mutateAsync(await optimizeImage(picked));
+      toast.show(t('profile.avatarUpdated'));
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    }
   };
 
   const [name, setName] = useState('');
@@ -58,8 +66,10 @@ export default function EditProfileScreen() {
     try {
       await update.mutateAsync({ name: name.trim(), bio: bio.trim(), accentColor: accent });
       router.back();
+      toast.show(t('profile.saved'));
     } catch (e) {
       setError(t(errorMessageKey(e)));
+      toast.show(t(errorMessageKey(e)), 'error');
     }
   };
 

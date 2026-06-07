@@ -16,6 +16,7 @@ import { BottomSheet } from '../../src/components/BottomSheet';
 import { PASticker } from '../../src/components/paper/PASticker';
 import { WashiTape } from '../../src/components/paper/WashiTape';
 import { LocationPill } from '../../src/components/paper/LocationPill';
+import { useToast } from '../../src/components/Toast';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useDeleteEntry } from '../../src/hooks/queries';
 import { findMood, moodLabel } from '../../src/lib/mood';
@@ -28,6 +29,7 @@ export default function EntryDetailScreen() {
   const { t, i18n } = useTranslation();
   const { colors, radius, space, brand, sheetRadius, shadow } = useTheme();
   const router = useRouter();
+  const toast = useToast();
   const entry = useEntry(id);
   const moods = useMoods();
   const del = useDeleteEntry();
@@ -41,8 +43,10 @@ export default function EntryDetailScreen() {
       await del.mutateAsync(id);
       setConfirming(false);
       router.back();
-    } catch {
+      toast.show(t('entry.deleted'));
+    } catch (e) {
       setConfirming(false);
+      toast.show(t(errorMessageKey(e)), 'error');
     }
   };
 
