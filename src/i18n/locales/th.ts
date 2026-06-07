@@ -209,6 +209,10 @@ const th: typeof en = {
   },
   smartlog: {
     title: 'วันนี้เป็นยังไงบ้าง',
+    drawerTitle: 'บันทึกด้วย AI',
+    activitiesLabel: 'กิจกรรม',
+    analyzeBtn: 'วิเคราะห์',
+    comingSoon: 'ฟีเจอร์นี้กำลังจะมาเร็วๆ นี้',
     pickMood: 'อารมณ์ของคุณ',
     notePlaceholder: 'สองสามคำเกี่ยวกับวันนี้…',
     quickSave: 'บันทึกอารมณ์',

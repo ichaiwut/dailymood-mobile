@@ -21,7 +21,7 @@ export interface MoodPickerProps {
 
 export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pack }: MoodPickerProps) {
   const { i18n } = useTranslation();
-  const { colors, radius, space } = useTheme();
+  const { colors, radius, space, shadow } = useTheme();
 
   if (layout === 'grid') {
     // 5-column, row-major grid → row 2 fills from the left (matches design).
@@ -75,9 +75,10 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
                 paddingVertical: space.md,
                 paddingHorizontal: space.xs,
                 borderRadius: radius.md,
-                backgroundColor: selected ? colors.surface : colors.surface2,
+                backgroundColor: colors.surface,
                 borderWidth: 2,
-                borderColor: selected ? colors.ink : 'transparent',
+                borderColor: selected ? colors.ink : colors.hairline,
+                boxShadow: shadow.sm,
               }}
             >
               <PASticker color={m.color} moodId={m.id} pack={pack} size={46} />

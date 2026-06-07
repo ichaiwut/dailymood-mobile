@@ -32,6 +32,8 @@ import { pickImage, optimizeImage } from '../../../lib/image';
 import { ApiError, errorMessageKey } from '../../../api/errors';
 import { findMood } from '../../../lib/mood';
 import { stripBold } from '../../../lib/text';
+import { formatDateKey, todayKey } from '../../../lib/time';
+import { PaperIconButton } from '../PaperIconButton';
 import i18n from '../../../i18n';
 import type { SmartSuggestion } from '../../../api/types';
 
@@ -58,7 +60,7 @@ export function SmartLogSheet({
   autoAnalyze,
 }: SmartLogSheetProps) {
   const { t } = useTranslation();
-  const { colors, space, radius } = useTheme();
+  const { colors, space, radius, brand } = useTheme();
   const router = useRouter();
   const moods = useMoods();
   const ai = useAiRemaining();
@@ -73,6 +75,7 @@ export function SmartLogSheet({
   const [suggestion, setSuggestion] = useState<SmartSuggestion | null>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [activityId, setActivityId] = useState<string | null>(null);
+  const [hint, setHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Reset each time the sheet opens.
@@ -86,6 +89,7 @@ export function SmartLogSheet({
       setSuggestion(null);
       setImageUri(null);
       setActivityId(null);
+      setHint(null);
       setError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -102,7 +106,6 @@ export function SmartLogSheet({
   const moodList = moods.data ?? [];
   const effectiveMoodId = moodId ?? moodList[0]?.id ?? null;
   const premium = ai.data?.tier === 'premium';
-  const quotaLeft = ai.data?.remaining;
 
   // Mood-adaptive placeholder (does not consume NLP quota).
   const journalPrompt = useJournalPrompt(
@@ -192,14 +195,44 @@ export function SmartLogSheet({
   return (
     <BottomSheet visible={visible} onClose={close}>
       {/* header */}
-      <View style={{ marginBottom: space.lg, gap: 4 }}>
-        <Text variant="eyebrow" color={colors.primary}>
-          DailyMood
-        </Text>
-        <View style={{ flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' }}>
-          <Text variant="h2">{t('smartlog.title')}</Text>
-          <QuotaPill premium={premium} left={quotaLeft} />
+      <View style={{ marginBottom: space.lg, gap: space.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
+            <View
+              style={{
+                width: 44,
+                height: 44,
+                borderRadius: radius.md,
+                backgroundColor: brand.purple,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              <Text style={{ fontSize: 22, color: '#fff' }}>✦</Text>
+            </View>
+            <Text variant="h2">{t('smartlog.drawerTitle')}</Text>
+          </View>
+          <Pressable
+            onPress={close}
+            hitSlop={8}
+            accessibilityLabel={t('common.cancel')}
+            style={{
+              width: 36,
+              height: 36,
+              borderRadius: 18,
+              backgroundColor: colors.surface2,
+              alignItems: 'center',
+              justifyContent: 'center',
+            }}
+          >
+            <Text variant="title" color={colors.ink2}>✕</Text>
+          </Pressable>
         </View>
+        {step !== 'analyzing' ? (
+          <Text variant="label" weight="bold" color={colors.primary}>
+            {formatDateKey(initialDate ?? todayKey(), i18n.language, { year: 'numeric' })}
+          </Text>
+        ) : null}
       </View>
 
       {error ? <Notice message={error} tone="error" /> : null}
@@ -259,30 +292,23 @@ export function SmartLogSheet({
                     <Text variant="label" color={colors.danger}>✕</Text>
                   </Pressable>
                 </View>
-              ) : (
-                <Pressable
-                  onPress={addPhoto}
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    gap: space.sm,
-                    alignSelf: 'flex-start',
-                    backgroundColor: colors.surface2,
-                    borderRadius: radius.pill,
-                    paddingHorizontal: space.md,
-                    paddingVertical: 8,
-                  }}
-                >
-                  <Text style={{ fontSize: 16 }}>📷</Text>
-                  <Text variant="label" weight="medium" color={colors.ink2}>
-                    {t('smartlog.addPhoto')}{premium ? '' : ' ✦'}
-                  </Text>
-                </Pressable>
-              )}
+              ) : null}
+
+              {/* toolbar: voice / photo / location */}
+              <View style={{ flexDirection: 'row', gap: space.sm }}>
+                <PaperIconButton glyph="🎤" onPress={() => setHint(t('smartlog.comingSoon'))} />
+                <PaperIconButton glyph="📷" onPress={addPhoto} />
+                <PaperIconButton glyph="📍" onPress={() => setHint(t('smartlog.comingSoon'))} />
+              </View>
+              {hint ? (
+                <Text variant="label" color={colors.ink3}>{hint}</Text>
+              ) : null}
 
               {/* activity chips */}
               {activities.data?.length ? (
-                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={{ gap: space.sm }}>
+                  <Text variant="label" color={colors.ink2}>{t('smartlog.activitiesLabel')}</Text>
+                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
                   <View style={{ flexDirection: 'row', gap: space.sm }}>
                     {activities.data.map((a) => {
                       const on = a.id === activityId;
@@ -310,7 +336,8 @@ export function SmartLogSheet({
                       );
                     })}
                   </View>
-                </ScrollView>
+                  </ScrollView>
+                </View>
               ) : null}
             </>
           ) : null}
@@ -380,50 +407,35 @@ export function SmartLogSheet({
 
           {/* actions */}
           {step === 'input' ? (
-            <View style={{ gap: space.md, marginTop: space.xs }}>
+            <View style={{ flexDirection: 'row', gap: space.sm, marginTop: space.xs }}>
+              <Button variant="paper" label={t('common.cancel')} onPress={close} style={{ flex: 1, paddingHorizontal: 8 }} />
               <Button
-                label={t('smartlog.analyze')}
+                variant="purple"
+                label={`✦ ${t('smartlog.analyzeBtn')}`}
                 onPress={() => analyze()}
                 disabled={!note.trim()}
+                style={{ flex: 1.4, paddingHorizontal: 8 }}
               />
               <Button
-                variant="paper"
-                label={t('smartlog.quickSave')}
+                label={t('common.save')}
                 onPress={() => save({ aiSource: 'manual' })}
                 loading={confirm.isPending}
+                style={{ flex: 1, paddingHorizontal: 8 }}
               />
             </View>
           ) : (
-            <Button
-              label={t('smartlog.save')}
-              onPress={() => save({ aiSource: 'nlp' })}
-              loading={confirm.isPending}
-            />
+            <View style={{ flexDirection: 'row', gap: space.sm, marginTop: space.xs }}>
+              <Button variant="paper" label={t('common.cancel')} onPress={close} style={{ flex: 1 }} />
+              <Button
+                label={t('common.save')}
+                onPress={() => save({ aiSource: 'nlp' })}
+                loading={confirm.isPending}
+                style={{ flex: 1.5 }}
+              />
+            </View>
           )}
         </View>
       ) : null}
     </BottomSheet>
-  );
-}
-
-function QuotaPill({ premium, left }: { premium: boolean; left?: number }) {
-  const { t } = useTranslation();
-  const { colors, brand, radius } = useTheme();
-  const label = premium
-    ? t('smartlog.quotaUnlimited')
-    : t('smartlog.quotaLeft', { count: left ?? 0 });
-  return (
-    <View
-      style={{
-        backgroundColor: premium ? brand.purple : colors.surface2,
-        borderRadius: radius.pill,
-        paddingHorizontal: 10,
-        paddingVertical: 4,
-      }}
-    >
-      <Text variant="label" weight="medium" color={premium ? '#fff' : colors.ink2}>
-        {label}
-      </Text>
-    </View>
   );
 }

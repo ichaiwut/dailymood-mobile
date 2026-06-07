@@ -208,6 +208,10 @@ export default {
   },
   smartlog: {
     title: 'How was your day?',
+    drawerTitle: 'Log with AI',
+    activitiesLabel: 'Activities',
+    analyzeBtn: 'Analyze',
+    comingSoon: 'Coming soon',
     pickMood: 'Your mood',
     notePlaceholder: 'A few words about today…',
     quickSave: 'Save mood',

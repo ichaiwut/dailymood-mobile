@@ -92,6 +92,7 @@ export const shadow = {
   btnPeach: '0 10px 0 -2px #D97F3B, 0 18px 30px -14px rgba(217,127,59,0.7)',
   btnInk: '0 9px 0 -2px #000, 0 18px 30px -16px rgba(0,0,0,0.6)',
   btnWhite: '0 9px 0 -2px #D9CDB8, 0 18px 30px -16px rgba(0,0,0,0.3)',
+  btnPurple: '0 9px 0 -2px #7C3AED, 0 18px 30px -14px rgba(124,58,237,0.55)',
 } as const;
 
 export const space = {

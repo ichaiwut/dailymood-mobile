@@ -10,7 +10,7 @@ import { Pressable, ActivityIndicator, View, type ViewStyle } from 'react-native
 import { useTheme } from '../theme/ThemeProvider';
 import { Text } from './Text';
 
-type Variant = 'primary' | 'ink' | 'paper' | 'ghost';
+type Variant = 'primary' | 'ink' | 'paper' | 'ghost' | 'purple';
 
 export interface ButtonProps {
   label: string;
@@ -39,18 +39,22 @@ export function Button({
       ? brand.peach
       : variant === 'ink'
         ? colors.ink
-        : variant === 'paper'
-          ? colors.surface
-          : 'transparent';
-  const fg = variant === 'primary' || variant === 'ink' ? '#fff' : colors.ink;
+        : variant === 'purple'
+          ? brand.purple
+          : variant === 'paper'
+            ? colors.surface
+            : 'transparent';
+  const fg = variant === 'primary' || variant === 'ink' || variant === 'purple' ? '#fff' : colors.ink;
   const boxShadow =
     variant === 'primary'
       ? shadow.btnPeach
       : variant === 'ink'
         ? shadow.btnInk
-        : variant === 'paper'
-          ? shadow.btnWhite
-          : undefined;
+        : variant === 'purple'
+          ? shadow.btnPurple
+          : variant === 'paper'
+            ? shadow.btnWhite
+            : undefined;
   const border = variant === 'ghost' ? colors.ink : variant === 'paper' ? colors.hairline : 'transparent';
 
   return (
