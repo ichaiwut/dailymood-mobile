@@ -7,6 +7,7 @@ import { View, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from '../Text';
 import { PASticker } from './PASticker';
+import { PinFilledIcon } from '../icons/Glyphs';
 import { useTheme } from '../../theme/ThemeProvider';
 import { moodLabel } from '../../lib/mood';
 import { timeOfDay, ictClock } from '../../lib/time';
@@ -17,7 +18,7 @@ import type { Mood, MoodEntry } from '../../api/types';
 export type CardEntry = Pick<
   MoodEntry,
   'id' | 'moodTypeId' | 'note' | 'aiSummary' | 'tags' | 'createdAt'
->;
+> & { location?: string | null };
 
 export interface EntryFolderCardProps {
   entry: CardEntry;
@@ -79,6 +80,14 @@ export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolde
             <Text variant="body" numberOfLines={2}>
               {title}
             </Text>
+          ) : null}
+          {entry.location ? (
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4 }}>
+              <PinFilledIcon size={12} color={colors.ink3} />
+              <Text variant="label" color={colors.ink3} numberOfLines={1} style={{ flex: 1 }}>
+                {entry.location}
+              </Text>
+            </View>
           ) : null}
           {entry.tags.length ? (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>

@@ -45,6 +45,7 @@ import {
   SearchIcon,
 } from '../../icons/Glyphs';
 import { getCurrentPlace, geocodePlace } from '../../../lib/location';
+import { LocationPill } from '../LocationPill';
 import i18n from '../../../i18n';
 import type { SmartSuggestion } from '../../../api/types';
 
@@ -451,31 +452,12 @@ export function SmartLogSheet({
                   </Pressable>
                 </View>
               ) : location ? (
-                <View
-                  style={{
-                    flexDirection: 'row',
-                    alignItems: 'center',
-                    alignSelf: 'flex-start',
-                    gap: 6,
-                    backgroundColor: colors.surface3,
-                    borderRadius: radius.pill,
-                    paddingLeft: 10,
-                    paddingRight: 6,
-                    paddingVertical: 6,
-                  }}
-                >
-                  <PinFilledIcon size={14} color={brand.purple} />
-                  <Text variant="label" weight="medium" numberOfLines={1} style={{ maxWidth: 220 }}>
-                    {location.name}
-                  </Text>
-                  <Pressable
-                    onPress={() => setLocation(null)}
-                    hitSlop={8}
-                    accessibilityLabel={t('common.cancel')}
-                  >
-                    <CloseIcon size={14} color={colors.ink3} />
-                  </Pressable>
-                </View>
+                <LocationPill
+                  name={location.name}
+                  lat={location.lat}
+                  lng={location.lng}
+                  onRemove={() => setLocation(null)}
+                />
               ) : null}
 
               {/* activity chips */}

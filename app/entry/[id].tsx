@@ -15,6 +15,7 @@ import { Notice } from '../../src/components/Notice';
 import { BottomSheet } from '../../src/components/BottomSheet';
 import { PASticker } from '../../src/components/paper/PASticker';
 import { WashiTape } from '../../src/components/paper/WashiTape';
+import { LocationPill } from '../../src/components/paper/LocationPill';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useDeleteEntry } from '../../src/hooks/queries';
 import { findMood, moodLabel } from '../../src/lib/mood';
@@ -99,6 +100,13 @@ export default function EntryDetailScreen() {
                 <Text variant="body" color={colors.ink2}>
                   {formatDateKey(entry.data.date, i18n.language)}
                 </Text>
+                {entry.data.location ? (
+                  <LocationPill
+                    name={entry.data.location}
+                    lat={entry.data.locationLat}
+                    lng={entry.data.locationLng}
+                  />
+                ) : null}
               </View>
             </View>
 

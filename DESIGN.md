@@ -79,6 +79,13 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   emoji badges = full color; moods = **soft tint `color+'40'`** by default, but the
   `discBg` prop overrides it (used by the Smart Log tiles, see §4).
 - **`PAClip`** — real SVG paperclip (not emoji).
+- **`LocationPill`** — pin (`#A673F1`) + place name, `surface3` pill. Read-only by
+  default; opens the device map when `lat`/`lng` are present. Pass `onRemove` for an
+  editable × (compose surfaces).
+- **`LocationField`** — full location editor: "เพิ่มสถานที่" chip → place-name search
+  field + Add + "ใช้ตำแหน่งปัจจุบัน" GPS shortcut → collapses to `LocationPill`. Parent
+  holds the `{name, lat?, lng?}` value. Used by Edit Entry (the drawer has its own
+  toolbar-bound variant).
 - **`MoodFace`** — line-art fallback faces; `MoodIcon` renders the user's R2 pack SVG
   via `SvgUri`, falling back to `MoodFace`.
 - **`MoodPicker`** — two layouts:
@@ -118,6 +125,11 @@ not pixel-pinned.
     raw error. Saved as `location` / `locationLat` / `locationLng` on confirm (manual
     *and* nlp). Geocoding/reverse-geocoding are unavailable on web → name-only / coords
     text. **Native module — only runs on a dev build / device**, not web preview / Expo Go.
+  - **Location read display:** a location pill / pin+name shows wherever an entry with a
+    location appears — Entry Detail (hero), Edit Entry (`LocationField`), and the
+    `EntryFolderCard` (Today, Timeline, Calendar Day Sheet) which renders a compact
+    pin+name line. Backend stores/returns `location` + `locationLat`/`locationLng`; it
+    never resolves places (all client-side).
 - **PRO teaser** (free only): lavender `#ECE3F4` box, sparkle + copy + "อัปเกรด →",
   routes to subscription. Never hidden.
 - **Activity chips:** horizontal scroll, single-select; selected = ink fill.

@@ -15,6 +15,7 @@ import { TextField } from '../../../src/components/TextField';
 import { Notice } from '../../../src/components/Notice';
 import { MoodPicker } from '../../../src/components/MoodPicker';
 import { BottomSheet } from '../../../src/components/BottomSheet';
+import { LocationField, type LocationValue } from '../../../src/components/paper/LocationField';
 import { useTheme } from '../../../src/theme/ThemeProvider';
 import { useEntry, useMoods, useUpdateEntry, useDeleteEntry } from '../../../src/hooks/queries';
 import { formatDateKey } from '../../../src/lib/time';
@@ -35,6 +36,7 @@ export default function EditEntryScreen() {
   const [note, setNote] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
+  const [location, setLocation] = useState<LocationValue>(null);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
@@ -44,6 +46,11 @@ export default function EditEntryScreen() {
       setMoodId(entry.data.moodTypeId);
       setNote(entry.data.note ?? '');
       setTags(entry.data.tags ?? []);
+      setLocation(
+        entry.data.location
+          ? { name: entry.data.location, lat: entry.data.locationLat, lng: entry.data.locationLng }
+          : null,
+      );
     }
   }, [entry.data]);
 
@@ -57,7 +64,14 @@ export default function EditEntryScreen() {
     if (!moodId) return;
     setError(null);
     try {
-      await update.mutateAsync({ moodTypeId: moodId, note: note.trim(), tags });
+      await update.mutateAsync({
+        moodTypeId: moodId,
+        note: note.trim(),
+        tags,
+        location: location?.name ?? null,
+        locationLat: location?.lat ?? null,
+        locationLng: location?.lng ?? null,
+      });
       router.back();
     } catch (e) {
       setError(t(errorMessageKey(e)));
@@ -143,6 +157,11 @@ export default function EditEntryScreen() {
                 returnKeyType="done"
                 autoCapitalize="none"
               />
+            </View>
+
+            <View style={{ gap: space.sm }}>
+              <Text variant="label" color={colors.ink2}>{t('smartlog.locationAddLabel')}</Text>
+              <LocationField value={location} onChange={setLocation} />
             </View>
 
             <Button label={t('common.save')} onPress={onSave} loading={update.isPending} />

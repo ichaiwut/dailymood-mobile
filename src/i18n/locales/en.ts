@@ -236,6 +236,7 @@ export default {
     locationUnavailable: "Couldn't get your location right now.",
     locationPlaceholder: 'Type a place name…',
     locationAdd: 'Add',
+    locationAddLabel: 'Add location',
     locationCurrent: 'Use current location',
     rateLimitTitle: "That's all the AI for today",
     rateLimitBody: 'Free includes 3 AI analyses a day. You can still save your mood, or go unlimited with Pro.',

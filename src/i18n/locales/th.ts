@@ -237,6 +237,7 @@ const th: typeof en = {
     locationUnavailable: 'ตอนนี้ขอตำแหน่งไม่ได้',
     locationPlaceholder: 'พิมพ์ชื่อสถานที่...',
     locationAdd: 'เพิ่ม',
+    locationAddLabel: 'เพิ่มสถานที่',
     locationCurrent: 'ใช้ตำแหน่งปัจจุบัน',
     rateLimitTitle: 'วันนี้ใช้ AI ครบแล้ว',
     rateLimitBody: 'แบบฟรีใช้ AI ได้วันละ 3 ครั้ง คุณยังบันทึกอารมณ์ได้ หรืออัปเป็น Pro เพื่อใช้ไม่จำกัด',
