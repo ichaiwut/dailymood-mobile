@@ -13,7 +13,6 @@ import { Appear } from '../../src/components/Appear';
 import { Skeleton } from '../../src/components/Skeleton';
 import { TopBar } from '../../src/components/paper/today/TopBar';
 import { GreetingFolder } from '../../src/components/paper/today/GreetingFolder';
-import { AiComposer } from '../../src/components/paper/today/AiComposer';
 import { StreakCard } from '../../src/components/paper/today/StreakCard';
 import { EmptyToday } from '../../src/components/paper/today/EmptyToday';
 import { EntryFolderCard } from '../../src/components/paper/EntryFolderCard';
@@ -36,10 +35,6 @@ export default function TodayScreen() {
 
       <Appear>
         <GreetingFolder />
-      </Appear>
-
-      <Appear delay={60}>
-        <AiComposer />
       </Appear>
 
       {/* today's entries */}

@@ -7,7 +7,7 @@
  * still Quick Save. Premium is server-enforced — we only adapt UX.
  */
 import { useEffect, useState } from 'react';
-import { View, Pressable, Image } from 'react-native';
+import { View, Pressable, Image, ScrollView } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 
@@ -19,7 +19,13 @@ import { TextField } from '../../TextField';
 import { Notice } from '../../Notice';
 import { MoodPicker } from '../../MoodPicker';
 import { useTheme } from '../../../theme/ThemeProvider';
-import { useMoods, useAiRemaining, useConfirmEntry, useJournalPrompt } from '../../../hooks/queries';
+import {
+  useMoods,
+  useAiRemaining,
+  useConfirmEntry,
+  useJournalPrompt,
+  useActivities,
+} from '../../../hooks/queries';
 import { analyzeSmart } from '../../../api/log';
 import { hasAiQuota } from '../../../api/ai';
 import { pickImage, optimizeImage } from '../../../lib/image';
@@ -57,6 +63,7 @@ export function SmartLogSheet({
   const moods = useMoods();
   const ai = useAiRemaining();
   const confirm = useConfirmEntry();
+  const activities = useActivities();
 
   const [step, setStep] = useState<Step>('input');
   const [moodId, setMoodId] = useState<string | null>(initialMoodId ?? null);
@@ -65,6 +72,7 @@ export function SmartLogSheet({
   const [newTag, setNewTag] = useState('');
   const [suggestion, setSuggestion] = useState<SmartSuggestion | null>(null);
   const [imageUri, setImageUri] = useState<string | null>(null);
+  const [activityId, setActivityId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   // Reset each time the sheet opens.
@@ -77,6 +85,7 @@ export function SmartLogSheet({
       setNewTag('');
       setSuggestion(null);
       setImageUri(null);
+      setActivityId(null);
       setError(null);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -121,7 +130,9 @@ export function SmartLogSheet({
         aiSummary: params.aiSource === 'nlp' ? suggestion?.aiSummary ?? undefined : undefined,
         sentiment: params.aiSource === 'nlp' ? suggestion?.sentiment ?? undefined : undefined,
         aiSource: params.aiSource,
-        activityId: params.aiSource === 'nlp' ? suggestion?.suggestedActivityId ?? undefined : undefined,
+        activityId:
+          activityId ??
+          (params.aiSource === 'nlp' ? suggestion?.suggestedActivityId ?? undefined : undefined),
         imageKey: params.aiSource === 'nlp' ? suggestion?.imageKey ?? undefined : undefined,
         date: initialDate,
       });
@@ -268,6 +279,39 @@ export function SmartLogSheet({
                   </Text>
                 </Pressable>
               )}
+
+              {/* activity chips */}
+              {activities.data?.length ? (
+                <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                  <View style={{ flexDirection: 'row', gap: space.sm }}>
+                    {activities.data.map((a) => {
+                      const on = a.id === activityId;
+                      return (
+                        <Pressable
+                          key={a.id}
+                          onPress={() => setActivityId(on ? null : a.id)}
+                          style={{
+                            flexDirection: 'row',
+                            alignItems: 'center',
+                            gap: 6,
+                            backgroundColor: on ? colors.ink : colors.surface,
+                            borderRadius: radius.pill,
+                            borderWidth: 1,
+                            borderColor: on ? colors.ink : colors.hairline2,
+                            paddingHorizontal: 12,
+                            paddingVertical: 7,
+                          }}
+                        >
+                          <Text style={{ fontSize: 14 }}>{a.emoji}</Text>
+                          <Text variant="label" weight="medium" color={on ? '#fff' : colors.ink2}>
+                            {i18n.language === 'th' ? a.labelTh : a.label}
+                          </Text>
+                        </Pressable>
+                      );
+                    })}
+                  </View>
+                </ScrollView>
+              ) : null}
             </>
           ) : null}
 
