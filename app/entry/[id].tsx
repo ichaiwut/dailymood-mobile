@@ -108,20 +108,6 @@ export default function EntryDetailScreen() {
             clip
             clipSide="right"
           >
-            {/* mood glow */}
-            <View
-              pointerEvents="none"
-              style={{
-                position: 'absolute',
-                top: -30,
-                right: -30,
-                width: 170,
-                height: 170,
-                borderRadius: 85,
-                backgroundColor: accent,
-                opacity: 0.22,
-              }}
-            />
             <View style={{ gap: space.md }}>
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.md }}>
                 <View style={{ transform: [{ rotate: '-6deg' }] }}>

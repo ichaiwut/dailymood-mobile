@@ -181,7 +181,7 @@ not pixel-pinned.
 
 Single-column Paper Desk stack (handoff entry-detail spec). Top bar (← back ghost +
 ✎ edit paper pill) → **mood hero folder** (lav `PaperSheet` tab = long date, paperclip,
-soft mood-color glow, 64px `PASticker` rotated -6°, mood name + day·time·period, big day
+64px `PASticker` rotated -6°, mood name + day·time·period, big day
 number + italic month + year, "Entry #N" + activity chip) → **note** (washi peach) →
 **AI insight** (washi yellow, sparkle + "AI noticed" + disclaimer) → **flashback**
 (premium: washi-lav; free: dashed teaser → Pro) → **photo** (clip) → **location** pill →
