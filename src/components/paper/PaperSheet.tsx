@@ -22,12 +22,12 @@ export function FolderTab({ label, bg, fg }: { label: string; bg: string; fg?: s
           backgroundColor: bg,
           borderTopLeftRadius: 16,
           borderTopRightRadius: 16,
-          paddingHorizontal: 24,
-          paddingTop: 10,
-          paddingBottom: 13,
+          paddingHorizontal: 18,
+          paddingTop: 8,
+          paddingBottom: 11,
         }}
       >
-        <Text weight="extrabold" color={fg ?? '#fff'} style={{ fontSize: 18, letterSpacing: -0.2 }}>
+        <Text weight="extrabold" color={fg ?? '#fff'} style={{ fontSize: 15, letterSpacing: -0.2 }}>
           {label}
         </Text>
       </View>
@@ -105,8 +105,8 @@ export function PaperSheet({
           <View
             style={{
               position: 'absolute',
-              top: -14,
-              ...(clipSide === 'right' ? { right: 28 } : { left: 28 }),
+              top: -20,
+              ...(clipSide === 'right' ? { right: 26 } : { left: 26 }),
               zIndex: 6,
             }}
           >

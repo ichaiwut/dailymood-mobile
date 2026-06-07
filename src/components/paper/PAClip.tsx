@@ -6,7 +6,7 @@ import { View } from 'react-native';
 import Svg, { Path } from 'react-native-svg';
 import { useTheme } from '../../theme/ThemeProvider';
 
-export function PAClip({ width = 26 }: { width?: number }) {
+export function PAClip({ width = 38 }: { width?: number }) {
   const { colors } = useTheme();
   const h = width * 1.88;
   return (
