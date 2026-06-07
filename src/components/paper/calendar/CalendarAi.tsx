@@ -74,10 +74,14 @@ export function CalendarAiPanel({
   const [answer, setAnswer] = useState<{ answer: string; matchingDates: string[] } | null>(null);
 
   const d = aiQ.data;
+  // When the month is too sparse the API returns another month's summary
+  // (fallbackMonth) — label the card with the month the summary is actually about.
+  const dispYear = d?.fallbackMonth ? Number(d.fallbackMonth.slice(0, 4)) : year;
+  const dispMonth = d?.fallbackMonth ? Number(d.fallbackMonth.slice(5, 7)) : month;
   const monthName = new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', {
     month: 'long',
     timeZone: APP_TIMEZONE,
-  }).format(new Date(Date.UTC(year, month - 1, 1)));
+  }).format(new Date(Date.UTC(dispYear, dispMonth - 1, 1)));
   const shortDate = (date: string) =>
     new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', timeZone: APP_TIMEZONE }).format(new Date(`${date}T00:00:00+07:00`));
 
@@ -113,6 +117,10 @@ export function CalendarAiPanel({
                 {monthName} · {t('calendar.aiSummaryShort')}
               </Text>
             </View>
+
+            {d.fallbackMonth ? (
+              <Text variant="label" color={colors.ink3}>{t('calendar.aiFallbackNote', { month: monthName })}</Text>
+            ) : null}
 
             <RichText text={d.summary} style={{ lineHeight: 24 }} />
 

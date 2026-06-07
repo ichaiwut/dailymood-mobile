@@ -98,6 +98,7 @@ const th: typeof en = {
     topTagLabel: 'สิ่งที่ส่งผล',
     aiDisclaimer: 'เป็นแค่มุมมองจาก AI ไว้ประกอบการตัดสินใจ',
     askDisclaimer: 'เป็นแค่ไอเดียจาก AI ไม่ได้ถูกทุกครั้ง',
+    aiFallbackNote: 'เดือนนี้บันทึกยังไม่พอ — แสดงข้อมูลเดือน{{month}}',
   },
   yip: {
     title: 'Year in Pixels',

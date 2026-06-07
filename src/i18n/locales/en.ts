@@ -97,6 +97,7 @@ export default {
     topTagLabel: 'What mattered',
     aiDisclaimer: 'Just an AI perspective to reflect on.',
     askDisclaimer: 'Just an AI idea — not always right.',
+    aiFallbackNote: 'Not enough entries this month — showing {{month}}.',
   },
   yip: {
     title: 'Year in Pixels',
