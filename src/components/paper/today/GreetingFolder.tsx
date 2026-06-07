@@ -35,7 +35,7 @@ export function GreetingFolder() {
   const smartLog = useSmartLog();
 
   return (
-    <PaperSheet tab={todayLabel(i18n.language)} clip>
+    <PaperSheet tab={todayLabel(i18n.language)} clip clipSide="right">
       <View style={{ gap: space.lg }}>
         <View style={{ gap: 6 }}>
           <Text variant="label" weight="bold" color={colors.primary}>

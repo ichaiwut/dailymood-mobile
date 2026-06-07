@@ -23,8 +23,9 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: M
   const { colors, radius, space } = useTheme();
 
   if (layout === 'grid') {
+    // 5-column, row-major grid → row 2 fills from the left (matches design).
     return (
-      <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md, justifyContent: 'space-between' }}>
+      <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: space.lg }}>
         {moods.map((m) => {
           const selected = m.id === selectedId;
           return (
@@ -33,7 +34,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: M
               accessibilityRole="button"
               accessibilityLabel={moodLabel(m, i18n.language)}
               onPress={() => onSelect(m)}
-              style={{ width: '18%', minWidth: 60, alignItems: 'center', gap: 5 }}
+              style={{ width: '20%', alignItems: 'center', gap: 6 }}
             >
               <View
                 style={
@@ -42,7 +43,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: M
                     : { padding: 2 }
                 }
               >
-                <PASticker color={m.color} moodId={m.id} size={52} />
+                <PASticker color={m.color} moodId={m.id} size={50} />
               </View>
               <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
                 {moodLabel(m, i18n.language)}

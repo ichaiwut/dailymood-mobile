@@ -56,6 +56,7 @@ export interface PaperSheetProps {
   tabTextColor?: string;
   variant?: SheetVariant;
   clip?: boolean;
+  clipSide?: 'left' | 'right';
   washi?: boolean;
   washiColor?: string;
   style?: ViewStyle;
@@ -69,6 +70,7 @@ export function PaperSheet({
   tabTextColor,
   variant = 'paper',
   clip,
+  clipSide = 'left',
   washi,
   washiColor,
   style,
@@ -100,7 +102,14 @@ export function PaperSheet({
         }}
       >
         {clip ? (
-          <View style={{ position: 'absolute', top: -14, left: 24, zIndex: 6 }}>
+          <View
+            style={{
+              position: 'absolute',
+              top: -14,
+              ...(clipSide === 'right' ? { right: 28 } : { left: 28 }),
+              zIndex: 6,
+            }}
+          >
             <PAClip />
           </View>
         ) : null}
