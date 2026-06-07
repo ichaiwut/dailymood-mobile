@@ -28,3 +28,23 @@ export function isSameIctDay(a: Date, b: Date): boolean {
 export function todayKey(): string {
   return ictDateKey();
 }
+
+/** ICT hour (0–23) for an instant. */
+export function ictHour(date: Date): number {
+  return toIct(date).getUTCHours();
+}
+
+export type TimeOfDay = 'morning' | 'afternoon' | 'evening';
+
+/** Bucket an instant into morning (<12) / afternoon (12–16) / evening (≥17), ICT. */
+export function timeOfDay(iso: string): TimeOfDay {
+  const h = ictHour(new Date(iso));
+  if (h < 12) return 'morning';
+  if (h < 17) return 'afternoon';
+  return 'evening';
+}
+
+/** HH:mm in ICT. */
+export function ictClock(iso: string): string {
+  return toIct(new Date(iso)).toISOString().slice(11, 16);
+}
