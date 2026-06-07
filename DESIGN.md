@@ -94,8 +94,8 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   via `SvgUri`, falling back to `MoodFace`.
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
-  ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip, and a "ตอนนี้/Now"
-  purple pill at the right edge. Shown above the entry cards when the day has entries.
+  ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
+  as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
 - **`MoodPicker`** — two layouts:
   - `grid` (Today greeting): 5-col circular discs, soft tinted rings (kept soft per
     user feedback — full saturation read as neon).

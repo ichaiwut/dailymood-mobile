@@ -98,25 +98,6 @@ export function TodayTimeline({ entries, moods }: { entries: MoodEntry[]; moods:
               />
             );
           })}
-          <View
-            style={{
-              position: 'absolute',
-              right: 0,
-              top: -30,
-              flexDirection: 'row',
-              alignItems: 'center',
-              gap: 5,
-              backgroundColor: brand.purple,
-              borderRadius: 100,
-              paddingHorizontal: 11,
-              paddingVertical: 4,
-            }}
-          >
-            <View style={{ width: 6, height: 6, borderRadius: 3, backgroundColor: '#fff' }} />
-            <Text variant="label" weight="bold" color="#fff" style={{ fontSize: 14 }}>
-              {t('today.now')}
-            </Text>
-          </View>
         </View>
       </View>
     </View>
