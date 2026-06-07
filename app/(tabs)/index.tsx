@@ -14,6 +14,7 @@ import { Skeleton } from '../../src/components/Skeleton';
 import { TopBar } from '../../src/components/paper/today/TopBar';
 import { GreetingFolder } from '../../src/components/paper/today/GreetingFolder';
 import { TodayTimeline } from '../../src/components/paper/today/TodayTimeline';
+import { AiWeeklyFolder } from '../../src/components/paper/today/AiWeeklyFolder';
 import { StreakCard } from '../../src/components/paper/today/StreakCard';
 import { EmptyToday } from '../../src/components/paper/today/EmptyToday';
 import { EntryFolderCard } from '../../src/components/paper/EntryFolderCard';
@@ -70,8 +71,13 @@ export default function TodayScreen() {
         )}
       </Appear>
 
+      {/* AI weekly insights — after the entries */}
+      <Appear delay={160}>
+        <AiWeeklyFolder />
+      </Appear>
+
       {profile.data ? (
-        <Appear delay={180}>
+        <Appear delay={200}>
           <StreakCard streak={profile.data.stats.streak} />
         </Appear>
       ) : null}

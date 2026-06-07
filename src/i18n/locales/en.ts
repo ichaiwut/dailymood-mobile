@@ -177,6 +177,10 @@ export default {
     lockedTitle: 'Weekly insights are a Pro feature',
     lockedBody: 'Pro turns your entries into weekly patterns and a gentle suggestion.',
     disclaimer: 'AI can be wrong — take it as a gentle reflection, not advice.',
+    weeklyTab: 'AI · This week',
+    weeklyTeaser: 'Weekly mood summary, pattern analysis, and personalized suggestions.',
+    weeklyOpen: 'Open AI Insights →',
+    weeklyUpgrade: 'Upgrade to Pro →',
   },
   entry: {
     note: 'Note',

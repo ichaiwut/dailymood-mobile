@@ -178,6 +178,10 @@ const th: typeof en = {
     lockedTitle: 'สรุปประจำสัปดาห์เป็นฟีเจอร์ Pro',
     lockedBody: 'Pro เปลี่ยนบันทึกของคุณเป็นรูปแบบรายสัปดาห์พร้อมคำแนะนำเบาๆ',
     disclaimer: 'AI อาจคลาดเคลื่อนได้ ใช้เป็นมุมมองสะท้อนคิด ไม่ใช่คำแนะนำทางการ',
+    weeklyTab: 'AI · สัปดาห์นี้',
+    weeklyTeaser: 'AI สรุปอารมณ์ประจำสัปดาห์ วิเคราะห์ pattern และแนะนำสิ่งที่ช่วยให้ดีขึ้น',
+    weeklyOpen: 'เปิด AI Insights →',
+    weeklyUpgrade: 'อัปเกรด Pro →',
   },
   entry: {
     note: 'บันทึก',

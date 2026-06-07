@@ -96,6 +96,10 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
   ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
   as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
+- **`AiWeeklyFolder`** (`paper/today/`) — "✦ AI · สัปดาห์นี้" dark-plum folder, placed
+  **after** the entries list on Today. Always shown (never hidden): premium sees the cached
+  weekly `summary`, free sees `previewHeadline`/teaser + a PRO badge. Button → `/insights`
+  (premium) or `/profile/subscription` (free). Data from `useInsights()`.
 - **`MoodPicker`** — two layouts:
   - `grid` (Today greeting): 5-col circular discs, soft tinted rings (kept soft per
     user feedback — full saturation read as neon).
