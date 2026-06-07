@@ -47,6 +47,13 @@ export interface Profile {
     accentColor: string;
     moodPack: string;
     createdAt: string;
+    // settings
+    reminderEnabled: boolean;
+    reminderTime: string;
+    reminderDays: string;
+    hidePreview: boolean;
+    anonymousInsights: boolean;
+    weeklyDigestEnabled: boolean;
   };
   stats: {
     streak: number;
@@ -54,6 +61,60 @@ export interface Profile {
     avgMood: number;
     avgMoodEmoji: string;
   };
+  moodSignature: {
+    distribution: {
+      moodId: string;
+      label: string;
+      labelTh: string;
+      color: string;
+      emoji: string;
+      percent: number;
+      count: number;
+    }[];
+    hasSufficientData: boolean;
+  };
+  achievements: AchievementsData;
+  tier: string;
+}
+
+export interface BadgeSummary {
+  id: string;
+  icon: string;
+  color: string;
+  target: number;
+  current: number;
+  progress: number;
+  status: 'earned' | 'in_progress' | 'locked';
+  earnedAt: string | null;
+}
+
+export interface AchievementsData {
+  total: number;
+  earned: number;
+  inProgress: number;
+  locked: number;
+  badges: BadgeSummary[];
+}
+
+export interface SubscriptionData {
+  isPremium: boolean;
+  hasStripeCustomer: boolean;
+  currentPeriodEnd: string | null;
+  cancelAtPeriodEnd: boolean;
+  planInterval: string | null;
+  subscriptionStatus: string | null;
+  memberSince: string;
+  trialActivatedAt: string | null;
+  trialEndsAt: string | null;
+  trialDaysLeft: number;
+  isTrialing: boolean;
+}
+
+export interface UpdateProfileInput {
+  name?: string;
+  bio?: string;
+  accentColor?: string;
+  locale?: 'th' | 'en';
 }
 
 /** A saved mood entry (GET /api/log). Shapes verified against the live API. */

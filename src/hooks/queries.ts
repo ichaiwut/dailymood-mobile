@@ -4,7 +4,8 @@
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
 import { fetchMoods } from '../api/moods';
-import { fetchProfile } from '../api/profile';
+import { fetchProfile, updateProfile, fetchAchievements } from '../api/profile';
+import { fetchSubscription, activateTrial } from '../api/subscription';
 import { listEntries, confirmEntry, getEntry, updateEntry, deleteEntry } from '../api/log';
 import { fetchAiRemaining, fetchJournalPrompt } from '../api/ai';
 import { fetchCalendarMonth, fetchTimeline } from '../api/calendar';
@@ -15,6 +16,7 @@ import type {
   UpdateEntryInput,
   StatsPeriod,
   InsightReaction,
+  UpdateProfileInput,
 } from '../api/types';
 
 export const queryKeys = {
@@ -27,6 +29,8 @@ export const queryKeys = {
   entry: (id: string) => ['entry', id] as const,
   stats: (period: StatsPeriod) => ['stats', period] as const,
   insights: ['insights'] as const,
+  achievements: ['achievements'] as const,
+  subscription: ['subscription'] as const,
 };
 
 export function useMoods() {
@@ -138,5 +142,32 @@ export function useInsightFeedback() {
   return useMutation({
     mutationFn: (body: { weekKey: string; suggestionTitle: string; reaction: InsightReaction }) =>
       sendInsightFeedback(body),
+  });
+}
+
+export function useAchievements() {
+  return useQuery({ queryKey: queryKeys.achievements, queryFn: fetchAchievements });
+}
+
+export function useSubscription() {
+  return useQuery({ queryKey: queryKeys.subscription, queryFn: fetchSubscription });
+}
+
+export function useUpdateProfile() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: UpdateProfileInput) => updateProfile(input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.profile }),
+  });
+}
+
+export function useActivateTrial() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: () => activateTrial(),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.subscription });
+      qc.invalidateQueries({ queryKey: queryKeys.profile });
+    },
   });
 }
