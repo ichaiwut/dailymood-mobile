@@ -191,6 +191,16 @@ built as a custom clipped sheet so the glow stays inside the rounded corner) →
 preview), **last month** (mint tab), **streak** (washi peach, 🔥 + day count) → **2-step
 delete** (text → red confirm). Uses `PaperSheet` tab colors lav/ink/mint + washi tints.
 
+## 4c. Edit Entry — `app/entry/[id]/edit.tsx`
+
+Mobile layout from the handoff (desktop sidebar skipped). Loose header (eyebrow
+"กำลังแก้ไข · บันทึกที่ N" + h2 title·date) → **single peach-tab `PaperSheet` form**
+(gap xl): mood tiles (`MoodPicker` scroll) · **date/time field shells** (`surface2`,
+1.5px rule, calendar/clock glyph — read-only; native picker deferred) · note + "N/500"
+counter · tags (chips + add input) · location (`LocationField`) → inline **danger zone**
+(1.5px `#FCA5A5` border, `#DC2626` delete) → **fixed bottom bar** (Cancel paper + Save
+peach, safe-area padded). Delete uses the confirm `BottomSheet`.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,

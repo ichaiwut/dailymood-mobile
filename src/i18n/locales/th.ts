@@ -208,6 +208,10 @@ const th: typeof en = {
     deleteThis: 'ลบบันทึกนี้',
     lookBack: 'ย้อนดูตัวเอง',
     unlockPro: '✦ ปลดล็อกด้วย Pro',
+    editing: 'กำลังแก้ไข · บันทึกที่ {{n}}',
+    editTitle: 'แก้ไขบันทึก',
+    dateTime: 'วันที่ / เวลา',
+    dangerZone: 'เขตอันตราย',
   },
   today: {
     greeting: 'วันนี้เป็นยังไงบ้าง',

@@ -207,6 +207,10 @@ export default {
     deleteThis: 'Delete this entry',
     lookBack: 'Looking back',
     unlockPro: '✦ Unlock with Pro',
+    editing: 'Editing · entry #{{n}}',
+    editTitle: 'Edit entry',
+    dateTime: 'Date / time',
+    dangerZone: 'Danger zone',
   },
   today: {
     greeting: 'How is today?',
