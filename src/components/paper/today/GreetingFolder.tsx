@@ -68,7 +68,7 @@ export function GreetingFolder({ name }: { name?: string | null }) {
         </Text>
         <MoodPicker
           moods={moods.data ?? []}
-          onSelect={(m) => smartLog.open(m.id)}
+          onSelect={(m) => smartLog.open({ moodId: m.id })}
         />
       </View>
     </View>

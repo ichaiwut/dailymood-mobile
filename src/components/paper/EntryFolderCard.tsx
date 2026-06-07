@@ -13,8 +13,14 @@ import { timeOfDay, ictClock } from '../../lib/time';
 import { stripBold } from '../../lib/text';
 import type { Mood, MoodEntry } from '../../api/types';
 
+/** Only the fields the card renders — satisfied by MoodEntry and TimelineEntry. */
+export type CardEntry = Pick<
+  MoodEntry,
+  'id' | 'moodTypeId' | 'note' | 'aiSummary' | 'tags' | 'createdAt'
+>;
+
 export interface EntryFolderCardProps {
-  entry: MoodEntry;
+  entry: CardEntry;
   mood?: Mood;
   onPress?: () => void;
   rotate?: number;

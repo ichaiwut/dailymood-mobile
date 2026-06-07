@@ -121,6 +121,67 @@ export interface JournalPrompt {
   source: 'generated' | 'static' | string;
 }
 
+/** One day's dominant mood (GET /api/calendar entries). */
+export interface CalendarDay {
+  date: string;
+  moodTypeId: string | null;
+}
+
+export interface CalendarStats {
+  avgMood: number;
+  avgMoodDelta: number | null;
+  streak: number;
+  loggedDays: number;
+  totalDays: number;
+}
+
+export interface CalendarMonth {
+  entries: CalendarDay[];
+  stats: CalendarStats;
+}
+
+/** Lighter entry shape for the timeline feed (GET /api/calendar/timeline). */
+export interface TimelineEntry {
+  id: string;
+  moodTypeId: string;
+  note: string | null;
+  aiSummary: string | null;
+  tags: string[];
+  activityId: string | null;
+  activityEmoji: string | null;
+  location: string | null;
+  date: string;
+  createdAt: string;
+  imageUrl: string | null;
+}
+
+/** Premium flashback reflection on negative-mood entries. */
+export interface Flashback {
+  message: string;
+  pastDate: string;
+  pastNote: string | null;
+}
+
+/** GET /api/log/[id] — full entry plus context (nearby days, streak, flashback). */
+export interface EntryDetail extends MoodEntry {
+  isPremium: boolean;
+  entryNumber: string;
+  nearby: { date: string; moodTypeId: string | null; note: string | null }[];
+  lastYear: { date: string; moodTypeId: string | null } | null;
+  streak: number;
+  flashback: Flashback | null;
+}
+
+/** Body for PATCH /api/log/[id]. */
+export interface UpdateEntryInput {
+  moodTypeId?: string;
+  note?: string;
+  tags?: string[];
+  date?: string;
+  activityId?: string | null;
+  location?: string | null;
+}
+
 /**
  * Error codes the API returns in `{ error }`. We map these to human TH/EN copy
  * before they reach the UI (handover rule §6.1) — raw codes must never be shown.

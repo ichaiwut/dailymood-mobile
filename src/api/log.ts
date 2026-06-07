@@ -7,7 +7,13 @@
  *   - listEntries: entries for a given ICT date (signed image URLs)
  */
 import { apiFetch } from './client';
-import type { MoodEntry, SmartSuggestion, ConfirmEntryInput } from './types';
+import type {
+  MoodEntry,
+  SmartSuggestion,
+  ConfirmEntryInput,
+  EntryDetail,
+  UpdateEntryInput,
+} from './types';
 
 /**
  * POST /api/log/smart — multipart. `text` and/or `image` (premium AI Vision).
@@ -41,6 +47,16 @@ export function confirmEntry(input: ConfirmEntryInput): Promise<{ id: string }> 
 export function listEntries(date?: string): Promise<MoodEntry[]> {
   const qs = date ? `?date=${encodeURIComponent(date)}` : '';
   return apiFetch<{ entries: MoodEntry[] }>(`/api/log${qs}`).then((r) => r.entries);
+}
+
+/** GET /api/log/:id — full entry + context (nearby, streak, flashback). */
+export function getEntry(id: string): Promise<EntryDetail> {
+  return apiFetch<EntryDetail>(`/api/log/${id}`);
+}
+
+/** PATCH /api/log/:id — update an entry. */
+export function updateEntry(id: string, input: UpdateEntryInput): Promise<{ ok: boolean }> {
+  return apiFetch<{ ok: boolean }>(`/api/log/${id}`, { method: 'PATCH', body: input });
 }
 
 /** DELETE /api/log/:id */

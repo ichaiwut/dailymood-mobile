@@ -11,7 +11,7 @@ import { View, Pressable } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 
-import { SLShell } from './SLShell';
+import { BottomSheet } from '../../BottomSheet';
 import { SLAnalyzing } from './SLAnalyzing';
 import { Text } from '../../Text';
 import { Button } from '../../Button';
@@ -34,9 +34,11 @@ export interface SmartLogSheetProps {
   visible: boolean;
   onClose: () => void;
   initialMoodId?: string | null;
+  /** Target date (ICT YYYY-MM-DD) for retroactive logging; defaults to today. */
+  initialDate?: string;
 }
 
-export function SmartLogSheet({ visible, onClose, initialMoodId }: SmartLogSheetProps) {
+export function SmartLogSheet({ visible, onClose, initialMoodId, initialDate }: SmartLogSheetProps) {
   const { t } = useTranslation();
   const { colors, space, radius } = useTheme();
   const router = useRouter();
@@ -97,6 +99,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId }: SmartLogSheet
         sentiment: params.aiSource === 'nlp' ? suggestion?.sentiment ?? undefined : undefined,
         aiSource: params.aiSource,
         activityId: params.aiSource === 'nlp' ? suggestion?.suggestedActivityId ?? undefined : undefined,
+        date: initialDate,
       });
       onClose();
     } catch (e) {
@@ -137,7 +140,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId }: SmartLogSheet
   };
 
   return (
-    <SLShell visible={visible} onClose={close}>
+    <BottomSheet visible={visible} onClose={close}>
       {/* header */}
       <View style={{ marginBottom: space.lg, gap: 4 }}>
         <Text variant="eyebrow" color={colors.primary}>
@@ -287,7 +290,7 @@ export function SmartLogSheet({ visible, onClose, initialMoodId }: SmartLogSheet
           )}
         </View>
       ) : null}
-    </SLShell>
+    </BottomSheet>
   );
 }
 

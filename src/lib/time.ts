@@ -48,3 +48,27 @@ export function timeOfDay(iso: string): TimeOfDay {
 export function ictClock(iso: string): string {
   return toIct(new Date(iso)).toISOString().slice(11, 16);
 }
+
+/** Format a YYYY-MM-DD key as a readable date in the given locale. */
+export function formatDateKey(
+  dateKey: string,
+  locale: string,
+  opts?: Intl.DateTimeFormatOptions,
+): string {
+  try {
+    return new Intl.DateTimeFormat(locale === 'th' ? 'th-TH' : 'en-US', {
+      weekday: 'long',
+      day: 'numeric',
+      month: 'long',
+      timeZone: 'UTC',
+      ...opts,
+    }).format(new Date(`${dateKey}T00:00:00Z`));
+  } catch {
+    return dateKey;
+  }
+}
+
+/** True if a date key is after today (ICT). */
+export function isFutureKey(dateKey: string): boolean {
+  return dateKey > todayKey();
+}

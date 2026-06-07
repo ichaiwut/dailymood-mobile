@@ -6,7 +6,8 @@ import { createContext, useContext, useState, useCallback, type ReactNode } from
 import { SmartLogSheet } from './SmartLogSheet';
 
 interface SmartLogApi {
-  open: (moodId?: string | null) => void;
+  /** Open the sheet, optionally preselecting a mood and/or a target date (ICT, YYYY-MM-DD). */
+  open: (opts?: { moodId?: string | null; date?: string }) => void;
 }
 
 const SmartLogContext = createContext<SmartLogApi | null>(null);
@@ -14,16 +15,23 @@ const SmartLogContext = createContext<SmartLogApi | null>(null);
 export function SmartLogProvider({ children }: { children: ReactNode }) {
   const [visible, setVisible] = useState(false);
   const [moodId, setMoodId] = useState<string | null>(null);
+  const [date, setDate] = useState<string | undefined>(undefined);
 
-  const open = useCallback((id?: string | null) => {
-    setMoodId(id ?? null);
+  const open = useCallback((opts?: { moodId?: string | null; date?: string }) => {
+    setMoodId(opts?.moodId ?? null);
+    setDate(opts?.date);
     setVisible(true);
   }, []);
 
   return (
     <SmartLogContext.Provider value={{ open }}>
       {children}
-      <SmartLogSheet visible={visible} onClose={() => setVisible(false)} initialMoodId={moodId} />
+      <SmartLogSheet
+        visible={visible}
+        onClose={() => setVisible(false)}
+        initialMoodId={moodId}
+        initialDate={date}
+      />
     </SmartLogContext.Provider>
   );
 }

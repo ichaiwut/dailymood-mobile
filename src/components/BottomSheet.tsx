@@ -1,8 +1,8 @@
 /**
- * Smart Log bottom sheet shell — backdrop + slide-up paper sheet with a drag
- * handle, rounded top, keyboard avoidance and scroll. (Native equivalent of the
- * web SLShell modal; gesture drag-to-dismiss is a polish item — tap backdrop or
- * the close affordance to dismiss.)
+ * Generic bottom sheet — backdrop + slide-up paper sheet with a drag handle,
+ * rounded top, keyboard avoidance and scroll. Used by Smart Log and the
+ * Calendar Day Sheet. (Gesture drag-to-dismiss is a polish item — tap the
+ * backdrop to dismiss.)
  */
 import type { ReactNode } from 'react';
 import {
@@ -16,15 +16,15 @@ import {
   useWindowDimensions,
 } from 'react-native';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
-import { useTheme } from '../../../theme/ThemeProvider';
+import { useTheme } from '../theme/ThemeProvider';
 
-export interface SLShellProps {
+export interface BottomSheetProps {
   visible: boolean;
   onClose: () => void;
   children: ReactNode;
 }
 
-export function SLShell({ visible, onClose, children }: SLShellProps) {
+export function BottomSheet({ visible, onClose, children }: BottomSheetProps) {
   const { colors, radius, space } = useTheme();
   const insets = useSafeAreaInsets();
   const { height } = useWindowDimensions();
@@ -56,15 +56,9 @@ export function SLShell({ visible, onClose, children }: SLShellProps) {
               paddingBottom: insets.bottom + space.lg,
             }}
           >
-            {/* drag handle */}
             <View style={{ alignItems: 'center', paddingVertical: space.md }}>
               <View
-                style={{
-                  width: 44,
-                  height: 5,
-                  borderRadius: 3,
-                  backgroundColor: colors.hairline2,
-                }}
+                style={{ width: 44, height: 5, borderRadius: 3, backgroundColor: colors.hairline2 }}
               />
             </View>
             <ScrollView
