@@ -5,6 +5,7 @@
  */
 import { View } from 'react-native';
 import { useTranslation } from 'react-i18next';
+import { useRouter } from 'expo-router';
 
 import { Screen } from '../../src/components/Screen';
 import { Text } from '../../src/components/Text';
@@ -26,6 +27,7 @@ import { errorMessageKey } from '../../src/api/errors';
 export default function TodayScreen() {
   const { t } = useTranslation();
   const { colors, radius, space } = useTheme();
+  const router = useRouter();
   const profile = useProfile();
   const entries = useTodayEntries();
   const moods = useMoods();
@@ -59,6 +61,7 @@ export default function TodayScreen() {
                   entry={entry}
                   mood={findMood(moods.data, entry.moodTypeId)}
                   rotate={i % 2 === 0 ? -0.5 : 0.5}
+                  onPress={() => router.push(`/entry/${entry.id}`)}
                 />
               ))}
             </View>
