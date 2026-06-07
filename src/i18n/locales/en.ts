@@ -193,9 +193,9 @@ export default {
   },
   today: {
     greeting: 'How is today?',
-    goodMorning: 'Good morning ☀️',
-    goodAfternoon: 'Good afternoon ☀️',
-    goodEvening: 'Good evening 🌙',
+    goodMorning: 'Good morning',
+    goodAfternoon: 'Good afternoon',
+    goodEvening: 'Good evening',
     qPre: 'How are you ',
     qMark: 'feeling',
     qPost: ' today?',

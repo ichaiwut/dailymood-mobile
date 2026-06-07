@@ -194,9 +194,9 @@ const th: typeof en = {
   },
   today: {
     greeting: 'วันนี้เป็นยังไงบ้าง',
-    goodMorning: 'สวัสดีตอนเช้า ☀️',
-    goodAfternoon: 'สวัสดีตอนบ่าย ☀️',
-    goodEvening: 'สวัสดีตอนเย็น 🌙',
+    goodMorning: 'สวัสดีตอนเช้า',
+    goodAfternoon: 'สวัสดีตอนบ่าย',
+    goodEvening: 'สวัสดีตอนเย็น',
     qPre: 'วันนี้คุณรู้สึก ',
     qMark: 'ยังไง',
     qPost: '?',

@@ -27,7 +27,7 @@ export function FolderTab({ label, bg, fg }: { label: string; bg: string; fg?: s
           paddingBottom: 13,
         }}
       >
-        <Text style={{ fontFamily: 'Urbanist_800ExtraBold', fontSize: 18, color: fg ?? '#fff', letterSpacing: -0.2 }}>
+        <Text weight="extrabold" color={fg ?? '#fff'} style={{ fontSize: 18, letterSpacing: -0.2 }}>
           {label}
         </Text>
       </View>

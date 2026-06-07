@@ -51,22 +51,6 @@ export function TopBar({ name, email, accent }: { name?: string | null; email?: 
           {t(`today.${greetingKey()}`)}{name ? `, ${name}` : ''}
         </Text>
       </View>
-
-      <Pressable
-        onPress={() => router.push('/(tabs)/profile')}
-        style={{
-          width: 44,
-          height: 44,
-          borderRadius: radius.md,
-          backgroundColor: colors.surface,
-          borderWidth: 1,
-          borderColor: colors.hairline2,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        <Text variant="title" color={colors.ink}>☰</Text>
-      </Pressable>
     </View>
   );
 }
