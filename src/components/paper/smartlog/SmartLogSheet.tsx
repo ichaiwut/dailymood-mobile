@@ -34,6 +34,14 @@ import { findMood } from '../../../lib/mood';
 import { stripBold } from '../../../lib/text';
 import { formatDateKey, todayKey } from '../../../lib/time';
 import { PaperIconButton } from '../PaperIconButton';
+import {
+  SparkleIcon,
+  CloseIcon,
+  CalendarIcon,
+  CameraIcon,
+  PinIcon,
+  MicIcon,
+} from '../../icons/Glyphs';
 import i18n from '../../../i18n';
 import type { SmartSuggestion } from '../../../api/types';
 
@@ -222,7 +230,7 @@ export function SmartLogSheet({
                 justifyContent: 'center',
               }}
             >
-              <Text style={{ fontSize: 16, color: '#fff' }}>✦</Text>
+              <SparkleIcon size={18} color="#fff" />
             </View>
             <Text variant="h2">{t('smartlog.drawerTitle')}</Text>
           </View>
@@ -239,13 +247,16 @@ export function SmartLogSheet({
               justifyContent: 'center',
             }}
           >
-            <Text variant="title" color={colors.ink2}>✕</Text>
+            <CloseIcon size={18} color={colors.ink2} />
           </Pressable>
         </View>
         {step !== 'analyzing' ? (
-          <Text variant="label" weight="bold" color={colors.primary}>
-            {formatDateKey(initialDate ?? todayKey(), i18n.language, { year: 'numeric' })}
-          </Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <CalendarIcon size={16} color={colors.ink3} />
+            <Text variant="label" weight="bold" color={colors.ink2}>
+              {formatDateKey(initialDate ?? todayKey(), i18n.language, { year: 'numeric' })}
+            </Text>
+          </View>
         ) : null}
       </View>
 
@@ -310,14 +321,20 @@ export function SmartLogSheet({
 
               {/* toolbar: voice / photo / location  + AI quota (free) */}
               <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-                <PaperIconButton glyph="🎤" onPress={() => setHint(t('smartlog.comingSoon'))} />
                 <PaperIconButton
-                  glyph="📷"
+                  icon={<MicIcon size={20} color={colors.ink2} />}
+                  onPress={() => setHint(t('smartlog.comingSoon'))}
+                />
+                <PaperIconButton
+                  icon={<CameraIcon size={20} color={colors.ink2} />}
                   onPress={addPhoto}
                   badge={premium ? undefined : 'PRO'}
                   dim={!premium}
                 />
-                <PaperIconButton glyph="📍" onPress={() => setHint(t('smartlog.comingSoon'))} />
+                <PaperIconButton
+                  icon={<PinIcon size={20} color={colors.ink2} />}
+                  onPress={() => setHint(t('smartlog.comingSoon'))}
+                />
                 {!premium ? (
                   <Text variant="label" color={colors.ink3} style={{ marginLeft: 'auto' }}>
                     {t('smartlog.quotaLeft', { count: ai.data?.remaining ?? 0 })}
@@ -391,7 +408,7 @@ export function SmartLogSheet({
                       justifyContent: 'center',
                     }}
                   >
-                    <Text style={{ fontSize: 14, color: '#fff' }}>✦</Text>
+                    <SparkleIcon size={16} color="#fff" />
                   </View>
                   <Text variant="label" color={colors.ink2} style={{ flex: 1 }}>
                     <Text variant="label" weight="bold" color={brand.purpleStrong}>PRO</Text>

@@ -1,15 +1,15 @@
-/** Small square paper button holding an emoji glyph (mic / camera / location). */
+/** Small square paper button holding a UI glyph (mic / camera / location). */
+import type { ReactNode } from 'react';
 import { Pressable, View, Text as RNText } from 'react-native';
-import { Text } from '../Text';
 import { useTheme } from '../../theme/ThemeProvider';
 
 export function PaperIconButton({
-  glyph,
+  icon,
   onPress,
   badge,
   dim,
 }: {
-  glyph: string;
+  icon: ReactNode;
   onPress: () => void;
   /** Small corner badge (e.g. "PRO" on the gated photo button). */
   badge?: string;
@@ -34,7 +34,7 @@ export function PaperIconButton({
         opacity: dim ? 0.55 : 1,
       }}
     >
-      <Text style={{ fontSize: 18 }}>{glyph}</Text>
+      {icon}
       {badge ? (
         <View
           style={{
