@@ -96,10 +96,12 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
   ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
   as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
-- **`AiWeeklyFolder`** (`paper/today/`) — "✦ AI · สัปดาห์นี้" dark-plum folder, placed
-  **after** the entries list on Today. Always shown (never hidden): premium sees the cached
-  weekly `summary`, free sees `previewHeadline`/teaser + a PRO badge. Button → `/insights`
-  (premium) or `/profile/subscription` (free). Data from `useInsights()`.
+- **`AiWeeklyFolder`** (`paper/today/`) — "✦ AI · สัปดาห์นี้" folder, placed **after** the
+  entries list on Today. Dark **plum gradient** (`plum2 → plum`, ~155°, via
+  `expo-linear-gradient`) + a soft peach corner glow, matching web. Always shown (never
+  hidden): premium sees the cached weekly `summary` (markdown stripped), free sees
+  `previewHeadline`/teaser + a PRO badge. Button → `/insights` (premium) or
+  `/profile/subscription` (free). Data from `useInsights()`.
 - **`MoodPicker`** — two layouts:
   - `grid` (Today greeting): 5-col circular discs, soft tinted rings (kept soft per
     user feedback — full saturation read as neon).
@@ -173,9 +175,9 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 
 ## 6. Known deviations / deferred
 
-- **No `expo-linear-gradient`** installed → the sparkle square & PRO teaser use solid
-  `brand.purple` instead of the spec's `135deg #A673F1→#C9A6F5` gradient. Add the lib if
-  real gradients are wanted (native dep → rebuild).
+- **`expo-linear-gradient`** is installed and used by `AiWeeklyFolder`. The sparkle square
+  & PRO teaser still use solid `brand.purple` (not yet upgraded to the spec's
+  `135deg #A673F1→#C9A6F5` gradient) — can adopt LinearGradient there too if wanted.
 - The footer **`✦` is a typographic dingbat** in the label string (not the SVG sparkle).
 - Live API mood set/colors differ from the design mock (backend data, not fixable here).
 - Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:

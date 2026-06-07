@@ -1,9 +1,11 @@
 /**
  * "✦ AI · สัปดาห์นี้" — dark plum folder on the Today screen. Always shown (never
  * hidden behind a premium check): premium sees the cached weekly summary, free
- * sees a teaser + PRO badge. Ported from web ai-weekly-folder.
+ * sees a teaser + PRO badge. Ported from web ai-weekly-folder (plum gradient +
+ * peach corner glow).
  */
 import { View, Pressable } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Text } from '../../Text';
@@ -14,15 +16,17 @@ import { stripBold } from '../../../lib/text';
 
 export function AiWeeklyFolder() {
   const { t } = useTranslation();
-  const { colors, radius, space } = useTheme();
+  const { colors, radius, space, brand } = useTheme();
   const router = useRouter();
   const insights = useInsights();
   const data = insights.data;
   const premium = data?.tier === 'premium';
 
-  const body = premium
-    ? stripBold(data?.summary) || data?.headline || t('insights.weeklyTeaser')
-    : data?.previewHeadline || data?.headline || t('insights.weeklyTeaser');
+  const body = stripBold(
+    premium
+      ? data?.summary || data?.headline
+      : data?.previewHeadline || data?.headline,
+  ) || t('insights.weeklyTeaser');
 
   return (
     <View>
@@ -49,10 +53,12 @@ export function AiWeeklyFolder() {
         </Text>
       </View>
 
-      {/* dark sheet */}
-      <View
+      {/* dark sheet — plum gradient (155°) + peach corner glow */}
+      <LinearGradient
+        colors={[colors.plum2, colors.plum]}
+        start={{ x: 0.15, y: 0 }}
+        end={{ x: 0.85, y: 1 }}
         style={{
-          backgroundColor: colors.plum,
           borderTopLeftRadius: 4,
           borderTopRightRadius: radius.lg,
           borderBottomLeftRadius: radius.lg,
@@ -62,6 +68,21 @@ export function AiWeeklyFolder() {
           overflow: 'hidden',
         }}
       >
+        {/* peach glow, top-right */}
+        <View
+          pointerEvents="none"
+          style={{
+            position: 'absolute',
+            top: -50,
+            right: -50,
+            width: 150,
+            height: 150,
+            borderRadius: 75,
+            backgroundColor: brand.peach,
+            opacity: 0.22,
+          }}
+        />
+
         {!premium ? (
           <View
             style={{
@@ -99,7 +120,7 @@ export function AiWeeklyFolder() {
             {premium ? t('insights.weeklyOpen') : t('insights.weeklyUpgrade')}
           </Text>
         </Pressable>
-      </View>
+      </LinearGradient>
     </View>
   );
 }
