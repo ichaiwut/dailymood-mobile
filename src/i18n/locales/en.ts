@@ -211,6 +211,8 @@ export default {
     editTitle: 'Edit entry',
     dateTime: 'Date / time',
     dangerZone: 'Danger zone',
+    reanalyze: 'Re-analyze',
+    reanalyzing: 'Re-analyzing…',
   },
   today: {
     greeting: 'How is today?',

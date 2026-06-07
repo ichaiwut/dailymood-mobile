@@ -257,6 +257,9 @@ export interface UpdateEntryInput {
   location?: string | null;
   locationLat?: number | null;
   locationLng?: number | null;
+  aiSummary?: string | null;
+  sentiment?: number | null;
+  aiSource?: 'manual' | 'nlp' | 'vision' | string;
 }
 
 // --- Stats (GET /api/stats?period=) ---

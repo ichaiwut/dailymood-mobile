@@ -212,6 +212,8 @@ const th: typeof en = {
     editTitle: 'แก้ไขบันทึก',
     dateTime: 'วันที่ / เวลา',
     dangerZone: 'เขตอันตราย',
+    reanalyze: 'วิเคราะห์ใหม่',
+    reanalyzing: 'กำลังวิเคราะห์…',
   },
   today: {
     greeting: 'วันนี้เป็นยังไงบ้าง',

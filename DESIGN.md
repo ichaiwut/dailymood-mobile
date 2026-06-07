@@ -197,7 +197,10 @@ Mobile layout from the handoff (desktop sidebar skipped). Loose header (eyebrow
 "กำลังแก้ไข · บันทึกที่ N" + h2 title·date) → **single peach-tab `PaperSheet` form**
 (gap xl): mood tiles (`MoodPicker` scroll) · **date/time field shells** (`surface2`,
 1.5px rule, calendar/clock glyph — read-only; native picker deferred) · note + "N/500"
-counter · tags (chips + add input) · location (`LocationField`) → inline **danger zone**
+counter + **✦ re-analyze chip** (AI re-runs on the note → updates mood/tags/summary;
+quota-gated: free 3/day with counter, Pro unlimited; persists `aiSummary`/`sentiment`/
+`aiSource` via PATCH) + AI-summary inset · tags (chips + add input) · location
+(`LocationField`) → inline **danger zone**
 (1.5px `#FCA5A5` border, `#DC2626` delete) → **fixed bottom bar** (Cancel paper + Save
 peach, safe-area padded). Delete uses the confirm `BottomSheet`.
 

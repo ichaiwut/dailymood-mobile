@@ -20,13 +20,17 @@ import { MoodPicker } from '../../../src/components/MoodPicker';
 import { BottomSheet } from '../../../src/components/BottomSheet';
 import { PaperSheet } from '../../../src/components/paper/PaperSheet';
 import { LocationField, type LocationValue } from '../../../src/components/paper/LocationField';
-import { CalendarIcon, ClockIcon } from '../../../src/components/icons/Glyphs';
+import { CalendarIcon, ClockIcon, SparkleIcon } from '../../../src/components/icons/Glyphs';
 import { useToast } from '../../../src/components/Toast';
 import { useGoBack } from '../../../src/hooks/useGoBack';
 import { useTheme } from '../../../src/theme/ThemeProvider';
-import { useEntry, useMoods, useUpdateEntry, useDeleteEntry } from '../../../src/hooks/queries';
+import { useEntry, useMoods, useUpdateEntry, useDeleteEntry, useAiRemaining } from '../../../src/hooks/queries';
+import { analyzeSmart } from '../../../src/api/log';
+import { hasAiQuota } from '../../../src/api/ai';
 import { formatDateKey, ictClock } from '../../../src/lib/time';
-import { errorMessageKey } from '../../../src/api/errors';
+import { stripBold } from '../../../src/lib/text';
+import i18n from '../../../src/i18n';
+import { ApiError, errorMessageKey } from '../../../src/api/errors';
 
 const NOTE_MAX = 500;
 
@@ -43,16 +47,23 @@ export default function EditEntryScreen() {
   const moods = useMoods();
   const update = useUpdateEntry(id);
   const del = useDeleteEntry();
+  const ai = useAiRemaining();
 
   const [moodId, setMoodId] = useState<string | null>(null);
   const [note, setNote] = useState('');
   const [tags, setTags] = useState<string[]>([]);
   const [newTag, setNewTag] = useState('');
   const [location, setLocation] = useState<LocationValue>(null);
+  // AI fields — preserved from the entry, refreshed by re-analyze.
+  const [aiSummary, setAiSummary] = useState<string | null>(null);
+  const [sentiment, setSentiment] = useState<number | null>(null);
+  const [aiSource, setAiSource] = useState<string>('manual');
+  const [analyzing, setAnalyzing] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [confirming, setConfirming] = useState(false);
 
   const d = entry.data;
+  const premium = ai.data?.tier === 'premium';
 
   useEffect(() => {
     if (d) {
@@ -60,8 +71,35 @@ export default function EditEntryScreen() {
       setNote(d.note ?? '');
       setTags(d.tags ?? []);
       setLocation(d.location ? { name: d.location, lat: d.locationLat, lng: d.locationLng } : null);
+      setAiSummary(d.aiSummary ?? null);
+      setSentiment(d.sentiment ?? null);
+      setAiSource(d.aiSource ?? 'manual');
     }
   }, [d]);
+
+  const reAnalyze = async () => {
+    const text = note.trim();
+    if (!text || analyzing) return;
+    if (!premium && !hasAiQuota(ai.data)) {
+      toast.show(t('smartlog.rateLimitBody'), 'error');
+      return;
+    }
+    setAnalyzing(true);
+    try {
+      const r = await analyzeSmart({ text, locale: i18n.language });
+      if (r.suggestedMoodId) setMoodId(r.suggestedMoodId);
+      if (r.tags?.length) setTags((prev) => Array.from(new Set([...prev, ...r.tags])));
+      setAiSummary(r.aiSummary ?? null);
+      setSentiment(r.sentiment ?? null);
+      setAiSource(r.aiSource ?? 'nlp');
+      ai.refetch();
+    } catch (e) {
+      const msg = e instanceof ApiError && e.code === 'rate_limited' ? 'smartlog.rateLimitBody' : errorMessageKey(e);
+      toast.show(t(msg), 'error');
+    } finally {
+      setAnalyzing(false);
+    }
+  };
 
   const addTag = () => {
     const v = newTag.trim().replace(/^#/, '');
@@ -80,6 +118,9 @@ export default function EditEntryScreen() {
         location: location?.name ?? null,
         locationLat: location?.lat ?? null,
         locationLng: location?.lng ?? null,
+        aiSummary,
+        sentiment,
+        aiSource,
       });
       goBack();
       toast.show(t('entry.saved'));
@@ -170,6 +211,48 @@ export default function EditEntryScreen() {
                     maxLength={NOTE_MAX}
                     style={{ minHeight: 120, textAlignVertical: 'top' }}
                   />
+
+                  {/* AI re-analyze (free: quota-limited; Pro: unlimited) */}
+                  <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm, flexWrap: 'wrap' }}>
+                    <Pressable
+                      onPress={reAnalyze}
+                      disabled={!note.trim() || analyzing}
+                      style={{
+                        flexDirection: 'row',
+                        alignItems: 'center',
+                        gap: 6,
+                        backgroundColor: '#F3ECF9',
+                        borderRadius: radius.pill,
+                        paddingHorizontal: 14,
+                        paddingVertical: 8,
+                        opacity: !note.trim() || analyzing ? 0.5 : 1,
+                      }}
+                    >
+                      {analyzing ? (
+                        <ActivityIndicator size="small" color={brand.purpleStrong} />
+                      ) : (
+                        <SparkleIcon size={14} color={brand.purpleStrong} />
+                      )}
+                      <Text variant="label" weight="bold" color={brand.purpleStrong}>
+                        {analyzing ? t('entry.reanalyzing') : `✦ ${t('entry.reanalyze')}`}
+                      </Text>
+                    </Pressable>
+                    {!premium ? (
+                      <Text variant="label" color={colors.ink3}>
+                        {t('smartlog.quotaLeft', { count: ai.data?.remaining ?? 0 })}
+                      </Text>
+                    ) : null}
+                  </View>
+
+                  {/* AI suggestion inset */}
+                  {aiSummary ? (
+                    <View style={{ backgroundColor: '#F3ECF9', borderRadius: radius.md, padding: space.lg, gap: 4 }}>
+                      <Text variant="label" weight="bold" color={brand.purpleStrong} style={eyebrowStyle}>
+                        {t('entry.aiNoticed')}
+                      </Text>
+                      <Text variant="body" style={{ lineHeight: 22 }}>{stripBold(aiSummary)}</Text>
+                    </View>
+                  ) : null}
                 </View>
 
                 {/* tags */}
