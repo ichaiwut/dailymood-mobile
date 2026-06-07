@@ -46,8 +46,10 @@ export function TopBar({ name, email, accent }: { name?: string | null; email?: 
       </Pressable>
 
       <View style={{ flex: 1 }}>
-        <Text variant="label" color={colors.ink3}>{dateLabel(i18n.language)}</Text>
-        <Text variant="title" numberOfLines={1}>
+        <Text variant="label" weight="medium" color={colors.ink3} numberOfLines={1}>
+          {dateLabel(i18n.language)}
+        </Text>
+        <Text variant="body" weight="extrabold" numberOfLines={1} ellipsizeMode="tail">
           {t(`today.${greetingKey()}`)}{name ? `, ${name}` : ''}
         </Text>
       </View>
