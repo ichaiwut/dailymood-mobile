@@ -12,7 +12,6 @@ import { Notice } from '../../src/components/Notice';
 import { Appear } from '../../src/components/Appear';
 import { Skeleton } from '../../src/components/Skeleton';
 import { TopBar } from '../../src/components/paper/today/TopBar';
-import { TrialPromoBar } from '../../src/components/paper/today/TrialPromoBar';
 import { GreetingFolder } from '../../src/components/paper/today/GreetingFolder';
 import { AiComposer } from '../../src/components/paper/today/AiComposer';
 import { StreakCard } from '../../src/components/paper/today/StreakCard';
@@ -33,7 +32,6 @@ export default function TodayScreen() {
 
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 120 }}>
-      <TrialPromoBar />
       <TopBar name={u?.name} email={u?.email} accent={u?.accentColor} />
 
       <Appear>
