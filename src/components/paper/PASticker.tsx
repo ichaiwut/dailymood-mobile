@@ -1,27 +1,42 @@
 /**
- * Mood sticker — a colored disc with a white border and a soft "peel" shadow
- * (handoff `.sticker`). Renders the brand MoodFace when a `face` is given
- * (mood contexts), or an emoji glyph otherwise (e.g. achievement badges).
+ * Mood sticker — colored disc + white border + soft "peel" shadow (handoff
+ * `.sticker`). Renders, in priority: an emoji glyph (badges) → the user's real
+ * mood-PACK icon from R2 (mood contexts) → line-art MoodFace fallback.
+ * The mood-color disc shows as a thin ring behind the face (matches the design).
  */
 import { View } from 'react-native';
 import { Text } from '../Text';
+import { MoodIcon } from './MoodIcon';
 import { MoodFace, faceForMood, type FaceType } from './MoodFace';
 import { useTheme } from '../../theme/ThemeProvider';
+import { DEFAULT_MOOD_PACK } from '../../config';
 
 export interface PAStickerProps {
   color: string;
-  /** Brand mood face. Pass `moodId` instead and it's derived. */
-  face?: FaceType;
   moodId?: string | null;
-  /** Emoji fallback when no face (badges etc.). */
+  /** Mood-pack id (defaults to the user's default pack). */
+  pack?: string;
+  /** Force the line-art face instead of the pack icon. */
+  face?: FaceType;
+  /** Emoji fallback when no mood (e.g. achievement badges). */
   emoji?: string;
   size?: number;
   halo?: boolean;
 }
 
-export function PASticker({ color, face, moodId, emoji, size = 56, halo }: PAStickerProps) {
+export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji, size = 56, halo }: PAStickerProps) {
   const { shadow } = useTheme();
-  const resolvedFace = face ?? (moodId !== undefined ? faceForMood(moodId) : undefined);
+
+  let content: React.ReactNode;
+  if (emoji) {
+    content = <Text style={{ fontSize: size * 0.46 }}>{emoji}</Text>;
+  } else if (face) {
+    content = <MoodFace face={face} size={size * 0.8} />;
+  } else if (moodId != null) {
+    content = <MoodIcon moodId={moodId} pack={pack} size={size * 0.82} />;
+  } else {
+    content = null;
+  }
 
   const disc = (
     <View
@@ -34,14 +49,11 @@ export function PASticker({ color, face, moodId, emoji, size = 56, halo }: PASti
         justifyContent: 'center',
         borderWidth: 4,
         borderColor: '#fff',
+        overflow: 'hidden',
         boxShadow: shadow.sticker,
       }}
     >
-      {resolvedFace ? (
-        <MoodFace face={resolvedFace} size={size * 0.78} />
-      ) : (
-        <Text style={{ fontSize: size * 0.46 }}>{emoji ?? ''}</Text>
-      )}
+      {content}
     </View>
   );
 

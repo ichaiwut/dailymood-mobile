@@ -14,3 +14,14 @@ export const APP_UTC_OFFSET_MINUTES = 7 * 60;
 
 /** Free-tier AI analyses per day (server-enforced; client shows UX only). */
 export const FREE_AI_DAILY_QUOTA = 3;
+
+/** Cloudflare R2 public base (mood-pack icons live here). Public by design. */
+export const R2_PUBLIC_URL = 'https://pub-f0f688a68f884179942645789862cf54.r2.dev';
+
+/** Default mood-pack id (matches the backend default). */
+export const DEFAULT_MOOD_PACK = 'set_486038';
+
+/** Mood-pack icon URL: {base}/{packId}/{moodId}.svg */
+export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK): string {
+  return `${R2_PUBLIC_URL}/${pack}/${moodId}.svg`;
+}

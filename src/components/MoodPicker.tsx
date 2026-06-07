@@ -16,9 +16,10 @@ export interface MoodPickerProps {
   selectedId?: string | null;
   onSelect: (mood: Mood) => void;
   layout?: 'scroll' | 'grid';
+  pack?: string;
 }
 
-export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: MoodPickerProps) {
+export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pack }: MoodPickerProps) {
   const { i18n } = useTranslation();
   const { colors, radius, space } = useTheme();
 
@@ -43,7 +44,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: M
                     : { padding: 2 }
                 }
               >
-                <PASticker color={m.color} moodId={m.id} size={50} />
+                <PASticker color={m.color} moodId={m.id} pack={pack} size={50} />
               </View>
               <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
                 {moodLabel(m, i18n.language)}
@@ -79,7 +80,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll' }: M
                 borderColor: selected ? colors.ink : 'transparent',
               }}
             >
-              <PASticker color={m.color} moodId={m.id} size={46} />
+              <PASticker color={m.color} moodId={m.id} pack={pack} size={46} />
               <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
                 {moodLabel(m, i18n.language)}
               </Text>
