@@ -91,6 +91,12 @@ export default {
     bestDay: 'Best day',
     hardDay: 'Hardest day',
     rateLimited: 'Too many questions — try again a bit later.',
+    aiSummaryShort: 'AI summary',
+    seeMore: 'See more →',
+    askTitle: 'Ask AI about this month',
+    topTagLabel: 'What mattered',
+    aiDisclaimer: 'Just an AI perspective to reflect on.',
+    askDisclaimer: 'Just an AI idea — not always right.',
   },
   yip: {
     title: 'Year in Pixels',

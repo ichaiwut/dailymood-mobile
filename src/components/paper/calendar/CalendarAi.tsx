@@ -1,9 +1,11 @@
 /**
- * Calendar AI — premium monthly summary + patterns feed + ask-AI bar, and the
+ * Calendar AI — premium monthly summary + patterns feed + ask-AI section, and the
  * free upsell card (never hidden). GET /api/calendar/ai, POST /api/calendar/ask.
+ * Matches the web "{month} · AI สรุป" card + separate "ถาม AI" section.
  */
 import { useState } from 'react';
 import { View, Pressable, TextInput, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import { useRouter } from 'expo-router';
 import { Text } from '../../Text';
@@ -13,10 +15,25 @@ import { useToast } from '../../Toast';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useCalendarAi, useAskCalendar } from '../../../hooks/queries';
 import { ApiError, errorMessageKey } from '../../../api/errors';
+import { APP_TIMEZONE } from '../../../config';
 import i18n from '../../../i18n';
 
 const AI_TINT = '#F3ECF9';
 const PATTERN_BG = ['#F4EBFE', '#FDE8DA', '#E8F4FD', '#F0FDF4'];
+
+/** Gradient sparkle square (purple → light) used as the AI card icon. */
+function SparkleSquare({ size = 40 }: { size?: number }) {
+  return (
+    <LinearGradient
+      colors={['#A673F1', '#C9A6F5']}
+      start={{ x: 0, y: 0 }}
+      end={{ x: 1, y: 1 }}
+      style={{ width: size, height: size, borderRadius: 10, alignItems: 'center', justifyContent: 'center' }}
+    >
+      <SparkleIcon size={size * 0.45} color="#fff" />
+    </LinearGradient>
+  );
+}
 
 /** Free upsell — shown when the user isn't premium. */
 export function CalendarAiUpsell() {
@@ -28,9 +45,7 @@ export function CalendarAiUpsell() {
       onPress={() => router.push('/profile/subscription')}
       style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: AI_TINT, borderRadius: radius.md, padding: space.lg }}
     >
-      <View style={{ width: 32, height: 32, borderRadius: 10, backgroundColor: brand.purple, alignItems: 'center', justifyContent: 'center' }}>
-        <SparkleIcon size={16} color="#fff" />
-      </View>
+      <SparkleSquare size={32} />
       <View style={{ flex: 1 }}>
         <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('calendar.aiUpsellTitle')}</Text>
         <Text variant="label" color={colors.ink2}>{t('calendar.aiUpsellBody')}</Text>
@@ -40,7 +55,6 @@ export function CalendarAiUpsell() {
   );
 }
 
-/** Premium AI panel for a given month. onPickDate opens that day's sheet. */
 export function CalendarAiPanel({
   year,
   month,
@@ -51,7 +65,8 @@ export function CalendarAiPanel({
   onPickDate: (date: string) => void;
 }) {
   const { t } = useTranslation();
-  const { colors, radius, space, brand, shadow } = useTheme();
+  const { colors, radius, space, brand, shadow, sheetRadius } = useTheme();
+  const router = useRouter();
   const toast = useToast();
   const aiQ = useCalendarAi(year, month, i18n.language);
   const ask = useAskCalendar();
@@ -59,6 +74,12 @@ export function CalendarAiPanel({
   const [answer, setAnswer] = useState<{ answer: string; matchingDates: string[] } | null>(null);
 
   const d = aiQ.data;
+  const monthName = new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', {
+    month: 'long',
+    timeZone: APP_TIMEZONE,
+  }).format(new Date(Date.UTC(year, month - 1, 1)));
+  const shortDate = (date: string) =>
+    new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', { month: 'short', day: 'numeric', timeZone: APP_TIMEZONE }).format(new Date(`${date}T00:00:00+07:00`));
 
   const submit = async () => {
     const q = query.trim();
@@ -76,22 +97,40 @@ export function CalendarAiPanel({
   if (aiQ.isLoading) return <ActivityIndicator color={colors.primary} />;
 
   return (
-    <View style={{ gap: space.md }}>
-      {/* monthly summary */}
+    <View style={{ gap: space.lg }}>
+      {/* monthly summary card */}
       {d?.summary ? (
-        <View style={{ backgroundColor: AI_TINT, borderRadius: radius.lg, padding: space.lg, gap: space.sm }}>
-          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-            <SparkleIcon size={14} color={brand.purpleStrong} />
-            <Text variant="label" weight="bold" color={brand.purpleStrong} style={{ textTransform: 'uppercase', letterSpacing: 0.6 }}>
-              {t('entry.aiNoticed')}
-            </Text>
-          </View>
-          <RichText text={d.summary} style={{ lineHeight: 22 }} />
-          {/* highlight chips */}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
-            {d.highlights?.bestDay ? <Chip text={`${d.highlights.bestDay.emoji} ${t('calendar.bestDay')}`} onPress={() => onPickDate(d.highlights!.bestDay!.date)} /> : null}
-            {d.highlights?.hardDay ? <Chip text={`${d.highlights.hardDay.emoji} ${t('calendar.hardDay')}`} onPress={() => onPickDate(d.highlights!.hardDay!.date)} /> : null}
-            {d.highlights?.topTag ? <Chip text={`#${d.highlights.topTag}`} /> : null}
+        <View style={{ marginTop: space.xs }}>
+          <View style={{ backgroundColor: AI_TINT, ...sheetRadius, padding: space.xl, gap: space.md, boxShadow: shadow.md }}>
+            {/* washi tape */}
+            <View style={{ position: 'absolute', top: -12, alignSelf: 'center', left: 0, right: 0, alignItems: 'center' }}>
+              <View style={{ width: 100, height: 26, borderRadius: 2, backgroundColor: 'rgba(253,203,86,0.65)', transform: [{ rotate: '-3deg' }] }} />
+            </View>
+
+            <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+              <SparkleSquare />
+              <Text variant="title" color={brand.purpleStrong}>
+                {monthName} · {t('calendar.aiSummaryShort')}
+              </Text>
+            </View>
+
+            <RichText text={d.summary} style={{ lineHeight: 24 }} />
+
+            {/* highlight chips */}
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.sm }}>
+              {d.highlights?.bestDay ? (
+                <Chip emoji={d.highlights.bestDay.emoji} label={t('calendar.bestDay')} meta={shortDate(d.highlights.bestDay.date)} onPress={() => onPickDate(d.highlights!.bestDay!.date)} />
+              ) : null}
+              {d.highlights?.hardDay ? (
+                <Chip emoji={d.highlights.hardDay.emoji} label={t('calendar.hardDay')} meta={shortDate(d.highlights.hardDay.date)} onPress={() => onPickDate(d.highlights!.hardDay!.date)} />
+              ) : null}
+              {d.highlights?.topTag ? <Chip emoji="🏷️" label={t('calendar.topTagLabel')} meta={d.highlights.topTag} /> : null}
+            </View>
+
+            <Pressable onPress={() => router.push('/insights')} hitSlop={6} style={{ alignSelf: 'flex-start' }}>
+              <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('calendar.seeMore')}</Text>
+            </Pressable>
+            <Text variant="label" color={colors.ink3}>{t('calendar.aiDisclaimer')}</Text>
           </View>
         </View>
       ) : d?.tooFewEntries ? (
@@ -118,8 +157,12 @@ export function CalendarAiPanel({
         </View>
       ) : null}
 
-      {/* ask AI */}
+      {/* ask AI — its own section */}
       <View style={{ gap: space.sm }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+          <SparkleSquare size={34} />
+          <Text variant="title">{t('calendar.askTitle')}</Text>
+        </View>
         <View
           style={{
             flexDirection: 'row',
@@ -134,6 +177,7 @@ export function CalendarAiPanel({
             paddingVertical: 6,
           }}
         >
+          <SparkleIcon size={15} color={brand.purple} />
           <TextInput
             value={query}
             onChangeText={setQuery}
@@ -148,7 +192,7 @@ export function CalendarAiPanel({
             disabled={!query.trim() || ask.isPending}
             style={{ width: 34, height: 34, borderRadius: 17, backgroundColor: query.trim() ? brand.purple : colors.surface3, alignItems: 'center', justifyContent: 'center' }}
           >
-            {ask.isPending ? <ActivityIndicator size="small" color="#fff" /> : <SparkleIcon size={15} color={query.trim() ? '#fff' : colors.ink3} />}
+            {ask.isPending ? <ActivityIndicator size="small" color="#fff" /> : <Text style={{ fontSize: 16, color: query.trim() ? '#fff' : colors.ink3 }}>→</Text>}
           </Pressable>
         </View>
         {answer ? (
@@ -157,20 +201,34 @@ export function CalendarAiPanel({
             {answer.matchingDates.length ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                 {answer.matchingDates.map((dt) => (
-                  <Chip key={dt} text={dt.slice(5)} onPress={() => onPickDate(dt)} />
+                  <Chip key={dt} label={shortDate(dt)} onPress={() => onPickDate(dt)} />
                 ))}
               </View>
             ) : null}
           </View>
         ) : null}
+        <Text variant="label" color={colors.ink3}>{t('calendar.askDisclaimer')}</Text>
       </View>
     </View>
   );
 
-  function Chip({ text, onPress }: { text: string; onPress?: () => void }) {
+  function Chip({ emoji, label, meta, onPress }: { emoji?: string; label: string; meta?: string; onPress?: () => void }) {
     const body = (
-      <View style={{ backgroundColor: colors.surface3, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 5 }}>
-        <Text variant="label" weight="medium" color={brand.purpleStrong}>{text}</Text>
+      <View
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 6,
+          backgroundColor: colors.surface,
+          borderRadius: radius.pill,
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+          boxShadow: shadow.sm,
+        }}
+      >
+        {emoji ? <Text style={{ fontSize: 14 }}>{emoji}</Text> : null}
+        <Text variant="label" weight="bold">{label}</Text>
+        {meta ? <Text variant="label" color={colors.ink3}>· {meta}</Text> : null}
       </View>
     );
     return onPress ? <Pressable onPress={onPress}>{body}</Pressable> : body;
