@@ -206,6 +206,9 @@ const th: typeof en = {
     emptyBody: 'แตะอารมณ์ด้านบนเพื่อบันทึกความรู้สึกของวันนี้',
     emptyAction: 'เริ่มบันทึกความรู้สึก',
     composerPlaceholder: 'สองสามคำเกี่ยวกับวันนี้…',
+    items_one: '{{count}} รายการ',
+    items_other: '{{count}} รายการ',
+    now: 'ตอนนี้',
   },
   smartlog: {
     title: 'วันนี้เป็นยังไงบ้าง',

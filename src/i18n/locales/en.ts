@@ -205,6 +205,9 @@ export default {
     emptyBody: 'Tap a mood above to capture how today feels.',
     emptyAction: 'Start logging',
     composerPlaceholder: 'A few words about today…',
+    items_one: '{{count}} entry',
+    items_other: '{{count}} entries',
+    now: 'Now',
   },
   smartlog: {
     title: 'How was your day?',

@@ -13,6 +13,7 @@ import { Appear } from '../../src/components/Appear';
 import { Skeleton } from '../../src/components/Skeleton';
 import { TopBar } from '../../src/components/paper/today/TopBar';
 import { GreetingFolder } from '../../src/components/paper/today/GreetingFolder';
+import { TodayTimeline } from '../../src/components/paper/today/TodayTimeline';
 import { StreakCard } from '../../src/components/paper/today/StreakCard';
 import { EmptyToday } from '../../src/components/paper/today/EmptyToday';
 import { EntryFolderCard } from '../../src/components/paper/EntryFolderCard';
@@ -38,28 +39,34 @@ export default function TodayScreen() {
       </Appear>
 
       {/* today's entries */}
-      <Appear delay={120} style={{ gap: space.md }}>
-        <Text variant="eyebrow">{t('tabs.today')}</Text>
+      <Appear delay={120} style={{ gap: space.lg }}>
         {entries.isLoading ? (
           <View style={{ gap: space.md }}>
+            <Text variant="eyebrow">{t('tabs.today')}</Text>
             <Skeleton height={88} radius={radius.lg} />
             <Skeleton height={88} radius={radius.lg} />
           </View>
         ) : entries.isError ? (
           <Notice message={t(errorMessageKey(entries.error))} tone="error" />
         ) : entries.data && entries.data.length > 0 ? (
-          <View style={{ gap: space.lg }}>
-            {entries.data.map((entry, i) => (
-              <EntryFolderCard
-                key={entry.id}
-                entry={entry}
-                mood={findMood(moods.data, entry.moodTypeId)}
-                rotate={i % 2 === 0 ? -0.5 : 0.5}
-              />
-            ))}
-          </View>
+          <>
+            <TodayTimeline entries={entries.data} moods={moods.data ?? []} />
+            <View style={{ gap: space.lg }}>
+              {entries.data.map((entry, i) => (
+                <EntryFolderCard
+                  key={entry.id}
+                  entry={entry}
+                  mood={findMood(moods.data, entry.moodTypeId)}
+                  rotate={i % 2 === 0 ? -0.5 : 0.5}
+                />
+              ))}
+            </View>
+          </>
         ) : (
-          <EmptyToday />
+          <View style={{ gap: space.md }}>
+            <Text variant="eyebrow">{t('tabs.today')}</Text>
+            <EmptyToday />
+          </View>
         )}
       </Appear>
 
