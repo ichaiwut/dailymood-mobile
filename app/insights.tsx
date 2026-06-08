@@ -95,7 +95,9 @@ export default function InsightsScreen() {
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 80 }}>
       {/* back + sub-tabs */}
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
-        <Pressable onPress={goBack} hitSlop={10}><Text variant="title" color={colors.ink2}>‹</Text></Pressable>
+        <Pressable onPress={goBack} hitSlop={10} style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', boxShadow: shadow.sm }}>
+          <Text weight="bold" style={{ fontSize: 22, lineHeight: 26, color: colors.ink2 }}>‹</Text>
+        </Pressable>
         <SubTab label={`✨ ${t('insights.tabInsights')}`} active onPress={() => {}} />
         <SubTab label={`💬 ${t('insights.tabAsk')}`} active={false} onPress={() => router.push('/ask-ai')} />
       </View>
