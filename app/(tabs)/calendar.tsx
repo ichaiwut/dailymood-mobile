@@ -112,13 +112,13 @@ export default function CalendarScreen() {
               style={{
                 flex: 1,
                 alignItems: 'center',
-                paddingVertical: 10,
+                paddingVertical: 11,
                 borderRadius: radius.pill,
                 backgroundColor: view === v ? colors.surface : 'transparent',
                 boxShadow: view === v ? shadow.sm : undefined,
               }}
             >
-              <Text variant="label" weight={view === v ? 'bold' : 'medium'} color={view === v ? colors.ink : colors.ink3} style={{ lineHeight: 20 }}>
+              <Text variant="label" weight={view === v ? 'bold' : 'medium'} color={view === v ? colors.ink : colors.ink3}>
                 {v === 'calendar' ? t('calendar.viewCalendar') : t('calendar.viewTimeline')}
               </Text>
             </Pressable>
@@ -126,9 +126,9 @@ export default function CalendarScreen() {
           {/* Year (Year-in-Pixels) — separate Pro page; 🔒 for free */}
           <Pressable
             onPress={() => router.push('/year-in-pixels')}
-            style={{ flex: 1, alignItems: 'center', paddingVertical: 10, borderRadius: radius.pill }}
+            style={{ flex: 1, alignItems: 'center', paddingVertical: 11, borderRadius: radius.pill }}
           >
-            <Text variant="label" weight="medium" color={colors.ink3} style={{ lineHeight: 20 }}>
+            <Text variant="label" weight="medium" color={colors.ink3}>
               {premium ? t('calendar.viewYear') : `🔒 ${t('calendar.viewYear')}`}
             </Text>
           </Pressable>

@@ -78,7 +78,7 @@ export function Text({
   // Noto Sans Thai's lower vowels/tone marks clip against a tight line box
   // (e.g. ไทม์ไลน์ inside a pill). Give Thai a roomier default line height; any
   // explicit lineHeight in `style` still overrides this (style merges after base).
-  if (thai) base.lineHeight = Math.round(resolvedSize * 1.4);
+  if (thai) base.lineHeight = Math.round(resolvedSize * 1.5);
   if (variant === 'eyebrow') {
     base.textTransform = 'uppercase';
     base.letterSpacing = 0.6;
