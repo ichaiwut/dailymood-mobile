@@ -112,8 +112,9 @@ export function TimelineFeed({
           borderRadius: radius.pill,
           paddingHorizontal: 14,
           paddingVertical: 8,
-          // active = chunky solid offset; inactive = soft paper shadow.
-          boxShadow: active ? '0 6px 0 -2px #000' : '0 5px 14px -8px rgba(60,40,20,0.4)',
+          // soft paper lift (a hard chunky offset reads as a sliced-off bottom at
+          // chip scale); active just sits a touch deeper.
+          boxShadow: active ? '0 6px 14px -7px rgba(0,0,0,0.55)' : '0 5px 14px -8px rgba(60,40,20,0.4)',
         }}
       >
         {dot ? <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: dot }} /> : null}
