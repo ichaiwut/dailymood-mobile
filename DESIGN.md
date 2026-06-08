@@ -211,7 +211,8 @@ Month nav (‹ month-year › paper buttons) → segmented **calendar / timeline
 3-up **stats row** (Avg [with ↑/↓ delta] / Streak / Logged, accent cards + `shadow.sm`) +
 **mood Legend** folder card (ink tab, 14×14 rounded swatches). **Timeline view** =
 `TimelineFeed`. Day → `DaySheet` (**centered popup modal** — fade, washi-lav tape, close
-circle, weekday-peach + big date header, entries / empty 🤔 / future 🔮); entry → detail.
+circle, weekday-peach + big date header, **special-day chip** (holiday/personal from
+`/api/events`), entries / empty 🤔 / future 🔮); entry → detail.
 - **Day cell:** radius 12; mood day = mood color + number `rgba(0,0,0,.55)`; empty = `surface2`
   + ink3; **today** = 2.5px purple ring; **selected** = 2.5px ink ring (wins over today);
   **future** = 0.4 opacity + tap → "future day" toast (not loggable).

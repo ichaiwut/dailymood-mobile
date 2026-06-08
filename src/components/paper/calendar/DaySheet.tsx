@@ -10,10 +10,10 @@ import { Button } from '../../Button';
 import { EntryFolderCard } from '../EntryFolderCard';
 import { CloseIcon } from '../../icons/Glyphs';
 import { useTheme } from '../../../theme/ThemeProvider';
-import { useEntriesByDate, useMoods } from '../../../hooks/queries';
+import { useEntriesByDate, useMoods, useEvents } from '../../../hooks/queries';
 import { useSmartLog } from '../smartlog/SmartLogProvider';
 import { findMood } from '../../../lib/mood';
-import { formatDateKey, isFutureKey } from '../../../lib/time';
+import { formatDateKey, isFutureKey, todayKey } from '../../../lib/time';
 
 export interface DaySheetProps {
   date: string | null;
@@ -29,6 +29,11 @@ export function DaySheet({ date, onClose, onOpenEntry }: DaySheetProps) {
   const moods = useMoods();
   const smartLog = useSmartLog();
   const future = date ? isFutureKey(date) : false;
+
+  // Special day (holiday / personal) for this date.
+  const ref = date ?? todayKey();
+  const evQ = useEvents(Number(ref.slice(0, 4)), Number(ref.slice(5, 7)));
+  const event = date ? evQ.data?.events.find((e) => e.date === date) : undefined;
 
   const weekday = date ? formatDateKey(date, i18n.language, { weekday: 'long', day: undefined, month: undefined, year: undefined }) : '';
   const dayMonth = date
@@ -74,6 +79,28 @@ export function DaySheet({ date, onClose, onOpenEntry }: DaySheetProps) {
               <Text variant="label" weight="bold" color={brand.peach}>{weekday}</Text>
               <Text variant="h1">{dayMonth}</Text>
             </View>
+
+            {/* special day (holiday / personal) */}
+            {event ? (
+              <View
+                style={{
+                  flexDirection: 'row',
+                  alignItems: 'center',
+                  alignSelf: 'flex-start',
+                  gap: 6,
+                  backgroundColor: colors.surface3,
+                  borderRadius: 999,
+                  paddingHorizontal: 12,
+                  paddingVertical: 6,
+                }}
+              >
+                <View style={{ width: 7, height: 7, borderRadius: 4, backgroundColor: event.type === 'holiday' ? '#F43F5E' : '#3B82F6' }} />
+                <Text style={{ fontSize: 14 }}>{event.emoji}</Text>
+                <Text variant="label" weight="medium" color={colors.ink2}>
+                  {i18n.language === 'th' ? event.labelTh : event.label}
+                </Text>
+              </View>
+            ) : null}
 
             {entries.isLoading ? (
               <ActivityIndicator color={colors.primary} />
