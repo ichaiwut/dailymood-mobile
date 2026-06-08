@@ -25,6 +25,7 @@ import { findMood, moodLabel } from '../src/lib/mood';
 import { todayKey } from '../src/lib/time';
 import { APP_TIMEZONE } from '../src/config';
 import { errorMessageKey } from '../src/api/errors';
+import type { YearInPixels } from '../src/api/types';
 
 const THIS_YEAR = Number(todayKey().slice(0, 4));
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
@@ -53,9 +54,11 @@ export default function YearInPixelsScreen() {
   const premium = ai.data?.tier === 'premium';
   const [year, setYear] = useState(THIS_YEAR);
   const [selected, setSelected] = useState<string | null>(null);
+  const [compareOpen, setCompareOpen] = useState(false);
 
   const moods = useMoods();
   const yip = useYearInPixels(year, i18n.language, premium);
+  const prevYip = useYearInPixels(year - 1, i18n.language, premium && compareOpen);
   const d = yip.data;
   const today = todayKey();
 
@@ -175,6 +178,19 @@ export default function YearInPixelsScreen() {
                 />
               </View>
 
+              {/* inline compare panel (this year vs previous) — toggled below */}
+              {compareOpen ? (
+                prevYip.isLoading ? (
+                  <ActivityIndicator color={brand.purple} style={{ marginVertical: space.md }} />
+                ) : prevYip.data && prevYip.data.totalDays > 0 ? (
+                  <ComparePanel cur={d} prev={prevYip.data} />
+                ) : (
+                  <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: space.lg }}>
+                    <Text variant="label" color={colors.ink3} center>{t('yip.cmpNoData', { year: year - 1 })}</Text>
+                  </View>
+                )
+              ) : null}
+
               {/* "tell me the story" → the scroll-reveal Year Story recap page */}
               {d.aiSummary ? (
                 <Pressable
@@ -192,8 +208,8 @@ export default function YearInPixelsScreen() {
                 </Pressable>
               ) : null}
 
-              {/* compare with previous year (flips the card) + PDF report (soon) */}
-              <WhiteBtn emoji="📊" label={t('yip.compare', { year: year - 1 })} onPress={() => { setSelected(null); setYear((y) => y - 1); }} />
+              {/* compare (toggles the panel above) + PDF report (soon) */}
+              <WhiteBtn emoji="📊" label={t('yip.compare', { year: year - 1 })} onPress={() => setCompareOpen((o) => !o)} active={compareOpen} />
               <WhiteBtn emoji="📄" label={t('yip.downloadPdf')} onPress={() => toast.show(t('yip.pdfSoon'))} />
             </View>
           </View>
@@ -289,7 +305,7 @@ export default function YearInPixelsScreen() {
     </Screen>
   );
 
-  function WhiteBtn({ emoji, label, onPress }: { emoji: string; label: string; onPress: () => void }) {
+  function WhiteBtn({ emoji, label, onPress, active }: { emoji: string; label: string; onPress: () => void; active?: boolean }) {
     return (
       <Pressable
         onPress={onPress}
@@ -301,12 +317,143 @@ export default function YearInPixelsScreen() {
           backgroundColor: colors.surface,
           borderRadius: radius.md,
           paddingVertical: 13,
+          borderWidth: active ? 1.5 : 0,
+          borderColor: brand.purple,
           boxShadow: shadow.sm,
         }}
       >
         <Text style={{ fontSize: 15 }}>{emoji}</Text>
-        <Text variant="label" weight="bold" color={colors.ink2}>{label}</Text>
+        <Text variant="label" weight="bold" color={active ? brand.purpleStrong : colors.ink2}>{label}</Text>
       </Pressable>
+    );
+  }
+
+  function ComparePanel({ cur, prev }: { cur: YearInPixels; prev: YearInPixels }) {
+    const curMood = findMood(moods.data, cur.dominantMood);
+    const prevMood = findMood(moods.data, prev.dominantMood);
+    const maxEntries = Math.max(cur.totalDays, prev.totalDays, 1);
+    const curStreak = cur.streak?.days ?? 0;
+    const prevStreak = prev.streak?.days ?? 0;
+    const maxStreak = Math.max(curStreak, prevStreak, 1);
+    const days = (n: number) => t('yip.streakDays', { n });
+    const delta = (diff: number) =>
+      diff === 0 ? undefined : { text: `${diff > 0 ? '↑ +' : '↓ '}${days(Math.abs(diff))}`, up: diff > 0 };
+    const monthName = (m: number) =>
+      new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', { month: 'long', timeZone: APP_TIMEZONE }).format(
+        new Date(Date.UTC(prev.year, m - 1, 1)),
+      );
+
+    return (
+      <View style={{ backgroundColor: colors.surface, borderRadius: radius.md, padding: space.lg, boxShadow: shadow.sm }}>
+        {/* header + legend */}
+        <View style={{ flexDirection: 'row', alignItems: 'flex-start', justifyContent: 'space-between', gap: space.sm }}>
+          <Text variant="label" weight="bold" color={brand.purpleStrong} style={{ flex: 1 }}>
+            📊 {t('yip.compareTitle', { a: cur.year, b: prev.year })}
+          </Text>
+          <View style={{ gap: 4 }}>
+            <LegendDot color={brand.purple} label={String(cur.year)} />
+            <LegendDot color={brand.lavender} label={String(prev.year)} />
+          </View>
+        </View>
+
+        <CompareRow
+          emoji="📝"
+          label={t('yip.cmpEntries')}
+          curColor={brand.purple}
+          curFrac={cur.totalDays / maxEntries}
+          curText={days(cur.totalDays)}
+          prevFrac={prev.totalDays / maxEntries}
+          prevText={days(prev.totalDays)}
+          delta={delta(cur.totalDays - prev.totalDays)}
+        />
+        <CompareRow
+          emoji="😊"
+          label={t('yip.statDominant')}
+          curColor={curMood?.color ?? brand.mint}
+          curFrac={cur.dominantPct / 100}
+          curText={`${curMood ? moodLabel(curMood, i18n.language) : '—'} ${cur.dominantPct}%`}
+          prevFrac={prev.dominantPct / 100}
+          prevText={`${prevMood ? moodLabel(prevMood, i18n.language) : '—'} ${prev.dominantPct}%`}
+        />
+        <CompareRow
+          emoji="🔥"
+          label={t('yip.cmpStreak')}
+          curColor={brand.peach}
+          curFrac={curStreak / maxStreak}
+          curText={days(curStreak)}
+          prevFrac={prevStreak / maxStreak}
+          prevText={days(prevStreak)}
+          delta={delta(curStreak - prevStreak)}
+        />
+        {cur.bestMonth || prev.bestMonth ? (
+          <CompareRow
+            emoji="⭐"
+            label={t('yip.bestMonthTab')}
+            curColor={brand.mint}
+            curFrac={(cur.bestMonth?.avg ?? 0) / 5}
+            curText={cur.bestMonth ? `${monthName(cur.bestMonth.month)} · ${cur.bestMonth.avg.toFixed(1)}/5` : '—'}
+            prevFrac={(prev.bestMonth?.avg ?? 0) / 5}
+            prevText={prev.bestMonth ? `${monthName(prev.bestMonth.month)} · ${prev.bestMonth.avg.toFixed(1)}/5` : '—'}
+          />
+        ) : null}
+      </View>
+    );
+  }
+
+  function LegendDot({ color, label }: { color: string; label: string }) {
+    return (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+        <View style={{ width: 10, height: 10, borderRadius: 5, backgroundColor: color }} />
+        <Text variant="label" color={colors.ink3}>{label}</Text>
+      </View>
+    );
+  }
+
+  function CompareRow({
+    emoji,
+    label,
+    curColor,
+    curFrac,
+    curText,
+    prevFrac,
+    prevText,
+    delta,
+  }: {
+    emoji: string;
+    label: string;
+    curColor: string;
+    curFrac: number;
+    curText: string;
+    prevFrac: number;
+    prevText: string;
+    delta?: { text: string; up: boolean };
+  }) {
+    const Bar = ({ frac, color, text, muted }: { frac: number; color: string; text: string; muted?: boolean }) => (
+      <View style={{ flexDirection: 'row', alignItems: 'center', gap: 8 }}>
+        <View style={{ flex: 1, height: 10, borderRadius: 5, backgroundColor: colors.surface2, overflow: 'hidden' }}>
+          <View style={{ height: '100%', width: `${Math.max(0, Math.min(1, frac)) * 100}%`, backgroundColor: color, borderRadius: 5 }} />
+        </View>
+        <Text variant="label" weight={muted ? 'medium' : 'bold'} color={muted ? colors.ink3 : colors.ink} style={{ width: 86, textAlign: 'right' }}>
+          {text}
+        </Text>
+      </View>
+    );
+    return (
+      <View style={{ gap: 6, marginTop: space.md }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' }}>
+          <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+            <Text style={{ fontSize: 15 }}>{emoji}</Text>
+            <Text variant="label" weight="bold">{label}</Text>
+          </View>
+          {delta ? (
+            <View style={{ paddingHorizontal: 8, paddingVertical: 3, borderRadius: radius.pill, backgroundColor: delta.up ? '#E6F7EE' : '#FDE8E8' }}>
+              <Text variant="label" weight="bold" color={delta.up ? colors.success : colors.danger}>{delta.text}</Text>
+            </View>
+          ) : null}
+        </View>
+        <Bar frac={curFrac} color={curColor} text={curText} />
+        <Bar frac={prevFrac} color={brand.lavender} text={prevText} muted />
+      </View>
     );
   }
 

@@ -253,7 +253,10 @@ grey label + bold value · meta: 😊 top mood + %, 🔥 longest streak + month,
 💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
 **`/year-in-pixels/story?year=` (the scroll-reveal Year Story page, §4f)**; and two stacked
 **white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
-(flips the whole card/grid to the previous year) and `📄 ดาวน์โหลด AI report (PDF)`
+(toggles an **inline compare panel** inside the card: fetches the previous year and shows
+this-year-vs-last dual bars + delta badges for entries / dominant mood / streak / best month —
+current year in accent colour, previous year in lavender, deltas green ↑ / red ↓; the button
+shows a purple active ring while open) and `📄 ดาวน์โหลด AI report (PDF)`
 (toast "coming soon" until `expo-print`/`expo-sharing` land). Below the card: the
 **pixel grid in a peach-tab "ทั้งปี" PaperSheet** — like web, **months run down the side**
 (fixed left label column, `monthShort`) and **days run across (1–31) in a horizontal
@@ -264,8 +267,9 @@ footer. A **selected-cell tooltip** (sticker + date + mood) sits under the sheet
 Data from `useYearInPixels` (premium only);
 no-summary fallback shows `stats.tooFew` but keeps the stat grid.
 **Partial:** the PDF button is a "coming soon" toast (real export needs `expo-print`/
-`expo-sharing`); compare currently *navigates* to the previous year rather than showing a
-true side-by-side diff.
+`expo-sharing`). The compare panel reads `useYearInPixels(year-1, …, enabled=compareOpen)`
+so the previous year is only fetched when opened; if that year has no entries it shows a
+"ยังไม่มีข้อมูลปี {prevYear}" note.
 
 ## 4f. Year Story — `app/year-in-pixels/story.tsx` (Pro, `/api/year-in-pixels`)
 
