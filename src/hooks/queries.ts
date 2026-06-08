@@ -23,7 +23,7 @@ import {
   askCalendar,
   fetchEvents,
 } from '../api/calendar';
-import { fetchStats, fetchInsights, sendInsightFeedback } from '../api/stats';
+import { fetchStats, fetchInsights, fetchInsightsAll, sendInsightFeedback } from '../api/stats';
 import { todayKey } from '../lib/time';
 import type {
   ConfirmEntryInput,
@@ -46,6 +46,7 @@ export const queryKeys = {
   entry: (id: string) => ['entry', id] as const,
   stats: (period: StatsPeriod) => ['stats', period] as const,
   insights: ['insights'] as const,
+  insightsAll: (week?: string) => ['insights-all', week ?? 'current'] as const,
   achievements: ['achievements'] as const,
   subscription: ['subscription'] as const,
 };
@@ -195,6 +196,10 @@ export function useStats(period: StatsPeriod) {
 
 export function useInsights() {
   return useQuery({ queryKey: queryKeys.insights, queryFn: fetchInsights });
+}
+
+export function useInsightsAll(locale: string, week?: string, enabled = true) {
+  return useQuery({ queryKey: queryKeys.insightsAll(week), queryFn: () => fetchInsightsAll(locale, week), enabled });
 }
 
 export function useInsightFeedback() {

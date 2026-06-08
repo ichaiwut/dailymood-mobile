@@ -323,6 +323,27 @@ dark tooltip with `labelTh/En` + `tagRefs`; Free → one blurred lavender ghost 
 "✦ Unlock AI Annotations — PRO" chip → subscription. **Deferred vs web:** pulsing pin
 animation (static glow here) and holiday/personal timeline markers.
 
+## 4h. AI Insights — `app/insights.tsx` (Pro, `/api/insights/all` + `/api/insights/feedback`)
+
+Weekly AI dashboard (`useInsightsAll(locale, week, enabled=premium)`). Top: a back chevron +
+**AiSubTabs** (`✨ Insights` active ink pill w/ chunky `0 6px 0 -2px #000`, `💬 Ask AI`). **Non-premium
+→ whole-page FreeGate**: eyebrow + h1 + a purple-tab **CTA folder** (gradient `#F9A870→#C89BF5→#A673F1`
++ PAClip, 5 bullets, white "✨ สมัคร Pro" → `/profile/subscription`, ฿99/mo) + a dimmed teaser.
+Premium: header (eyebrow "AI INSIGHTS · Week N" from `weekKey`, h1, prev/next week pills — next
+only when viewing the past, via `isoWeekKey` + `weekOffset`); a disclaimer note (AI-tint + ✨);
+the **hero recap folder** (purple tab + PAClip + gradient sheet `#A673F1→#C89BF5→#FCA45B`, white
+RichText headline, "อ่านเต็ม" expands `summary`, glass buttons, and a 2×2 **glass-tile** grid
+avg/good-days/patterns/wellness with ↑/↓ deltas); a **4-feature grid** (2-col): 🔮 Forecast
+(predicted-mood sticker + confidence% + ± factor rows), 🧬 Mood DNA (`RadarChart` 5-axis +
+archetype), 🔁 Themes (color-bar list ≤5 + `N×`), ⏰ Energy Clock (`EnergyRadial` 24 spokes +
+peak), each → a "✨ generating…" placeholder when its datum is null; up to 3 **pattern cards**
+(tag badge 📌/↗/⚠️ + title + desc + 7-bar `MoodBarChart` when `miniVizData`); a **suggestion**
+card (warm gradient + washi, 💡 SUGGESTION badge, 👍/👎 `FeedbackPill`s → `/api/insights/feedback`,
+one-shot then disabled). New viz live in `src/components/paper/insights/`. **States:** loading
+skeleton, error (😵 + retry), and `status.ready === false` → TooFew (📝, <7 entries) / Empty (🔮).
+**Deferred vs web:** the Ask-AI tab (no Ask page yet → toast) and the footer AI-Coach / Weekly-
+Digest toggles (need a settings-persistence contract).
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,

@@ -408,6 +408,54 @@ export interface InsightsData {
 
 export type InsightReaction = 'up' | 'down' | 'routine';
 
+// --- Insights "all" (GET /api/insights/all) — the rich weekly dashboard ---
+export interface InsightsForecast {
+  factors: { label: string; direction: '+' | '-' | string }[];
+  miniTrend: number[];
+  reasoning: string;
+  confidence: number; // 0..1
+  predictedMood: string; // moodId
+}
+export interface InsightsEnergy {
+  hourly: number[]; // 24 values 0..1
+  peakHour: number;
+  troughHour: number;
+}
+export interface InsightsTheme {
+  color: string;
+  count: number;
+  label: string;
+}
+export interface InsightsDna {
+  axes: { calm: number; depth: number; bright: number; energy: number; social: number };
+  archetype: string;
+  description: string;
+  archetypeIcon: string;
+}
+export interface InsightsAll {
+  status: { ready: boolean; entryCount: number; aiQuota: number | null; tier: 'free' | 'premium' | string };
+  weekKey: string;
+  stats: {
+    avgMood: number;
+    avgMoodDelta: number;
+    goodDays: number;
+    patternsCount: number;
+    wellnessScore: number;
+    wellnessDelta: number;
+  };
+  streak: number;
+  headline: string;
+  summary: string;
+  patterns: InsightPattern[];
+  suggestion: InsightSuggestion | null;
+  forecast: InsightsForecast | null;
+  energy: InsightsEnergy | null;
+  themes: { themes: InsightsTheme[] } | null;
+  dna: InsightsDna | null;
+  empty?: boolean;
+  tooFewEntries?: boolean;
+}
+
 /**
  * Error codes the API returns in `{ error }`. We map these to human TH/EN copy
  * before they reach the UI (handover rule §6.1) — raw codes must never be shown.
