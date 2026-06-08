@@ -66,6 +66,7 @@ export interface Profile {
     hidePreview: boolean;
     anonymousInsights: boolean;
     weeklyDigestEnabled: boolean;
+    aiCoachEnabled: boolean;
   };
   stats: {
     streak: number;
@@ -127,6 +128,8 @@ export interface UpdateProfileInput {
   bio?: string;
   accentColor?: string;
   locale?: 'th' | 'en';
+  weeklyDigestEnabled?: boolean;
+  aiCoachEnabled?: boolean;
 }
 
 /** A saved mood entry (GET /api/log). Shapes verified against the live API. */

@@ -10,7 +10,7 @@ export function fetchProfile(): Promise<Profile> {
   return apiFetch<Profile>('/api/profile');
 }
 
-/** PATCH /api/profile — name, bio, accentColor, locale. */
+/** PATCH /api/profile — name, bio, accentColor, locale, weeklyDigestEnabled, aiCoachEnabled. */
 export function updateProfile(input: UpdateProfileInput): Promise<unknown> {
   return apiFetch('/api/profile', { method: 'PATCH', body: input });
 }

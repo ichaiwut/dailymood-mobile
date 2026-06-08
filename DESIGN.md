@@ -341,8 +341,10 @@ peak), each → a "✨ generating…" placeholder when its datum is null; up to 
 card (warm gradient + washi, 💡 SUGGESTION badge, 👍/👎 `FeedbackPill`s → `/api/insights/feedback`,
 one-shot then disabled). New viz live in `src/components/paper/insights/`. **States:** loading
 skeleton, error (😵 + retry), and `status.ready === false` → TooFew (📝, <7 entries) / Empty (🔮).
-**Deferred vs web:** the Ask-AI tab (no Ask page yet → toast) and the footer AI-Coach / Weekly-
-Digest toggles (need a settings-persistence contract).
+**Footer toggles** (`ToggleRow` + `TogglePill` 44×24): 🤖 AI Coach (gradient icon tile) + 📩 Weekly
+Digest, bound to `profile.aiCoachEnabled` / `weeklyDigestEnabled` and persisted via
+`PATCH /api/profile` (`useUpdateProfile`, toast on save). **Deferred vs web:** the Ask-AI tab
+(no Ask page yet → toast).
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
