@@ -19,8 +19,9 @@ export function sendAskMessage(body: { threadId: string; content: string; locale
   return apiFetch('/api/ask-ai/messages', { method: 'POST', body });
 }
 
+/** PATCH (NOT POST — POST is for sending new questions and 400s on this body). */
 export function sendAskFeedback(body: { messageId: string; feedback: 'up' | 'down' }): Promise<unknown> {
-  return apiFetch('/api/ask-ai/messages', { method: 'POST', body });
+  return apiFetch('/api/ask-ai/messages', { method: 'PATCH', body });
 }
 
 export function fetchAskSuggested(locale: string): Promise<{ questions: string[] }> {
