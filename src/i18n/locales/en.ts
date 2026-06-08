@@ -71,6 +71,7 @@ export default {
     viewCalendar: 'Calendar',
     viewTimeline: 'Timeline',
     avgMood: 'Avg mood',
+    avgShort: 'Avg',
     streak: 'Streak',
     logged: 'Logged',
     emptyDay: 'Nothing logged this day',

@@ -199,19 +199,19 @@ export default function CalendarScreen() {
                 />
               </PaperSheet>
               {cal.data ? (
-                <View style={{ flexDirection: 'row', gap: space.md }}>
+                <View style={{ flexDirection: 'row', gap: space.sm }}>
                   <Stat
-                    label={t('calendar.avgMood')}
+                    label={t('calendar.avgShort')}
                     value={cal.data.stats.avgMood.toFixed(1)}
-                    accent={colors.primary}
+                    tab={brand.peach}
                     sub={
                       cal.data.stats.avgMoodDelta != null && cal.data.stats.avgMoodDelta !== 0
                         ? `${cal.data.stats.avgMoodDelta > 0 ? '↑' : '↓'} ${Math.abs(cal.data.stats.avgMoodDelta).toFixed(1)}`
                         : undefined
                     }
                   />
-                  <Stat label={t('calendar.streak')} value={`${cal.data.stats.streak}`} accent={colors.accent} />
-                  <Stat label={t('calendar.logged')} value={`${cal.data.stats.loggedDays}`} accent={brand.mint} />
+                  <Stat label={t('calendar.streak')} value={`${cal.data.stats.streak}`} tab={brand.purple} sub="🔥" />
+                  <Stat label={t('calendar.logged')} value={`${cal.data.stats.loggedDays}`} tab={brand.mint} tabInk />
                 </View>
               ) : null}
               {moods.data?.length ? <Legend /> : null}
@@ -247,23 +247,39 @@ export default function CalendarScreen() {
     );
   }
 
-  function Stat({ label, value, accent, sub }: { label: string; value: string; accent: string; sub?: string }) {
+  function Stat({ label, value, tab, tabInk, sub }: { label: string; value: string; tab: string; tabInk?: boolean; sub?: string }) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.surface,
-          borderRadius: radius.md,
-          borderLeftWidth: 4,
-          borderLeftColor: accent,
-          padding: space.md,
-          gap: 2,
-          boxShadow: shadow.sm,
-        }}
-      >
-        <Text variant="eyebrow">{label}</Text>
-        <Text variant="h2">{value}</Text>
-        {sub ? <Text variant="label" color={colors.ink3}>{sub}</Text> : null}
+      <View style={{ flex: 1 }}>
+        {/* compact folder tab (fits 3-across) */}
+        <View
+          style={{
+            alignSelf: 'flex-start',
+            maxWidth: '100%',
+            backgroundColor: tab,
+            borderTopLeftRadius: radius.sm,
+            borderTopRightRadius: radius.sm,
+            paddingHorizontal: 10,
+            paddingVertical: 4,
+            marginBottom: -2,
+          }}
+        >
+          <Text variant="eyebrow" weight="bold" color={tabInk ? colors.ink : '#fff'} numberOfLines={1}>
+            {label}
+          </Text>
+        </View>
+        <View
+          style={{
+            backgroundColor: colors.surface,
+            ...sheetRadius,
+            borderTopLeftRadius: 0,
+            padding: space.md,
+            gap: 2,
+            boxShadow: shadow.sm,
+          }}
+        >
+          <Text variant="h2">{value}</Text>
+          {sub ? <Text variant="label" color={colors.ink3} numberOfLines={1}>{sub}</Text> : null}
+        </View>
       </View>
     );
   }
