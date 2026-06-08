@@ -199,19 +199,25 @@ export default function CalendarScreen() {
                 />
               </PaperSheet>
               {cal.data ? (
-                <View style={{ flexDirection: 'row', gap: space.sm }}>
-                  <Stat
-                    label={t('calendar.avgShort')}
-                    value={cal.data.stats.avgMood.toFixed(1)}
-                    tab={brand.peach}
-                    sub={
-                      cal.data.stats.avgMoodDelta != null && cal.data.stats.avgMoodDelta !== 0
-                        ? `${cal.data.stats.avgMoodDelta > 0 ? '↑' : '↓'} ${Math.abs(cal.data.stats.avgMoodDelta).toFixed(1)}`
-                        : undefined
-                    }
-                  />
-                  <Stat label={t('calendar.streak')} value={`${cal.data.stats.streak}`} tab={brand.purple} sub="🔥" />
-                  <Stat label={t('calendar.logged')} value={`${cal.data.stats.loggedDays}`} tab={brand.mint} tabInk />
+                <View style={{ gap: space.sm }}>
+                  {/* row 1: avg + streak */}
+                  <View style={{ flexDirection: 'row', gap: space.sm }}>
+                    <Stat
+                      label={t('calendar.avgShort')}
+                      value={cal.data.stats.avgMood.toFixed(1)}
+                      tab={brand.peach}
+                      sub={
+                        cal.data.stats.avgMoodDelta != null && cal.data.stats.avgMoodDelta !== 0
+                          ? `${cal.data.stats.avgMoodDelta > 0 ? '↑' : '↓'} ${Math.abs(cal.data.stats.avgMoodDelta).toFixed(1)} ${t('calendar.vsLastMonth')}`
+                          : undefined
+                      }
+                    />
+                    <Stat label={t('calendar.streak')} value={`${cal.data.stats.streak}`} tab={brand.purple} sub={t('calendar.streakUnit')} />
+                  </View>
+                  {/* row 2: logged (full width) */}
+                  <View style={{ flexDirection: 'row' }}>
+                    <Stat label={t('calendar.logged')} value={`${cal.data.stats.loggedDays}`} tab={brand.mint} tabInk sub={t('calendar.loggedUnit')} inline />
+                  </View>
                 </View>
               ) : null}
               {moods.data?.length ? <Legend /> : null}
@@ -247,10 +253,10 @@ export default function CalendarScreen() {
     );
   }
 
-  function Stat({ label, value, tab, tabInk, sub }: { label: string; value: string; tab: string; tabInk?: boolean; sub?: string }) {
+  function Stat({ label, value, tab, tabInk, sub, inline }: { label: string; value: string; tab: string; tabInk?: boolean; sub?: string; inline?: boolean }) {
     return (
       <View style={{ flex: 1 }}>
-        {/* compact folder tab (fits 3-across) */}
+        {/* compact folder tab */}
         <View
           style={{
             alignSelf: 'flex-start',
@@ -273,12 +279,18 @@ export default function CalendarScreen() {
             ...sheetRadius,
             borderTopLeftRadius: 0,
             padding: space.md,
-            gap: 2,
+            gap: inline ? 0 : 2,
+            flexDirection: inline ? 'row' : 'column',
+            alignItems: inline ? 'baseline' : 'stretch',
             boxShadow: shadow.sm,
           }}
         >
           <Text variant="h2">{value}</Text>
-          {sub ? <Text variant="label" color={colors.ink3} numberOfLines={1}>{sub}</Text> : null}
+          {sub ? (
+            <Text variant="label" color={colors.ink3} numberOfLines={1} style={inline ? { marginLeft: 8 } : undefined}>
+              {sub}
+            </Text>
+          ) : null}
         </View>
       </View>
     );
