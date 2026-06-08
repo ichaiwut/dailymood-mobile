@@ -51,26 +51,26 @@ export default function TodayScreen() {
           </View>
         ) : entries.isError ? (
           <Notice message={t(errorMessageKey(entries.error))} tone="error" />
-        ) : entries.data && entries.data.length > 0 ? (
-          <>
-            <TodayTimeline entries={entries.data} moods={moods.data ?? []} />
-            <View style={{ gap: space.lg }}>
-              {entries.data.map((entry, i) => (
-                <EntryFolderCard
-                  key={entry.id}
-                  entry={entry}
-                  mood={findMood(moods.data, entry.moodTypeId)}
-                  rotate={i % 2 === 0 ? -0.5 : 0.5}
-                  onPress={() => router.push(`/entry/${entry.id}`)}
-                />
-              ))}
-            </View>
-          </>
         ) : (
-          <View style={{ gap: space.md }}>
-            <Text variant="eyebrow">{t('tabs.today')}</Text>
-            <EmptyToday />
-          </View>
+          <>
+            {/* the day-axis timeline always shows — even with no entries yet */}
+            <TodayTimeline entries={entries.data ?? []} moods={moods.data ?? []} />
+            {entries.data && entries.data.length > 0 ? (
+              <View style={{ gap: space.lg }}>
+                {entries.data.map((entry, i) => (
+                  <EntryFolderCard
+                    key={entry.id}
+                    entry={entry}
+                    mood={findMood(moods.data, entry.moodTypeId)}
+                    rotate={i % 2 === 0 ? -0.5 : 0.5}
+                    onPress={() => router.push(`/entry/${entry.id}`)}
+                  />
+                ))}
+              </View>
+            ) : (
+              <EmptyToday />
+            )}
+          </>
         )}
       </Appear>
 

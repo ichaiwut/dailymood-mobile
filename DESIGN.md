@@ -102,7 +102,8 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
   ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
-  as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
+  as it collided with the 21:00 tick.) **Always shown on the Today screen** (even with 0 entries —
+  the axis renders empty with a "0 รายการ" count); entry cards or the `EmptyToday` prompt sit below it.
 - **`FloatingNav`** (`paper/`) — mobile bottom nav: white pill (76px tall, radius 38, soft
   float shadow `0 14px 40px rgba(0,0,0,.10)` + 1px hairline), 4 route tabs (Home / Calendar
   / Stats / Profile, SVG glyphs from `Glyphs`), and a raised peach **FAB** (56px, `-28`
