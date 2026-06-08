@@ -253,15 +253,15 @@ export default function YearInPixelsScreen() {
 
   function Stat({ emoji, label, value, meta }: { emoji: string; label: string; value: string; meta?: string }) {
     return (
-      <View style={{ flexGrow: 1, flexBasis: '46%', backgroundColor: colors.surface, borderRadius: radius.md, padding: space.lg, gap: 6, boxShadow: shadow.sm }}>
+      <View style={{ flexGrow: 1, flexBasis: '46%', backgroundColor: colors.surface, borderRadius: radius.md, padding: space.lg, gap: 8, boxShadow: shadow.sm }}>
         <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
-          <Text style={{ fontSize: 16 }}>{emoji}</Text>
-          <Text variant="label" color={colors.ink3}>{label}</Text>
+          <Text style={{ fontSize: 15 }}>{emoji}</Text>
+          <Text variant="label" color={colors.ink3} style={{ flex: 1 }}>{label}</Text>
         </View>
-        <Text variant="title">
-          {value || '—'}
-          {meta ? <Text variant="label" weight="bold" color={colors.ink3}>{`  ·  ${meta}`}</Text> : null}
-        </Text>
+        <View style={{ flexDirection: 'row', alignItems: 'baseline', flexWrap: 'wrap', gap: 5 }}>
+          <Text weight="bold" style={{ fontSize: 17 }}>{value || '—'}</Text>
+          {meta ? <Text variant="label" color={colors.ink3}>· {meta}</Text> : null}
+        </View>
       </View>
     );
   }
