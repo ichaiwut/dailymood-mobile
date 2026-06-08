@@ -20,6 +20,7 @@ import { useTheme } from '../src/theme/ThemeProvider';
 import { useToast } from '../src/components/Toast';
 import { useProfile, useAskThreads, useAskSuggested } from '../src/hooks/queries';
 import { sendAskMessage, sendAskFeedback, fetchAskMessages } from '../src/api/askai';
+import { askStore } from '../src/lib/askai-store';
 import { errorMessageKey } from '../src/api/errors';
 import { APP_TIMEZONE } from '../src/config';
 import type { AskAiThread, AskAiMessage } from '../src/api/types';
@@ -50,9 +51,24 @@ export default function AskAiScreen() {
 
   const msgs = activeId ? msgsByThread[activeId] ?? [] : [];
 
+  // hydrate from the localStorage mirror once on mount (web; no-op on native)
+  useEffect(() => {
+    const stored = askStore.getThreads();
+    if (stored.length) setThreads(stored);
+  }, []);
+
+  // API threads win only when the server actually returns some (currently empty)
   useEffect(() => {
     if (threadsQ.data?.threads?.length) setThreads(threadsQ.data.threads);
   }, [threadsQ.data]);
+
+  // persist threads + messages so history survives a reload
+  useEffect(() => {
+    if (threads.length) askStore.setThreads(threads);
+  }, [threads]);
+  useEffect(() => {
+    for (const [id, arr] of Object.entries(msgsByThread)) if (arr.length) askStore.setMessages(id, arr);
+  }, [msgsByThread]);
 
   useEffect(() => {
     const id = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
@@ -98,6 +114,8 @@ export default function AskAiScreen() {
     setActiveId(id);
     setDrawerOpen(false);
     if (!(msgsByThread[id]?.length)) {
+      const cached = askStore.getMessages(id);
+      if (cached.length) setMsgsByThread((m) => ({ ...m, [id]: cached }));
       fetchAskMessages(id)
         .then((r) => {
           if (r.messages?.length) setMsgsByThread((m) => ({ ...m, [id]: r.messages }));

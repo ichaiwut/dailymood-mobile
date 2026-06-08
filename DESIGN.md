@@ -359,10 +359,12 @@ radius 16/4-corner, "คุณเอง · time"); **AI bubble** = gradient ✦ 
 **Input bar** pinned bottom (pill + ↑ send, Enter sends) + disclaimer. **Non-premium** → whole-page
 FreeGate (plum CTA folder `#2C2435→#3D2E50→#A673F1` + PAClip + bullets + ฿99/mo).
 Client owns `threadId` (`sendAskMessage` returns `{userMessage, aiMessage{sourcesJson, entriesUsed}}`).
-**Caveat:** the API's history reads (`GET threads`/`messages`) currently return empty, so chat is
-**in-memory for the session** — it hydrates from the API when those endpoints return data, but
-history won't survive a reload until the backend persists it (no client faking). Copy uses
-`navigator.clipboard` on web, Share on native (no clipboard dep).
+**History:** the API's reads (`GET threads`/`messages`) return empty (not read back yet), so —
+like the web — history is mirrored to **localStorage** (`askStore`, keys `askai_threads` /
+`askai_msgs_{id}`); it hydrates on mount, persists on change, and the API wins if it ever returns
+data. Survives reload on web (+ interops with the web app's keys); native has no localStorage so
+it's session-only until AsyncStorage/API lands. Feedback uses **PATCH** /api/ask-ai/messages
+(POST is for new questions). Copy uses `navigator.clipboard` on web, Share on native.
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
