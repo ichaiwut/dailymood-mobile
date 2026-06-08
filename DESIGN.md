@@ -358,13 +358,13 @@ radius 16/4-corner, "คุณเอง · time"); **AI bubble** = gradient ✦ 
 `POST /api/ask-ai/messages {messageId,feedback}`) + 📋 copy. **Thinking** = avatar + "กำลังคิด…".
 **Input bar** pinned bottom (pill + ↑ send, Enter sends) + disclaimer. **Non-premium** → whole-page
 FreeGate (plum CTA folder `#2C2435→#3D2E50→#A673F1` + PAClip + bullets + ฿99/mo).
-Client owns `threadId` (`sendAskMessage` returns `{userMessage, aiMessage{sourcesJson, entriesUsed}}`).
-**History:** the API's reads (`GET threads`/`messages`) return empty (not read back yet), so —
-like the web — history is mirrored to **localStorage** (`askStore`, keys `askai_threads` /
-`askai_msgs_{id}`); it hydrates on mount, persists on change, and the API wins if it ever returns
-data. Survives reload on web (+ interops with the web app's keys); native has no localStorage so
-it's session-only until AsyncStorage/API lands. Feedback uses **PATCH** /api/ask-ai/messages
-(POST is for new questions). Copy uses `navigator.clipboard` on web, Share on native.
+**History is DB-backed** (cross-platform): a new chat first calls **`POST /api/ask-ai/threads`**
+to get a server `threadId`, *then* `POST /messages {threadId, content, locale}` (returns
+`{userMessage, aiMessage{sourcesJson, entriesUsed}}`); the server sets the title + `lastMessageAt`
+from the first message. After sending we `refetch` the thread list. `GET threads` (the drawer) and
+`GET messages` (on thread select) return everything on reload — no client persistence needed.
+Feedback uses **PATCH** /api/ask-ai/messages (POST is for new questions). Copy uses
+`navigator.clipboard` on web, Share on native.
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

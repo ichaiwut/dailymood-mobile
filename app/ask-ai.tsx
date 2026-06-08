@@ -19,8 +19,7 @@ import { PAClip } from '../src/components/paper/PAClip';
 import { useTheme } from '../src/theme/ThemeProvider';
 import { useToast } from '../src/components/Toast';
 import { useProfile, useAskThreads, useAskSuggested } from '../src/hooks/queries';
-import { sendAskMessage, sendAskFeedback, fetchAskMessages } from '../src/api/askai';
-import { askStore } from '../src/lib/askai-store';
+import { sendAskMessage, sendAskFeedback, fetchAskMessages, createAskThread } from '../src/api/askai';
 import { errorMessageKey } from '../src/api/errors';
 import { APP_TIMEZONE } from '../src/config';
 import type { AskAiThread, AskAiMessage } from '../src/api/types';
@@ -41,7 +40,6 @@ export default function AskAiScreen() {
   const threadsQ = useAskThreads(premium);
   const suggestedQ = useAskSuggested(locale, premium);
 
-  const [threads, setThreads] = useState<AskAiThread[]>([]);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [msgsByThread, setMsgsByThread] = useState<Record<string, AskAiMessage[]>>({});
   const [input, setInput] = useState('');
@@ -49,26 +47,9 @@ export default function AskAiScreen() {
   const [drawerOpen, setDrawerOpen] = useState(false);
   const scrollRef = useRef<ScrollView>(null);
 
+  // threads are DB-backed — the server list is the source of truth
+  const threads = threadsQ.data?.threads ?? [];
   const msgs = activeId ? msgsByThread[activeId] ?? [] : [];
-
-  // hydrate from the localStorage mirror once on mount (web; no-op on native)
-  useEffect(() => {
-    const stored = askStore.getThreads();
-    if (stored.length) setThreads(stored);
-  }, []);
-
-  // API threads win only when the server actually returns some (currently empty)
-  useEffect(() => {
-    if (threadsQ.data?.threads?.length) setThreads(threadsQ.data.threads);
-  }, [threadsQ.data]);
-
-  // persist threads + messages so history survives a reload
-  useEffect(() => {
-    if (threads.length) askStore.setThreads(threads);
-  }, [threads]);
-  useEffect(() => {
-    for (const [id, arr] of Object.entries(msgsByThread)) if (arr.length) askStore.setMessages(id, arr);
-  }, [msgsByThread]);
 
   useEffect(() => {
     const id = setTimeout(() => scrollRef.current?.scrollToEnd({ animated: true }), 80);
@@ -81,24 +62,27 @@ export default function AskAiScreen() {
   const send = async (text: string) => {
     const content = text.trim();
     if (!content || sending) return;
-    let tid = activeId;
-    if (!tid) {
-      tid = genId();
-      setThreads((ts) => [{ id: tid!, title: content.slice(0, 48) }, ...ts]);
-      setActiveId(tid);
-    }
-    const userMsg: AskAiMessage = { id: genId('u'), role: 'user', content, createdAt: new Date().toISOString() };
-    setMsgsByThread((m) => ({ ...m, [tid!]: [...(m[tid!] ?? []), userMsg] }));
     setInput('');
     setSending(true);
+    const localUserId = genId('u');
     try {
+      // a thread must exist server-side before messages can be saved
+      let tid = activeId;
+      if (!tid) {
+        const thread = await createAskThread();
+        tid = thread.id;
+        setActiveId(tid);
+      }
+      const userMsg: AskAiMessage = { id: localUserId, role: 'user', content, createdAt: new Date().toISOString() };
+      setMsgsByThread((m) => ({ ...m, [tid!]: [...(m[tid!] ?? []), userMsg] }));
       const res = await sendAskMessage({ threadId: tid, content, locale });
       setMsgsByThread((m) => {
-        const arr = (m[tid!] ?? []).map((x) => (x.id === userMsg.id ? res.userMessage : x));
+        const arr = (m[tid!] ?? []).map((x) => (x.id === localUserId ? res.userMessage : x));
         return { ...m, [tid!]: [...arr, res.aiMessage] };
       });
+      threadsQ.refetch(); // server set the title / lastMessageAt
     } catch (e) {
-      setMsgsByThread((m) => ({ ...m, [tid!]: (m[tid!] ?? []).filter((x) => x.id !== userMsg.id) }));
+      if (activeId) setMsgsByThread((m) => ({ ...m, [activeId]: (m[activeId] ?? []).filter((x) => x.id !== localUserId) }));
       toast.show(t(errorMessageKey(e)), 'error');
     } finally {
       setSending(false);
@@ -114,8 +98,6 @@ export default function AskAiScreen() {
     setActiveId(id);
     setDrawerOpen(false);
     if (!(msgsByThread[id]?.length)) {
-      const cached = askStore.getMessages(id);
-      if (cached.length) setMsgsByThread((m) => ({ ...m, [id]: cached }));
       fetchAskMessages(id)
         .then((r) => {
           if (r.messages?.length) setMsgsByThread((m) => ({ ...m, [id]: r.messages }));
