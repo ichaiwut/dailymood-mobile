@@ -343,8 +343,26 @@ one-shot then disabled). New viz live in `src/components/paper/insights/`. **Sta
 skeleton, error (😵 + retry), and `status.ready === false` → TooFew (📝, <7 entries) / Empty (🔮).
 **Footer toggles** (`ToggleRow` + `TogglePill` 44×24): 🤖 AI Coach (gradient icon tile) + 📩 Weekly
 Digest, bound to `profile.aiCoachEnabled` / `weeklyDigestEnabled` and persisted via
-`PATCH /api/profile` (`useUpdateProfile`, toast on save). **Deferred vs web:** the Ask-AI tab
-(no Ask page yet → toast).
+`PATCH /api/profile` (`useUpdateProfile`, toast on save). The Ask-AI tab routes to `/ask-ai` (§4i).
+
+## 4i. Ask AI chat — `app/ask-ai.tsx` (Pro, `/api/ask-ai/*`)
+
+Full-screen multi-turn chat grounded in real entries. Top bar = the shared AiSubTabs
+(`✨ Insights` → `/insights`, `💬 Ask AI` active) + a `📋 {N}` history button that opens a
+**threads drawer** (left panel + scrim): "+ คำถามใหม่" (ink button), "ก่อนหน้า" list (active =
+`#F3ECF9` + 3px purple left border). Chat column is a `KeyboardAvoidingView` (`ScrollView`
+auto-scrolls to bottom). **Empty state** = gradient ✦ tile + "ถามอะไรก็ได้เกี่ยวกับคุณ" +
+suggested-question cards (`/api/ask-ai/suggested`, tap → send). **User bubble** right (`#F3ECF9`,
+radius 16/4-corner, "คุณเอง · time"); **AI bubble** = gradient ✦ avatar + paper sheet with eyebrow
+"DAILYMOOD AI · ดู N ENTRIES", RichText answer, and a pill row 👍/👎 (one-shot →
+`POST /api/ask-ai/messages {messageId,feedback}`) + 📋 copy. **Thinking** = avatar + "กำลังคิด…".
+**Input bar** pinned bottom (pill + ↑ send, Enter sends) + disclaimer. **Non-premium** → whole-page
+FreeGate (plum CTA folder `#2C2435→#3D2E50→#A673F1` + PAClip + bullets + ฿99/mo).
+Client owns `threadId` (`sendAskMessage` returns `{userMessage, aiMessage{sourcesJson, entriesUsed}}`).
+**Caveat:** the API's history reads (`GET threads`/`messages`) currently return empty, so chat is
+**in-memory for the session** — it hydrates from the API when those endpoints return data, but
+history won't survive a reload until the backend persists it (no client faking). Copy uses
+`navigator.clipboard` on web, Share on native (no clipboard dep).
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

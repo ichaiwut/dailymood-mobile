@@ -411,6 +411,32 @@ export interface InsightsData {
 
 export type InsightReaction = 'up' | 'down' | 'routine';
 
+// --- Ask AI chat (GET/POST /api/ask-ai/*) ---
+export interface AskAiSource {
+  kind: string; // e.g. 'entry'
+  ref: string; // e.g. a date key
+  snippet: string;
+}
+export interface AskAiMessage {
+  id: string;
+  role: 'user' | 'ai' | string;
+  content: string;
+  createdAt: string;
+  sourcesJson?: AskAiSource[];
+  entriesUsed?: number;
+  feedback?: 'up' | 'down' | null;
+}
+export interface AskAiThread {
+  id: string;
+  title: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface AskAiSendResult {
+  userMessage: AskAiMessage;
+  aiMessage: AskAiMessage;
+}
+
 // --- Insights "all" (GET /api/insights/all) — the rich weekly dashboard ---
 export interface InsightsForecast {
   factors: { label: string; direction: '+' | '-' | string }[];

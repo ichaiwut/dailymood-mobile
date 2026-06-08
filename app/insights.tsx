@@ -97,7 +97,7 @@ export default function InsightsScreen() {
       <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
         <Pressable onPress={goBack} hitSlop={10}><Text variant="title" color={colors.ink2}>‹</Text></Pressable>
         <SubTab label={`✨ ${t('insights.tabInsights')}`} active onPress={() => {}} />
-        <SubTab label={`💬 ${t('insights.tabAsk')}`} active={false} onPress={() => toast.show(t('insights.askComingSoon'))} />
+        <SubTab label={`💬 ${t('insights.tabAsk')}`} active={false} onPress={() => router.push('/ask-ai')} />
       </View>
 
       {!premium ? (

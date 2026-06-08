@@ -24,6 +24,7 @@ import {
   fetchEvents,
 } from '../api/calendar';
 import { fetchStats, fetchInsights, fetchInsightsAll, sendInsightFeedback } from '../api/stats';
+import { fetchAskThreads, fetchAskSuggested } from '../api/askai';
 import { todayKey } from '../lib/time';
 import type {
   ConfirmEntryInput,
@@ -47,6 +48,8 @@ export const queryKeys = {
   stats: (period: StatsPeriod) => ['stats', period] as const,
   insights: ['insights'] as const,
   insightsAll: (week?: string) => ['insights-all', week ?? 'current'] as const,
+  askThreads: ['ask-ai', 'threads'] as const,
+  askSuggested: (locale: string) => ['ask-ai', 'suggested', locale] as const,
   achievements: ['achievements'] as const,
   subscription: ['subscription'] as const,
 };
@@ -200,6 +203,14 @@ export function useInsights() {
 
 export function useInsightsAll(locale: string, week?: string, enabled = true) {
   return useQuery({ queryKey: queryKeys.insightsAll(week), queryFn: () => fetchInsightsAll(locale, week), enabled });
+}
+
+export function useAskThreads(enabled = true) {
+  return useQuery({ queryKey: queryKeys.askThreads, queryFn: fetchAskThreads, enabled });
+}
+
+export function useAskSuggested(locale: string, enabled = true) {
+  return useQuery({ queryKey: queryKeys.askSuggested(locale), queryFn: () => fetchAskSuggested(locale), enabled, staleTime: 60 * 60_000 });
 }
 
 export function useInsightFeedback() {
