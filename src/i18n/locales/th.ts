@@ -133,6 +133,9 @@ const th: typeof en = {
     downloadPdf: 'ดาวน์โหลด AI report (PDF)',
     pdfSoon: 'ดาวน์โหลดรายงาน AI กำลังจะมาเร็ว ๆ นี้',
     dominantOfYear: 'อารมณ์เด่นของปี',
+    bestStretch: 'ช่วงที่ดีที่สุด',
+    hardestStretch: 'ช่วงที่ท้าทายที่สุด',
+    showLess: 'ย่อ ↑',
   },
   profile: {
     memberSince: 'สมาชิกตั้งแต่ {{date}}',

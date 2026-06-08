@@ -132,6 +132,9 @@ export default {
     downloadPdf: 'Download AI report (PDF)',
     pdfSoon: 'AI report export is coming soon.',
     dominantOfYear: "This year's top mood",
+    bestStretch: 'Best stretch',
+    hardestStretch: 'Hardest stretch',
+    showLess: 'Show less ↑',
   },
   profile: {
     memberSince: 'Member since {{date}}',

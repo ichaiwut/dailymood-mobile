@@ -250,8 +250,10 @@ washi), mirroring the web — header row of a **gradient sparkle square** (`#A67
 (16/26); a **peach theme chip** (`📑 {yearTheme}`, `rgba(252,164,91,.22)` bg, `#B5651D` text);
 the AI disclaimer caption; a **2×2 stat grid inside the card** (each white card = emoji +
 grey label + bold value · meta: 😊 top mood + %, 🔥 longest streak + month, 📝 entries logged,
-💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
-`/insights`; and two stacked **white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
+💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button that
+**expands the year recap in place** (reveals `bestQuarter` 🌤️ + `hardestPeriod` 🌧️ as white
+rows, with a "ย่อ ↑" collapse) — it stays on this page, which *is* the year-in-review, and
+never routes to `/insights`; and two stacked **white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
 (flips the whole card/grid to the previous year) and `📄 ดาวน์โหลด AI report (PDF)`
 (toast "coming soon" until `expo-print`/`expo-sharing` land). Below the card: the
 **pixel grid in a peach-tab "ทั้งปี" PaperSheet** — like web, **months run down the side**
