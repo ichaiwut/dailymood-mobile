@@ -228,6 +228,10 @@ Month nav (‹ month-year › paper buttons) → segmented **calendar / timeline
 - **Day-cell indicators:** special-day dot top-left (holiday `#F43F5E` / personal `#3B82F6`,
   from `/api/events`, all tiers) · ★ best-day top-right · recurring (purple) / anomaly (lav)
   dot bottom-center (from `/api/calendar/ai`, premium).
+- **Grid month folder tab** (peach, month name) + an **AI patterns legend** above the grid:
+  a `✦ AI patterns · ON/OFF` toggle (ink pill) + ★ best-day + a dot+title per pattern.
+  Toggle off hides the cell indicators. (Pattern titles come from the API; their language
+  is a backend concern.)
 
 ## 4e. Year in Pixels — `app/year-in-pixels.tsx` (Pro, `/api/year-in-pixels`)
 

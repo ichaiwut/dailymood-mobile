@@ -35,6 +35,7 @@ export default function CalendarScreen() {
   const [month, setMonth] = useState(TODAY_M); // 1–12
   const [view, setView] = useState<ViewMode>('calendar');
   const [selectedDate, setSelectedDate] = useState<string | null>(null);
+  const [showPatterns, setShowPatterns] = useState(true);
 
   const cal = useCalendarMonth(year, month);
   const moods = useMoods();
@@ -72,6 +73,16 @@ export default function CalendarScreen() {
     month: 'long',
     year: 'numeric',
   });
+  const monthShort = formatDateKey(`${year}-${String(month).padStart(2, '0')}-01`, i18n.language, {
+    weekday: undefined,
+    day: undefined,
+    month: 'long',
+    year: undefined,
+  });
+
+  // AI pattern indicators only when toggled on + premium + this month's own data.
+  const patternsOn = premium && showPatterns && !calAi.data?.tooFewEntries && !calAi.data?.fallbackMonth;
+  const legendPatterns = patternsOn ? calAi.data?.patterns ?? [] : [];
 
   const openEntry = (id: string) => router.push(`/entry/${id}`);
 
@@ -136,7 +147,43 @@ export default function CalendarScreen() {
               ) : (
                 <CalendarAiUpsell />
               )}
-              <PaperSheet clip clipSide="right">
+
+              {/* AI patterns legend + toggle */}
+              {premium && (legendPatterns.length || (patternsOn && bestDate)) ? (
+                <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: space.md }}>
+                  <Pressable
+                    onPress={() => setShowPatterns((s) => !s)}
+                    style={{
+                      flexDirection: 'row',
+                      alignItems: 'center',
+                      gap: 6,
+                      backgroundColor: showPatterns ? colors.ink : colors.surface,
+                      borderRadius: radius.pill,
+                      paddingHorizontal: 12,
+                      paddingVertical: 7,
+                      boxShadow: shadow.sm,
+                    }}
+                  >
+                    <Text variant="label" weight="bold" color={showPatterns ? '#fff' : colors.ink2}>
+                      ✦ {t('calendar.aiPatternsLabel')} · {showPatterns ? t('calendar.on') : t('calendar.off')}
+                    </Text>
+                  </Pressable>
+                  {showPatterns && bestDate ? (
+                    <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                      <Text style={{ fontSize: 13, color: brand.peach }}>★</Text>
+                      <Text variant="label" color={colors.ink2}>{t('calendar.bestDay')}</Text>
+                    </View>
+                  ) : null}
+                  {legendPatterns.map((p, i) => (
+                    <View key={i} style={{ flexDirection: 'row', alignItems: 'center', gap: 5 }}>
+                      <View style={{ width: 8, height: 8, borderRadius: 4, backgroundColor: p.type === 'anomaly' ? brand.lavender : brand.purple }} />
+                      <Text variant="label" color={colors.ink2} numberOfLines={1}>{p.title}</Text>
+                    </View>
+                  ))}
+                </View>
+              ) : null}
+
+              <PaperSheet tab={monthShort} tabColor={brand.peach} tabTextColor="#fff" clip clipSide="right">
                 <MoodGrid
                   year={year}
                   month={month}
@@ -146,9 +193,9 @@ export default function CalendarScreen() {
                   onDayPress={setSelectedDate}
                   selectedDate={selectedDate}
                   events={eventMap}
-                  bestDate={bestDate}
-                  recurringDates={recurringDates}
-                  anomalyDates={anomalyDates}
+                  bestDate={patternsOn ? bestDate : null}
+                  recurringDates={patternsOn ? recurringDates : undefined}
+                  anomalyDates={patternsOn ? anomalyDates : undefined}
                 />
               </PaperSheet>
               {cal.data ? (

@@ -98,6 +98,9 @@ export default {
     aiDisclaimer: 'Just an AI perspective to reflect on.',
     askDisclaimer: 'Just an AI idea — not always right.',
     aiFallbackNote: 'Not enough entries this month — showing {{month}}.',
+    aiPatternsLabel: 'AI patterns',
+    on: 'ON',
+    off: 'OFF',
   },
   yip: {
     title: 'Year in Pixels',
