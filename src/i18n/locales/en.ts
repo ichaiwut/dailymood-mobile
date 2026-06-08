@@ -131,6 +131,7 @@ export default {
     compare: 'Compare with {{year}}',
     downloadPdf: 'Download AI report (PDF)',
     pdfSoon: 'AI report export is coming soon.',
+    dominantOfYear: "This year's top mood",
   },
   profile: {
     memberSince: 'Member since {{date}}',

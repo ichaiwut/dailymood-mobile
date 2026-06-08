@@ -253,11 +253,14 @@ grey label + bold value · meta: 😊 top mood + %, 🔥 longest streak + month,
 💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
 `/insights`; and two stacked **white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
 (flips the whole card/grid to the previous year) and `📄 ดาวน์โหลด AI report (PDF)`
-(toast "coming soon" until `expo-print`/`expo-sharing` land). Below the card:
-**pixel grid transposed for mobile** (31 day-rows × 12
-month-columns, narrow month-letter header + day-number gutter; cell = mood color / `surface2`
-empty / blank for invalid dates; today = purple ring, selected = ink ring) and a
-**selected-cell tooltip** (sticker + date + mood). Data from `useYearInPixels` (premium only);
+(toast "coming soon" until `expo-print`/`expo-sharing` land). Below the card: the
+**pixel grid in a peach-tab "ทั้งปี" PaperSheet** — like web, **months run down the side**
+(fixed left label column, `monthShort`) and **days run across (1–31) in a horizontal
+ScrollView you swipe right**; 27px rounded cells, `GAP` 3, `mood.color` / `surface2` empty /
+blank for invalid dates; today = yellow ring, selected = ink ring. Below a hairline: a
+**mood-color legend** (swatch + label per mood) and an **"อารมณ์เด่นของปี · {mood} · {pct}%"**
+footer. A **selected-cell tooltip** (sticker + date + mood) sits under the sheet.
+Data from `useYearInPixels` (premium only);
 no-summary fallback shows `stats.tooFew` but keeps the stat grid.
 **Partial:** the PDF button is a "coming soon" toast (real export needs `expo-print`/
 `expo-sharing`); compare currently *navigates* to the previous year rather than showing a

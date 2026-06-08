@@ -132,6 +132,7 @@ const th: typeof en = {
     compare: 'เปรียบเทียบกับ {{year}}',
     downloadPdf: 'ดาวน์โหลด AI report (PDF)',
     pdfSoon: 'ดาวน์โหลดรายงาน AI กำลังจะมาเร็ว ๆ นี้',
+    dominantOfYear: 'อารมณ์เด่นของปี',
   },
   profile: {
     memberSince: 'สมาชิกตั้งแต่ {{date}}',

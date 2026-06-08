@@ -4,7 +4,7 @@
  * and stat cards. Free users see the Pro gate. GET /api/year-in-pixels.
  */
 import { useState } from 'react';
-import { View, Pressable, ActivityIndicator } from 'react-native';
+import { View, Pressable, ActivityIndicator, ScrollView } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 
@@ -29,6 +29,11 @@ import { errorMessageKey } from '../src/api/errors';
 const THIS_YEAR = Number(todayKey().slice(0, 4));
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const MONTHS = Array.from({ length: 12 }, (_, i) => i + 1);
+// pixel grid: months down the side, days across (horizontally swipeable, like web)
+const CELL = 27;
+const GAP = 3;
+const HEADER_H = 20;
+const LABEL_W = 42;
 
 function pad(n: number) {
   return String(n).padStart(2, '0');
@@ -53,12 +58,6 @@ export default function YearInPixelsScreen() {
   const yip = useYearInPixels(year, i18n.language, premium);
   const d = yip.data;
   const today = todayKey();
-
-  const monthLabel = (m: number) =>
-    new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', {
-      month: 'narrow',
-      timeZone: APP_TIMEZONE,
-    }).format(new Date(Date.UTC(year, m - 1, 1)));
 
   const selMood = selected ? findMood(moods.data, d?.dayMap[selected]) : undefined;
   const dominantMood = d?.dominantMood ? findMood(moods.data, d.dominantMood) : undefined;
@@ -198,46 +197,78 @@ export default function YearInPixelsScreen() {
             </View>
           </View>
 
-          {/* pixel grid */}
-          <PaperSheet>
-            {/* month header row */}
-            <View style={{ flexDirection: 'row', marginBottom: 4 }}>
-              <View style={{ width: 22 }} />
-              {MONTHS.map((m) => (
-                <View key={m} style={{ flex: 1, alignItems: 'center' }}>
-                  <Text variant="label" weight="bold" color={colors.ink3} style={{ fontSize: 14 }}>{monthLabel(m)}</Text>
+          {/* pixel grid — months down the side, days across (swipe right for more) */}
+          <PaperSheet tab={t('calendar.viewYear')} tabColor={brand.peach} tabTextColor={colors.ink}>
+            <View style={{ flexDirection: 'row' }}>
+              {/* fixed month-label column */}
+              <View style={{ width: LABEL_W }}>
+                <View style={{ height: HEADER_H, marginBottom: GAP }} />
+                {MONTHS.map((m) => (
+                  <View key={m} style={{ height: CELL, marginBottom: GAP, justifyContent: 'center' }}>
+                    <Text variant="label" weight="bold" color={colors.ink2} style={{ fontSize: 14 }}>{monthShort(m)}</Text>
+                  </View>
+                ))}
+              </View>
+
+              {/* horizontally scrollable day columns */}
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View>
+                  {/* day-number header */}
+                  <View style={{ flexDirection: 'row', height: HEADER_H, marginBottom: GAP }}>
+                    {DAYS.map((day) => (
+                      <View key={day} style={{ width: CELL, marginRight: GAP, alignItems: 'center', justifyContent: 'center' }}>
+                        <Text variant="label" color={colors.ink3} style={{ fontSize: 14 }}>{day}</Text>
+                      </View>
+                    ))}
+                  </View>
+                  {MONTHS.map((m) => (
+                    <View key={m} style={{ flexDirection: 'row', marginBottom: GAP }}>
+                      {DAYS.map((day) => {
+                        if (day > daysInMonth(year, m)) return <View key={day} style={{ width: CELL, height: CELL, marginRight: GAP }} />;
+                        const key = `${year}-${pad(m)}-${pad(day)}`;
+                        const mood = findMood(moods.data, d.dayMap[key]);
+                        const isToday = key === today;
+                        const isSel = key === selected;
+                        return (
+                          <Pressable
+                            key={day}
+                            onPress={() => setSelected(isSel ? null : key)}
+                            style={{
+                              width: CELL,
+                              height: CELL,
+                              marginRight: GAP,
+                              borderRadius: 7,
+                              backgroundColor: mood ? mood.color : colors.surface2,
+                              borderWidth: isSel ? 2.5 : isToday ? 2.5 : 0,
+                              borderColor: isSel ? colors.ink : brand.yellow,
+                            }}
+                          />
+                        );
+                      })}
+                    </View>
+                  ))}
+                </View>
+              </ScrollView>
+            </View>
+
+            {/* mood legend */}
+            <View style={{ height: 1, backgroundColor: colors.hairline, marginVertical: space.lg }} />
+            <View style={{ flexDirection: 'row', flexWrap: 'wrap', rowGap: space.sm, columnGap: space.lg }}>
+              {moods.data?.map((mo) => (
+                <View key={mo.id} style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+                  <View style={{ width: 14, height: 14, borderRadius: 4, backgroundColor: mo.color }} />
+                  <Text variant="label" color={colors.ink2}>{moodLabel(mo, i18n.language)}</Text>
                 </View>
               ))}
             </View>
-            {DAYS.map((day) => (
-              <View key={day} style={{ flexDirection: 'row', alignItems: 'center', marginBottom: 2 }}>
-                <View style={{ width: 22 }}>
-                  <Text variant="label" color={colors.ink3} style={{ fontSize: 14 }}>{day}</Text>
-                </View>
-                {MONTHS.map((m) => {
-                  if (day > daysInMonth(year, m)) return <View key={m} style={{ flex: 1, aspectRatio: 1, margin: 1 }} />;
-                  const key = `${year}-${pad(m)}-${pad(day)}`;
-                  const mood = findMood(moods.data, d.dayMap[key]);
-                  const isToday = key === today;
-                  const isSel = key === selected;
-                  return (
-                    <Pressable
-                      key={m}
-                      onPress={() => setSelected(isSel ? null : key)}
-                      style={{
-                        flex: 1,
-                        aspectRatio: 1,
-                        margin: 1,
-                        borderRadius: 3,
-                        backgroundColor: mood ? mood.color : colors.surface2,
-                        borderWidth: isSel ? 2 : isToday ? 2 : 0,
-                        borderColor: isSel ? colors.ink : brand.purple,
-                      }}
-                    />
-                  );
-                })}
-              </View>
-            ))}
+
+            {/* dominant-of-year footer */}
+            {dominantMood ? (
+              <Text variant="label" color={colors.ink3} style={{ marginTop: space.lg }}>
+                {t('yip.dominantOfYear')} · <Text variant="label" weight="bold" color={colors.ink}>{moodLabel(dominantMood, i18n.language)}</Text>
+                {d.dominantPct ? `  ·  ${d.dominantPct}%` : ''}
+              </Text>
+            ) : null}
           </PaperSheet>
 
           {/* selected-cell tooltip */}
