@@ -250,10 +250,9 @@ washi), mirroring the web — header row of a **gradient sparkle square** (`#A67
 (16/26); a **peach theme chip** (`📑 {yearTheme}`, `rgba(252,164,91,.22)` bg, `#B5651D` text);
 the AI disclaimer caption; a **2×2 stat grid inside the card** (each white card = emoji +
 grey label + bold value · meta: 😊 top mood + %, 🔥 longest streak + month, 📝 entries logged,
-💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button that
-**expands the year recap in place** (reveals `bestQuarter` 🌤️ + `hardestPeriod` 🌧️ as white
-rows, with a "ย่อ ↑" collapse) — it stays on this page, which *is* the year-in-review, and
-never routes to `/insights`; and two stacked **white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
+💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
+**`/year-in-pixels/story?year=` (the scroll-reveal Year Story page, §4f)**; and two stacked
+**white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
 (flips the whole card/grid to the previous year) and `📄 ดาวน์โหลด AI report (PDF)`
 (toast "coming soon" until `expo-print`/`expo-sharing` land). Below the card: the
 **pixel grid in a peach-tab "ทั้งปี" PaperSheet** — like web, **months run down the side**
@@ -267,6 +266,26 @@ no-summary fallback shows `stats.tooFew` but keeps the stat grid.
 **Partial:** the PDF button is a "coming soon" toast (real export needs `expo-print`/
 `expo-sharing`); compare currently *navigates* to the previous year rather than showing a
 true side-by-side diff.
+
+## 4f. Year Story — `app/year-in-pixels/story.tsx` (Pro, `/api/year-in-pixels`)
+
+Scroll-reveal recap of the whole year, Paper Desk style; reached via the AI card's
+"เล่าให้ฟังต่อ →". Own `Animated.ScrollView` (not `Screen scroll`) so the scroll offset
+drives the reveal. **Signature motion:** every section is wrapped in **`<Reveal>`**
+(`src/components/Reveal.tsx`) — fades up (opacity 0→1, translateY 24→0, 0.7s
+`cubic-bezier(.16,1,.3,1)`) once its top crosses `scrollY + viewport − 60`. Reveal is
+**scroll-position-driven via a Reanimated shared value, NOT `entering`** (which swallows web
+presses, see `Appear.tsx`); respects reduce-motion (`useReducedMotion` → shown immediately).
+Content is centered, `maxWidth` 960. Sections top→bottom: **1** hero (purple `★ YEAR STORY`
+tab + clip, back link, big year, 52-week dominant-mood strip 10×16); **2** two stat folders
+(peach/yellow washi — entries + streak); **3** dominant-mood folder (lav tab, PASticker 64
+rotate −6°, name, % + a full-year **distribution bar**); **4** best/toughest month (yellow +
+purple tabs, `monthLong` + avg; only the months that exist); **5** patterns (mint + lav washi
+— top theme + Q4 trend); **6** **AI year summary** (ink `✦` tab + **plum-gradient sheet
+`#2A1F33→#1A1320`, white text**, RichText narrative + 📑 theme); **7** pixel grid (mint tab,
+same months-rows × swipeable-days layout as §4e but 22px cells + legend); **8** outro
+(centered sheet, PASticker rotate −8°, "ขอบคุณสำหรับปี {year}" + back button). States: large
+spinner while loading; whole-page **Pro gate** (lav washi + 🎨 + upgrade) when free.
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

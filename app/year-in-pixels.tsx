@@ -53,7 +53,6 @@ export default function YearInPixelsScreen() {
   const premium = ai.data?.tier === 'premium';
   const [year, setYear] = useState(THIS_YEAR);
   const [selected, setSelected] = useState<string | null>(null);
-  const [expanded, setExpanded] = useState(false);
 
   const moods = useMoods();
   const yip = useYearInPixels(year, i18n.language, premium);
@@ -176,35 +175,21 @@ export default function YearInPixelsScreen() {
                 />
               </View>
 
-              {/* "tell me more" expands the year recap in place (best / hardest stretch) */}
-              {d.aiSummary && (d.aiSummary.bestQuarter || d.aiSummary.hardestPeriod) ? (
-                expanded ? (
-                  <View style={{ gap: space.sm }}>
-                    {d.aiSummary.bestQuarter ? (
-                      <ReviewRow emoji="🌤️" label={t('yip.bestStretch')} text={d.aiSummary.bestQuarter} />
-                    ) : null}
-                    {d.aiSummary.hardestPeriod ? (
-                      <ReviewRow emoji="🌧️" label={t('yip.hardestStretch')} text={d.aiSummary.hardestPeriod} />
-                    ) : null}
-                    <Pressable onPress={() => setExpanded(false)} hitSlop={6} style={{ alignSelf: 'center', paddingTop: space.xs }}>
-                      <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('yip.showLess')}</Text>
-                    </Pressable>
-                  </View>
-                ) : (
-                  <Pressable
-                    onPress={() => setExpanded(true)}
-                    style={{ borderRadius: radius.md, overflow: 'hidden', marginTop: space.xs }}
+              {/* "tell me the story" → the scroll-reveal Year Story recap page */}
+              {d.aiSummary ? (
+                <Pressable
+                  onPress={() => router.push({ pathname: '/year-in-pixels/story', params: { year: String(year) } })}
+                  style={{ borderRadius: radius.md, overflow: 'hidden', marginTop: space.xs }}
+                >
+                  <LinearGradient
+                    colors={['#A673F1', '#9747FF']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{ paddingVertical: 14, alignItems: 'center' }}
                   >
-                    <LinearGradient
-                      colors={['#A673F1', '#9747FF']}
-                      start={{ x: 0, y: 0 }}
-                      end={{ x: 1, y: 0 }}
-                      style={{ paddingVertical: 14, alignItems: 'center' }}
-                    >
-                      <Text variant="label" weight="bold" color="#fff">{t('yip.tellMore')}</Text>
-                    </LinearGradient>
-                  </Pressable>
-                )
+                    <Text variant="label" weight="bold" color="#fff">{t('yip.tellMore')}</Text>
+                  </LinearGradient>
+                </Pressable>
               ) : null}
 
               {/* compare with previous year (flips the card) + PDF report (soon) */}
@@ -303,18 +288,6 @@ export default function YearInPixelsScreen() {
       ) : null}
     </Screen>
   );
-
-  function ReviewRow({ emoji, label, text }: { emoji: string; label: string; text: string }) {
-    return (
-      <View style={{ flexDirection: 'row', gap: space.sm, backgroundColor: colors.surface, borderRadius: radius.md, padding: space.lg }}>
-        <Text style={{ fontSize: 18 }}>{emoji}</Text>
-        <View style={{ flex: 1, gap: 2 }}>
-          <Text variant="label" weight="bold" color={brand.purpleStrong}>{label}</Text>
-          <Text variant="label" color={colors.ink2} style={{ lineHeight: 22 }}>{text}</Text>
-        </View>
-      </View>
-    );
-  }
 
   function WhiteBtn({ emoji, label, onPress }: { emoji: string; label: string; onPress: () => void }) {
     return (
