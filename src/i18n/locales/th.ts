@@ -103,6 +103,8 @@ const th: typeof en = {
     askDisclaimer: 'เป็นแค่ไอเดียจาก AI ไม่ได้ถูกทุกครั้ง',
     aiFallbackNote: 'เดือนนี้บันทึกยังไม่พอ — แสดงข้อมูลเดือน{{month}}',
     aiPatternsLabel: 'AI patterns',
+    patternsFound: 'แพทเทิร์นที่พบ',
+    view: 'ดู →',
     on: 'ON',
     off: 'OFF',
   },

@@ -151,18 +151,29 @@ export function CalendarAiPanel({
       {/* patterns feed (current month only) */}
       {d?.patterns?.length && !d.tooFewEntries && !d.fallbackMonth ? (
         <View style={{ gap: space.sm }}>
-          <Text variant="eyebrow">{t('calendar.patterns')}</Text>
-          {d.patterns.map((p, i) => (
-            <View key={i} style={{ flexDirection: 'row', gap: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, boxShadow: shadow.sm }}>
-              <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: PATTERN_BG[i % PATTERN_BG.length], alignItems: 'center', justifyContent: 'center' }}>
-                <Text style={{ fontSize: 20 }}>{p.icon}</Text>
-              </View>
-              <View style={{ flex: 1 }}>
-                <Text variant="label" weight="bold">{p.title}</Text>
-                <Text variant="label" color={colors.ink2}>{p.explanation}</Text>
-              </View>
-            </View>
-          ))}
+          <Text variant="eyebrow">{t('calendar.patternsFound')}</Text>
+          {d.patterns.map((p, i) => {
+            const target = p.dates?.[0];
+            return (
+              <Pressable
+                key={i}
+                onPress={() => target && onPickDate(target)}
+                disabled={!target}
+                style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, boxShadow: shadow.sm }}
+              >
+                <View style={{ width: 44, height: 44, borderRadius: 22, backgroundColor: PATTERN_BG[i % PATTERN_BG.length], alignItems: 'center', justifyContent: 'center' }}>
+                  <Text style={{ fontSize: 20 }}>{p.icon}</Text>
+                </View>
+                <View style={{ flex: 1 }}>
+                  <Text variant="label" weight="bold">{p.title}</Text>
+                  <Text variant="label" color={colors.ink2}>{p.explanation}</Text>
+                </View>
+                {target ? (
+                  <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('calendar.view')}</Text>
+                ) : null}
+              </Pressable>
+            );
+          })}
         </View>
       ) : null}
 

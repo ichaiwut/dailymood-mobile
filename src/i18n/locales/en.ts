@@ -102,6 +102,8 @@ export default {
     askDisclaimer: 'Just an AI idea — not always right.',
     aiFallbackNote: 'Not enough entries this month — showing {{month}}.',
     aiPatternsLabel: 'AI patterns',
+    patternsFound: 'Patterns found',
+    view: 'View →',
     on: 'ON',
     off: 'OFF',
   },
