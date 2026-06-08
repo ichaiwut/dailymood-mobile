@@ -150,10 +150,10 @@ not pixel-pinned.
     220px) and as an 80px **banner in `EntryFolderCard`** (Today / Timeline / Day Sheet).
     `GET /api/log[/id]` returns a signed R2 URL (TTL 1h) — render it directly, don't cache
     across the hour.
-  - **Activity chips + Location** are a **shared section** rendered in *both* the input and
-    result steps (so they stay editable after Analyze). Location uses the self-contained
-    `LocationField` (chip → search → pill); the toolbar pin was removed in favor of it.
-  - **Location (legacy note):** the place-name search field (web parity):
+  - **Toolbar (mic / camera / pin) + location + activity chips** render in *both* the input
+    and result steps (via shared `tools`/`activityChips`), so they stay editable after
+    Analyze. The **pin** (in the toolbar, next to camera) toggles the place search.
+  - **Location (Pin):** the place-name search field (web parity):
     `SearchIcon` + text input ("พิมพ์ชื่อสถานที่…") + dark "Add" button, plus a
     "ใช้ตำแหน่งปัจจุบัน" GPS shortcut row beneath. Typed name → `geocodePlace()` resolves
     coords when possible; GPS → `getCurrentPlace()` (both in `src/lib/location.ts`,
