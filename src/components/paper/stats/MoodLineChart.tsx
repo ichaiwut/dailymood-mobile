@@ -136,12 +136,8 @@ export function MoodLineChart({
             ) : null,
           )}
 
-          {/* AI pins (Pro) — hit areas then visuals */}
-          {premium
-            ? pins.map((p, idx) => (
-                <Circle key={`hit-${idx}`} cx={x(p.i)} cy={y(p.score)} r={14} fill="transparent" onPress={() => setSel(sel === idx ? null : idx)} />
-              ))
-            : null}
+          {/* AI pins (Pro) — visuals only; tap targets are RN overlays below
+              (rn-svg shapes don't support the touch responder on web) */}
           {premium ? (
             pins.map((p, idx) => <Pin key={`pin-${idx}`} cx={x(p.i)} cy={y(p.score)} color={brand.purple} active={sel === idx} />)
           ) : ghost ? (
@@ -151,6 +147,17 @@ export function MoodLineChart({
             </>
           ) : null}
         </Svg>
+
+        {/* AI pin tap targets (RN overlay — reliable on web + native) */}
+        {premium
+          ? pins.map((p, idx) => (
+              <Pressable
+                key={`hit-${idx}`}
+                onPress={() => setSel(sel === idx ? null : idx)}
+                style={{ position: 'absolute', left: x(p.i) * s - 16, top: y(p.score) * s - 16, width: 32, height: 32 }}
+              />
+            ))
+          : null}
 
         {/* tooltip */}
         {premium && selPin ? (
