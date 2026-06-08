@@ -4,7 +4,8 @@
  * and stat cards. Free users see the Pro gate. GET /api/year-in-pixels.
  */
 import { useState } from 'react';
-import { View, Pressable, ActivityIndicator, ScrollView } from 'react-native';
+import { View, Pressable, ActivityIndicator } from 'react-native';
+import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 
 import { Screen } from '../src/components/Screen';
@@ -12,6 +13,7 @@ import { Text } from '../src/components/Text';
 import { Button } from '../src/components/Button';
 import { Notice } from '../src/components/Notice';
 import { RichText } from '../src/components/RichText';
+import { SparkleIcon } from '../src/components/icons/Glyphs';
 import { PaperSheet } from '../src/components/paper/PaperSheet';
 import { PASticker } from '../src/components/paper/PASticker';
 import { useTheme } from '../src/theme/ThemeProvider';
@@ -57,6 +59,12 @@ export default function YearInPixelsScreen() {
     }).format(new Date(Date.UTC(year, m - 1, 1)));
 
   const selMood = selected ? findMood(moods.data, d?.dayMap[selected]) : undefined;
+  const dominantMood = d?.dominantMood ? findMood(moods.data, d.dominantMood) : undefined;
+  const monthShort = (m: number) =>
+    new Intl.DateTimeFormat(i18n.language === 'th' ? 'th-TH' : 'en-US', {
+      month: 'short',
+      timeZone: APP_TIMEZONE,
+    }).format(new Date(Date.UTC(year, m - 1, 1)));
 
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 80 }}>
@@ -101,23 +109,88 @@ export default function YearInPixelsScreen() {
         <Notice message={t(errorMessageKey(yip.error))} tone="error" />
       ) : d ? (
         <>
-          {/* AI year summary */}
-          {d.aiSummary ? (
-            <View style={{ marginTop: space.xs }}>
-              <View style={{ backgroundColor: '#F3ECF9', ...sheetRadius, padding: space.xl, gap: space.sm, boxShadow: shadow.md }}>
-                <View style={{ position: 'absolute', top: -12, alignSelf: 'center', left: 0, right: 0, alignItems: 'center' }}>
-                  <View style={{ width: 100, height: 26, borderRadius: 2, backgroundColor: 'rgba(253,203,86,0.65)', transform: [{ rotate: '-3deg' }] }} />
-                </View>
-                <Text variant="label" weight="bold" color={brand.purpleStrong} style={{ textTransform: 'uppercase', letterSpacing: 0.6 }}>
+          {/* AI year summary — header, summary, theme chip, stats + "tell me more" */}
+          <View style={{ marginTop: space.xs }}>
+            <View style={{ backgroundColor: '#F3ECF9', ...sheetRadius, padding: space.xl, gap: space.md, boxShadow: shadow.md }}>
+              {/* washi tape */}
+              <View style={{ position: 'absolute', top: -12, alignSelf: 'center', left: 0, right: 0, alignItems: 'center' }}>
+                <View style={{ width: 100, height: 26, borderRadius: 2, backgroundColor: 'rgba(253,203,86,0.65)', transform: [{ rotate: '-3deg' }] }} />
+              </View>
+
+              {/* header: gradient sparkle + title + Pro pill */}
+              <View style={{ flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+                <LinearGradient
+                  colors={['#A673F1', '#C9A6F5']}
+                  start={{ x: 0, y: 0 }}
+                  end={{ x: 1, y: 1 }}
+                  style={{ width: 32, height: 32, borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}
+                >
+                  <SparkleIcon size={16} color="#fff" />
+                </LinearGradient>
+                <Text variant="title" color={brand.purpleStrong} style={{ flex: 1 }}>
                   {t('yip.yearSummary')} · {year}
                 </Text>
-                <RichText text={d.aiSummary.summary} style={{ lineHeight: 24 }} />
-                {d.aiSummary.yearTheme ? (
-                  <Text variant="label" weight="bold" color={brand.purpleStrong}>🏷️ {d.aiSummary.yearTheme}</Text>
-                ) : null}
+                <View style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: 10, paddingVertical: 5, boxShadow: shadow.sm }}>
+                  <SparkleIcon size={12} color={brand.purple} />
+                  <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('yip.pro')}</Text>
+                </View>
               </View>
+
+              {d.aiSummary ? (
+                <>
+                  <RichText text={d.aiSummary.summary} style={{ lineHeight: 26, fontSize: 16 }} />
+                  {d.aiSummary.yearTheme ? (
+                    <View style={{ flexDirection: 'row', alignSelf: 'flex-start', alignItems: 'center', gap: 6, backgroundColor: 'rgba(252,164,91,0.22)', borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 7 }}>
+                      <Text style={{ fontSize: 14 }}>📑</Text>
+                      <Text variant="label" weight="bold" color="#B5651D">{d.aiSummary.yearTheme}</Text>
+                    </View>
+                  ) : null}
+                  <Text variant="label" color={colors.ink3}>{t('yip.aiDisclaimer')}</Text>
+                </>
+              ) : (
+                <Text variant="body" color={colors.ink2}>{t('stats.tooFew')}</Text>
+              )}
+
+              {/* 2×2 stat cards */}
+              <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md, marginTop: space.xs }}>
+                <Stat
+                  emoji={dominantMood?.emoji ?? '😊'}
+                  label={t('yip.statDominant')}
+                  value={dominantMood ? moodLabel(dominantMood, i18n.language) : '—'}
+                  meta={d.dominantPct ? `${d.dominantPct}%` : undefined}
+                />
+                <Stat
+                  emoji="🔥"
+                  label={t('yip.statStreak')}
+                  value={d.streak ? t('yip.streakDays', { n: d.streak.days }) : '—'}
+                  meta={d.streak ? monthShort(d.streak.month) : undefined}
+                />
+                <Stat emoji="📝" label={t('yip.statEntries')} value={t('yip.times', { n: d.totalDays })} />
+                <Stat
+                  emoji="💡"
+                  label={t('yip.statTrigger')}
+                  value={d.topTrigger ? `"${d.topTrigger.tag}"` : '—'}
+                  meta={d.topTrigger ? t('yip.times', { n: d.topTrigger.count }) : undefined}
+                />
+              </View>
+
+              {d.aiSummary ? (
+                <Pressable
+                  onPress={() => router.push('/insights')}
+                  style={{ borderRadius: radius.md, overflow: 'hidden', marginTop: space.xs }}
+                >
+                  <LinearGradient
+                    colors={['#A673F1', '#9747FF']}
+                    start={{ x: 0, y: 0 }}
+                    end={{ x: 1, y: 0 }}
+                    style={{ paddingVertical: 14, alignItems: 'center' }}
+                  >
+                    <Text variant="label" weight="bold" color="#fff">{t('yip.tellMore')}</Text>
+                  </LinearGradient>
+                </Pressable>
+              ) : null}
             </View>
-          ) : null}
+          </View>
 
           {/* pixel grid */}
           <PaperSheet>
@@ -173,23 +246,22 @@ export default function YearInPixelsScreen() {
               </View>
             </View>
           ) : null}
-
-          {/* stat cards */}
-          <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: space.md }}>
-            <Stat label={t('yip.dominant')} value={d.dominantMood ? moodLabel(findMood(moods.data, d.dominantMood), i18n.language) : '—'} sub={d.dominantPct ? `${d.dominantPct}%` : undefined} />
-            <Stat label={t('yip.longestStreak')} value={d.streak ? t('yip.streakDays', { n: d.streak.days }) : '—'} />
-            <Stat label={t('yip.daysLogged', { n: d.totalDays, total: d.daysInYear })} value={`${Math.round((d.totalDays / d.daysInYear) * 100)}%`} />
-          </View>
         </>
       ) : null}
     </Screen>
   );
 
-  function Stat({ label, value, sub }: { label: string; value: string; sub?: string }) {
+  function Stat({ emoji, label, value, meta }: { emoji: string; label: string; value: string; meta?: string }) {
     return (
-      <View style={{ flexGrow: 1, minWidth: '46%', backgroundColor: colors.surface, borderRadius: radius.md, padding: space.md, gap: 2, boxShadow: shadow.sm }}>
-        <Text variant="label" color={colors.ink3}>{label}</Text>
-        <Text variant="title">{value || '—'}{sub ? <Text variant="label" color={colors.ink3}>  {sub}</Text> : null}</Text>
+      <View style={{ flexGrow: 1, flexBasis: '46%', backgroundColor: colors.surface, borderRadius: radius.md, padding: space.lg, gap: 6, boxShadow: shadow.sm }}>
+        <View style={{ flexDirection: 'row', alignItems: 'center', gap: 6 }}>
+          <Text style={{ fontSize: 16 }}>{emoji}</Text>
+          <Text variant="label" color={colors.ink3}>{label}</Text>
+        </View>
+        <Text variant="title">
+          {value || '—'}
+          {meta ? <Text variant="label" weight="bold" color={colors.ink3}>{`  ·  ${meta}`}</Text> : null}
+        </Text>
       </View>
     );
   }

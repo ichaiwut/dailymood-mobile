@@ -244,13 +244,20 @@ circle, weekday-peach + big date header, **special-day chip** (holiday/personal 
 ## 4e. Year in Pixels — `app/year-in-pixels.tsx` (Pro, `/api/year-in-pixels`)
 
 Pro-gated page (free → 🎨 gate card + "Upgrade to Pro" → subscription). Header (← back +
-year ◀▶) + eyebrow. Premium: **AI year-summary** card (lavender + yellow washi, RichText
-bold + 🏷️ theme), **pixel grid transposed for mobile** (31 day-rows × 12 month-columns,
-narrow month-letter header + day-number gutter; cell = mood color / `surface2` empty /
-blank for invalid dates; today = purple ring, selected = ink ring), a **selected-cell
-tooltip** (sticker + date + mood), and **stat cards** (dominant mood + %, longest streak,
-days-logged %). Data from `useYearInPixels` (enabled only when premium).
-**Deferred:** PNG/PDF export (needs `react-native-view-shot`); year-over-year compare.
+year ◀▶) + eyebrow. Premium: one tall **AI year-summary card** (lavender `#F3ECF9` + yellow
+washi), mirroring the web — header row of a **gradient sparkle square** (`#A673F1→#C9A6F5`) +
+"`{t(yip.yearSummary)} · {year}`" title + a white **"✦ Pro" pill**; RichText-bold summary
+(16/26); a **peach theme chip** (`📑 {yearTheme}`, `rgba(252,164,91,.22)` bg, `#B5651D` text);
+the AI disclaimer caption; a **2×2 stat grid inside the card** (each white card = emoji +
+grey label + bold value · meta: 😊 top mood + %, 🔥 longest streak + month, 📝 entries logged,
+💡 top trigger + count); and a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
+`/insights`. Below the card: **pixel grid transposed for mobile** (31 day-rows × 12
+month-columns, narrow month-letter header + day-number gutter; cell = mood color / `surface2`
+empty / blank for invalid dates; today = purple ring, selected = ink ring) and a
+**selected-cell tooltip** (sticker + date + mood). Data from `useYearInPixels` (premium only);
+no-summary fallback shows `stats.tooFew` but keeps the stat grid.
+**Deferred:** PDF report export (needs `expo-print`/`expo-sharing`); year-over-year compare
+("เปรียบเทียบกับ {prevYear}" button).
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
