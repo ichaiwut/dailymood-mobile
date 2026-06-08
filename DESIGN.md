@@ -250,14 +250,18 @@ washi), mirroring the web — header row of a **gradient sparkle square** (`#A67
 (16/26); a **peach theme chip** (`📑 {yearTheme}`, `rgba(252,164,91,.22)` bg, `#B5651D` text);
 the AI disclaimer caption; a **2×2 stat grid inside the card** (each white card = emoji +
 grey label + bold value · meta: 😊 top mood + %, 🔥 longest streak + month, 📝 entries logged,
-💡 top trigger + count); and a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
-`/insights`. Below the card: **pixel grid transposed for mobile** (31 day-rows × 12
+💡 top trigger + count); a full-width **purple-gradient "เล่าให้ฟังต่อ →"** button →
+`/insights`; and two stacked **white chunky buttons** — `📊 เปรียบเทียบกับ {prevYear}`
+(flips the whole card/grid to the previous year) and `📄 ดาวน์โหลด AI report (PDF)`
+(toast "coming soon" until `expo-print`/`expo-sharing` land). Below the card:
+**pixel grid transposed for mobile** (31 day-rows × 12
 month-columns, narrow month-letter header + day-number gutter; cell = mood color / `surface2`
 empty / blank for invalid dates; today = purple ring, selected = ink ring) and a
 **selected-cell tooltip** (sticker + date + mood). Data from `useYearInPixels` (premium only);
 no-summary fallback shows `stats.tooFew` but keeps the stat grid.
-**Deferred:** PDF report export (needs `expo-print`/`expo-sharing`); year-over-year compare
-("เปรียบเทียบกับ {prevYear}" button).
+**Partial:** the PDF button is a "coming soon" toast (real export needs `expo-print`/
+`expo-sharing`); compare currently *navigates* to the previous year rather than showing a
+true side-by-side diff.
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

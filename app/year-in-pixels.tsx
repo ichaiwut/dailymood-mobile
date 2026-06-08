@@ -14,6 +14,7 @@ import { Button } from '../src/components/Button';
 import { Notice } from '../src/components/Notice';
 import { RichText } from '../src/components/RichText';
 import { SparkleIcon } from '../src/components/icons/Glyphs';
+import { useToast } from '../src/components/Toast';
 import { PaperSheet } from '../src/components/paper/PaperSheet';
 import { PASticker } from '../src/components/paper/PASticker';
 import { useTheme } from '../src/theme/ThemeProvider';
@@ -41,6 +42,7 @@ export default function YearInPixelsScreen() {
   const { colors, radius, space, brand, shadow, sheetRadius } = useTheme();
   const router = useRouter();
   const goBack = useGoBack();
+  const toast = useToast();
 
   const ai = useAiRemaining();
   const premium = ai.data?.tier === 'premium';
@@ -189,6 +191,10 @@ export default function YearInPixelsScreen() {
                   </LinearGradient>
                 </Pressable>
               ) : null}
+
+              {/* compare with previous year (flips the card) + PDF report (soon) */}
+              <WhiteBtn emoji="📊" label={t('yip.compare', { year: year - 1 })} onPress={() => { setSelected(null); setYear((y) => y - 1); }} />
+              <WhiteBtn emoji="📄" label={t('yip.downloadPdf')} onPress={() => toast.show(t('yip.pdfSoon'))} />
             </View>
           </View>
 
@@ -250,6 +256,27 @@ export default function YearInPixelsScreen() {
       ) : null}
     </Screen>
   );
+
+  function WhiteBtn({ emoji, label, onPress }: { emoji: string; label: string; onPress: () => void }) {
+    return (
+      <Pressable
+        onPress={onPress}
+        style={{
+          flexDirection: 'row',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 8,
+          backgroundColor: colors.surface,
+          borderRadius: radius.md,
+          paddingVertical: 13,
+          boxShadow: shadow.sm,
+        }}
+      >
+        <Text style={{ fontSize: 15 }}>{emoji}</Text>
+        <Text variant="label" weight="bold" color={colors.ink2}>{label}</Text>
+      </Pressable>
+    );
+  }
 
   function Stat({ emoji, label, value, meta }: { emoji: string; label: string; value: string; meta?: string }) {
     return (

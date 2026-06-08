@@ -128,6 +128,9 @@ export default {
     times: '{{n}}×',
     tellMore: 'Tell me more →',
     aiDisclaimer: 'Just an AI perspective to reflect on.',
+    compare: 'Compare with {{year}}',
+    downloadPdf: 'Download AI report (PDF)',
+    pdfSoon: 'AI report export is coming soon.',
   },
   profile: {
     memberSince: 'Member since {{date}}',

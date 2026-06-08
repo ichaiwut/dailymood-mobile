@@ -129,6 +129,9 @@ const th: typeof en = {
     times: '{{n}} ครั้ง',
     tellMore: 'เล่าให้ฟังต่อ →',
     aiDisclaimer: 'เป็นแค่มุมมองจาก AI ไว้ประกอบการตัดสินใจ',
+    compare: 'เปรียบเทียบกับ {{year}}',
+    downloadPdf: 'ดาวน์โหลด AI report (PDF)',
+    pdfSoon: 'ดาวน์โหลดรายงาน AI กำลังจะมาเร็ว ๆ นี้',
   },
   profile: {
     memberSince: 'สมาชิกตั้งแต่ {{date}}',
