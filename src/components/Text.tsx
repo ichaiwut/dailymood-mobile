@@ -68,12 +68,17 @@ export function Text({
   const resolvedWeight = weight ?? VARIANT_WEIGHT[variant];
   const thai = hasThai(children);
 
+  const resolvedSize = Math.max(fontSize[variant], MIN_FONT_SIZE);
   const base: TextStyle = {
     fontFamily: fontFamily(resolvedWeight, thai),
-    fontSize: Math.max(fontSize[variant], MIN_FONT_SIZE),
+    fontSize: resolvedSize,
     color: color ?? colors.ink,
     textAlign: center ? 'center' : undefined,
   };
+  // Noto Sans Thai's lower vowels/tone marks clip against a tight line box
+  // (e.g. ไทม์ไลน์ inside a pill). Give Thai a roomier default line height; any
+  // explicit lineHeight in `style` still overrides this (style merges after base).
+  if (thai) base.lineHeight = Math.round(resolvedSize * 1.4);
   if (variant === 'eyebrow') {
     base.textTransform = 'uppercase';
     base.letterSpacing = 0.6;

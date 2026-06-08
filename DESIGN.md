@@ -58,7 +58,10 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   *Exception:* purely decorative chrome micro-labels (e.g. the "PRO" badge) may use
   raw RN `Text` below the floor — never for content/copy.
 - **Thai routes to Noto Sans Thai, Latin to Urbanist** (auto-detected in `Text`).
-  Noto tops out at weight 700, so extrabold Thai falls back to bold.
+  Noto tops out at weight 700, so extrabold Thai falls back to bold. Thai strings also
+  get a default `lineHeight` of `round(fontSize × 1.4)` so lower vowels/tone marks
+  (e.g. the `์` in ไทม์ไลน์) never clip in tight boxes; pass an explicit `lineHeight`
+  via `style` to override.
 - **No system emoji in chrome.** Use the brand SVG glyphs (see §5). Emoji are only
   acceptable as data the API/user supplies (mood-pack fallback, activity chips).
 - **Premium features are never hidden** — show a teaser / PRO badge that routes to
