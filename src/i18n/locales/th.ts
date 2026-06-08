@@ -260,6 +260,7 @@ const th: typeof en = {
     activityTitle: 'อิทธิพลของกิจกรรม',
     activitySub: 'วิเคราะห์จาก {{n}} บันทึก',
     activityHint: 'ตัวเลข = ผลต่ออารมณ์ · บวกช่วยให้ดีขึ้น · ลบฉุดให้แย่ลง',
+    specialDays: 'วันสำคัญในช่วงนี้',
     activityBetter: 'ดีขึ้น',
     activityWorse: 'แย่ลง',
     activityTeaser: 'ดูว่ากิจกรรมไหนช่วยให้อารมณ์ดีขึ้นหรือฉุดลง — เป็นฟีเจอร์ Pro',

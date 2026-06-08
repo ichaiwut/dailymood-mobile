@@ -301,7 +301,10 @@ Pro-gated**: the pill is `opacity .5` and tapping it doesn't switch — it revea
 yellow washi, gradient sparkle tile + "AI INSIGHT · {period}"; Pro → `insights.summary`
 clamped 3 lines, Free → generic copy + a `PRO` chip; "ดูเพิ่มเติม →" → `/insights`); **4 KPI
 cards** (2×2: avg mood + delta ↑/↓, entries, streak 🔥, top mood emoji + label·%); the
-**mood-trend line chart** (`MoodLineChart`, §below); **mood mix** (stacked bar + featured
+**mood-trend line chart** (`MoodLineChart`, §below); a **special-days card** (`วันสำคัญในช่วงนี้`)
+listing `/api/events` holidays/personal days in the period window — holiday chips `#FFF0F3/#BE123C`,
+personal `#EFF6FF/#1D4ED8`, each emoji + name + `d/m` (events are per-month → fetches current +
+previous month, filters to the window; week/month only, skipped for year); **mood mix** (stacked bar + featured
 top-mood tile `mood.color+22` + top-5 list with track bars); **activity impact** (Pro →
 a plain-language hint line + diverging bars from `activityInsight`: emoji+label, centre-anchored
 bar `min(|impact|/2,50)%` mint right / `#F4A8A8` left, and a readable value `↑ better / ↓ worse`

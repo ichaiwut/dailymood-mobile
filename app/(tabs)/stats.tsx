@@ -19,10 +19,11 @@ import { MoodLineChart } from '../../src/components/paper/stats/MoodLineChart';
 import { PASticker } from '../../src/components/paper/PASticker';
 import { SparkleIcon } from '../../src/components/icons/Glyphs';
 import { useTheme } from '../../src/theme/ThemeProvider';
-import { useStats, useMoods, useProfile, useInsights } from '../../src/hooks/queries';
+import { useStats, useMoods, useProfile, useInsights, useEvents } from '../../src/hooks/queries';
 import { findMood, moodLabel } from '../../src/lib/mood';
+import { todayKey } from '../../src/lib/time';
 import { errorMessageKey } from '../../src/api/errors';
-import type { StatsPeriod, Mood, ActivityInsight } from '../../src/api/types';
+import type { StatsPeriod, Mood, ActivityInsight, MonthEvent } from '../../src/api/types';
 
 const AI_TINT = '#F3ECF9';
 const PERIOD_DAYS: Record<StatsPeriod, number> = { week: 7, month: 30, year: 365 };
@@ -60,6 +61,28 @@ export default function StatsScreen() {
     : [];
   const mixTotal = mix.reduce((s, x) => s + x.count, 0);
   const top = mix[0];
+
+  // special days within the period window (events are per-month, so fetch the
+  // current + previous month and filter — covers week/month; year is skipped).
+  const today = todayKey();
+  const curY = Number(today.slice(0, 4));
+  const curM = Number(today.slice(5, 7));
+  const prevY = curM === 1 ? curY - 1 : curY;
+  const prevM = curM === 1 ? 12 : curM - 1;
+  const evCur = useEvents(curY, curM);
+  const evPrev = useEvents(prevY, prevM);
+  const windowStart = (() => {
+    const dt = new Date(`${today}T00:00:00Z`);
+    dt.setUTCDate(dt.getUTCDate() - (PERIOD_DAYS[period] - 1));
+    return dt.toISOString().slice(0, 10);
+  })();
+  const specialDays: MonthEvent[] =
+    period === 'year'
+      ? []
+      : [...(evPrev.data?.events ?? []), ...(evCur.data?.events ?? [])]
+          .filter((e) => e.date >= windowStart && e.date <= today)
+          .sort((a, b) => (a.date < b.date ? -1 : 1));
+  const dm = (date: string) => `${Number(date.slice(8, 10))}/${Number(date.slice(5, 7))}`;
 
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 120 }}>
@@ -163,6 +186,30 @@ export default function StatsScreen() {
               </View>
               <MoodLineChart points={d.moodTrend} period={period} annotations={d.annotations} premium={premium} onUpgrade={goPro} />
             </Card>
+
+            {/* special days in this period */}
+            {specialDays.length ? (
+              <Card>
+                <Text variant="title">{t('stats.specialDays')}</Text>
+                <View style={{ gap: space.sm }}>
+                  {specialDays.map((e, i) => {
+                    const holiday = e.type === 'holiday';
+                    return (
+                      <View
+                        key={e.id ?? `${e.date}-${i}`}
+                        style={{ flexDirection: 'row', alignItems: 'center', alignSelf: 'flex-start', gap: 8, backgroundColor: holiday ? '#FFF0F3' : '#EFF6FF', borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 9 }}
+                      >
+                        <Text style={{ fontSize: 15 }}>{e.emoji}</Text>
+                        <Text variant="label" weight="bold" color={holiday ? '#BE123C' : '#1D4ED8'}>
+                          {i18n.language === 'th' ? e.labelTh : e.label}
+                        </Text>
+                        <Text variant="label" color={colors.ink3}>{dm(e.date)}</Text>
+                      </View>
+                    );
+                  })}
+                </View>
+              </Card>
+            ) : null}
 
             {/* mood mix */}
             {top ? (

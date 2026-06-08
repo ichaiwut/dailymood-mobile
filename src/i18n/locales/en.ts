@@ -259,6 +259,7 @@ export default {
     activityTitle: 'Activity impact',
     activitySub: 'From {{n}} entries',
     activityHint: 'Numbers = mood impact · positive lifts it · negative lowers it',
+    specialDays: 'Special days this period',
     activityBetter: 'better',
     activityWorse: 'worse',
     activityTeaser: 'See which activities lift your mood and which weigh it down — a Pro feature.',
