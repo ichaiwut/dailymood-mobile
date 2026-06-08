@@ -342,6 +342,26 @@ export interface BestDay {
   entries: number;
 }
 
+/** One AI chart annotation (premium) — a pin on the mood-trend line. */
+export interface ChartAnnotation {
+  type: 'best' | 'worst' | 'anomaly_drop' | 'anomaly_spike' | string;
+  dateKey: string;
+  labelEn: string;
+  labelTh: string;
+  tagRefs: string[];
+  importance: number;
+}
+
+/** One activity's impact on mood (GET /api/stats activityInsight). */
+export interface ActivityInsight {
+  id: string;
+  label: string;
+  emoji: string;
+  /** signed impact score; positive lifts mood, negative lowers it. */
+  impact: number;
+  freq: number;
+}
+
 export interface StatsData {
   streak: number;
   todayMood: { moodId: string; createdAt: number } | null;
@@ -357,9 +377,9 @@ export interface StatsData {
   bestDay: BestDay | null;
   /** Tag-mood correlation; shape varies and may be empty — rendered defensively. */
   activityImpact: unknown[];
-  activityInsight: unknown[];
+  activityInsight: ActivityInsight[];
   /** AI chart annotations (premium); may be empty. */
-  annotations: unknown[];
+  annotations: ChartAnnotation[];
 }
 
 // --- Insights (GET /api/insights) ---

@@ -291,6 +291,34 @@ same months-rows × swipeable-days layout as §4e but 22px cells + legend); **8*
 (centered sheet, PASticker rotate −8°, "ขอบคุณสำหรับปี {year}" + back button). States: large
 spinner while loading; whole-page **Pro gate** (lav washi + 🎨 + upgrade) when free.
 
+## 4g. Stats — `app/(tabs)/stats.tsx` (`/api/stats?period=` + `/api/insights`)
+
+Paper Desk stats. **Header**: title + a row of `📤 แชร์` pill (purple-strong, only when
+`total ≥ 7`; uses RN `Share.share` with a text summary — the rich ShareCardModal is a
+separate handoff) and **week/month/year filter pills** (active = purple). **Year is
+Pro-gated**: the pill is `opacity .5` and tapping it doesn't switch — it reveals a
+`/profile/subscription` **banner** (AI-tint). Sections: **AI insight card** (AI-tint +
+yellow washi, gradient sparkle tile + "AI INSIGHT · {period}"; Pro → `insights.summary`
+clamped 3 lines, Free → generic copy + a `PRO` chip; "ดูเพิ่มเติม →" → `/insights`); **4 KPI
+cards** (2×2: avg mood + delta ↑/↓, entries, streak 🔥, top mood emoji + label·%); the
+**mood-trend line chart** (`MoodLineChart`, §below); **mood mix** (stacked bar + featured
+top-mood tile `mood.color+22` + top-5 list with track bars); **activity impact** (Pro →
+diverging bars from `activityInsight`: emoji+label, centre-anchored bar `min(|impact|/2,50)%`
+mint right / `#F4A8A8` left, signed value; Free → a whole-card teaser → subscription).
+States: **TooFew** (`total < 7`) replaces content — 📊 + "ต้องการอีก N วัน" + 7 progress dots
+(done = purple ✓) + "+ บันทึกวันนี้"; loading shows static gray skeleton blocks.
+Premium read from `useProfile().user.isPremium`.
+
+**`MoodLineChart`** (`src/components/paper/stats/MoodLineChart.tsx`) — SVG, width measured
+(`onLayout`) for uniform scaling. Y = 1–5 valence from `moodScore(moodId)` (trend points
+carry only a moodId; map lives in `mood.ts`); purple line (w3) + gradient area + white dots
+(last dot solid r6); **dashed gridlines + a mood-face Y axis** (`MoodFace`, scores 5→1).
+X labels are period-aware (week=weekday · month=every 5th date · year=month-short). **AI
+pins** from `annotations` (`ChartAnnotation`): Pro → glowing purple pin + ✦, tap toggles a
+dark tooltip with `labelTh/En` + `tagRefs`; Free → one blurred lavender ghost pin + an
+"✦ Unlock AI Annotations — PRO" chip → subscription. **Deferred vs web:** pulsing pin
+animation (static glow here) and holiday/personal timeline markers.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
