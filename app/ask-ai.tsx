@@ -18,6 +18,7 @@ import { SparkleIcon } from '../src/components/icons/Glyphs';
 import { PAClip } from '../src/components/paper/PAClip';
 import { useTheme } from '../src/theme/ThemeProvider';
 import { useToast } from '../src/components/Toast';
+import { useGoBack } from '../src/hooks/useGoBack';
 import { useProfile, useAskThreads, useAskSuggested } from '../src/hooks/queries';
 import { sendAskMessage, sendAskFeedback, fetchAskMessages, createAskThread } from '../src/api/askai';
 import { errorMessageKey } from '../src/api/errors';
@@ -32,6 +33,7 @@ export default function AskAiScreen() {
   const { colors, radius, space, brand, shadow, sheetRadius } = useTheme();
   const router = useRouter();
   const toast = useToast();
+  const goBack = useGoBack();
   const insets = useSafeAreaInsets();
   const locale = i18n.language;
 
@@ -126,7 +128,8 @@ export default function AskAiScreen() {
   if (!premium) {
     return (
       <View style={{ flex: 1, backgroundColor: colors.bg }}>
-        <View style={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.xl }}>
+        <View style={{ paddingTop: insets.top + space.lg, paddingHorizontal: space.xl, flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+          <BackBtn />
           <TopTabs />
         </View>
         <ScrollView contentContainerStyle={{ padding: space.xl, gap: space.lg }}>
@@ -142,6 +145,7 @@ export default function AskAiScreen() {
     <View style={{ flex: 1, backgroundColor: colors.bg }}>
       {/* top bar */}
       <View style={{ paddingTop: insets.top + space.md, paddingHorizontal: space.lg, paddingBottom: space.sm, flexDirection: 'row', alignItems: 'center', gap: space.sm }}>
+        <BackBtn />
         <View style={{ flexDirection: 'row', gap: space.sm, flex: 1 }}><TopTabs /></View>
         <Pressable onPress={() => setDrawerOpen(true)} style={{ flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: colors.surface, borderRadius: radius.pill, paddingHorizontal: 12, paddingVertical: 8, boxShadow: shadow.sm }}>
           <Text variant="label" weight="bold" color={colors.ink2}>📋 {threads.length}</Text>
@@ -232,6 +236,14 @@ export default function AskAiScreen() {
   );
 
   // ---- helpers ----
+  function BackBtn() {
+    return (
+      <Pressable onPress={goBack} hitSlop={10} style={{ width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', boxShadow: shadow.sm }}>
+        <Text weight="bold" style={{ fontSize: 22, lineHeight: 26, color: colors.ink2 }}>‹</Text>
+      </Pressable>
+    );
+  }
+
   function TopTabs() {
     const Tab = ({ label, active, onPress }: { label: string; active: boolean; onPress: () => void }) => (
       <Pressable onPress={onPress} style={{ borderRadius: radius.pill, paddingHorizontal: 14, paddingVertical: 8, backgroundColor: active ? colors.ink : colors.surface, boxShadow: active ? '0 6px 0 -2px #000' : shadow.sm }}>
