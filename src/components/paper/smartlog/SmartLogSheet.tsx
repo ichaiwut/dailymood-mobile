@@ -40,12 +40,9 @@ import {
   CloseIcon,
   CalendarIcon,
   CameraIcon,
-  PinIcon,
-  PinFilledIcon,
   MicIcon,
 } from '../../icons/Glyphs';
-import { LocationPill } from '../LocationPill';
-import { PlaceSearchBox } from '../PlaceSearchBox';
+import { LocationField } from '../LocationField';
 import i18n from '../../../i18n';
 import type { SmartSuggestion } from '../../../api/types';
 
@@ -89,7 +86,6 @@ export function SmartLogSheet({
   const [imageUri, setImageUri] = useState<string | null>(null);
   const [activityId, setActivityId] = useState<string | null>(null);
   const [location, setLocation] = useState<{ name: string; lat?: number | null; lng?: number | null } | null>(null);
-  const [locOpen, setLocOpen] = useState(false);
   const [hint, setHint] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -105,7 +101,6 @@ export function SmartLogSheet({
       setImageUri(null);
       setActivityId(null);
       setLocation(null);
-      setLocOpen(false);
       setHint(null);
       setError(null);
     }
@@ -209,12 +204,6 @@ export function SmartLogSheet({
     }
     const picked = await pickImage();
     if (picked) setImageUri(await optimizeImage(picked));
-  };
-
-  // Tapping the pin toggles the place search box (web parity).
-  const toggleLocation = () => {
-    setHint(null);
-    setLocOpen((o) => !o);
   };
 
   const removeTag = (tag: string) => setTags((ts) => ts.filter((x) => x !== tag));
@@ -355,16 +344,6 @@ export function SmartLogSheet({
                   badge={premium ? undefined : 'PRO'}
                   dim={!premium}
                 />
-                <PaperIconButton
-                  icon={
-                    location || locOpen ? (
-                      <PinFilledIcon size={20} color={brand.purple} />
-                    ) : (
-                      <PinIcon size={20} color={colors.ink2} />
-                    )
-                  }
-                  onPress={toggleLocation}
-                />
                 {!premium ? (
                   <Text variant="label" color={colors.ink3} style={{ marginLeft: 'auto' }}>
                     {t('smartlog.quotaLeft', { count: ai.data?.remaining ?? 0 })}
@@ -373,61 +352,6 @@ export function SmartLogSheet({
               </View>
               {hint ? (
                 <Text variant="label" color={colors.ink3}>{hint}</Text>
-              ) : null}
-
-              {/* location: search box (open) → pill (set) */}
-              {locOpen ? (
-                <PlaceSearchBox
-                  autoFocus
-                  onPick={(p) => {
-                    setLocation(p);
-                    setLocOpen(false);
-                    setHint(null);
-                  }}
-                />
-              ) : location ? (
-                <LocationPill
-                  name={location.name}
-                  lat={location.lat}
-                  lng={location.lng}
-                  onRemove={() => setLocation(null)}
-                />
-              ) : null}
-
-              {/* activity chips */}
-              {activities.data?.length ? (
-                <View style={{ gap: space.sm }}>
-                  <Text variant="label" color={colors.ink2}>{t('smartlog.activitiesLabel')}</Text>
-                  <ScrollView horizontal showsHorizontalScrollIndicator={false}>
-                  <View style={{ flexDirection: 'row', gap: space.sm }}>
-                    {activities.data.map((a) => {
-                      const on = a.id === activityId;
-                      return (
-                        <Pressable
-                          key={a.id}
-                          onPress={() => setActivityId(on ? null : a.id)}
-                          style={{
-                            flexDirection: 'row',
-                            alignItems: 'center',
-                            gap: 6,
-                            backgroundColor: on ? colors.ink : colors.surface,
-                            borderRadius: radius.pill,
-                            borderWidth: 1,
-                            borderColor: on ? colors.ink : colors.hairline2,
-                            paddingHorizontal: 12,
-                            paddingVertical: 7,
-                          }}
-                        >
-                          <Text style={{ fontSize: 14 }}>{a.emoji}</Text>
-                          <Text variant="label" weight="medium" color={on ? '#fff' : colors.ink2}>
-                            {i18n.language === 'th' ? a.labelTh : a.label}
-                          </Text>
-                        </Pressable>
-                      );
-                    })}
-                  </View>
-                  </ScrollView>
-                </View>
               ) : null}
 
               {/* PRO teaser — never hide premium features (handover rule). */}
@@ -550,6 +474,44 @@ export function SmartLogSheet({
               </View>
             </View>
           ) : null}
+
+          {/* shared: activity + location (editable in both input & result) */}
+          {activities.data?.length ? (
+            <View style={{ gap: space.sm }}>
+              <Text variant="label" color={colors.ink2}>{t('smartlog.activitiesLabel')}</Text>
+              <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+                <View style={{ flexDirection: 'row', gap: space.sm }}>
+                  {activities.data.map((a) => {
+                    const on = a.id === activityId;
+                    return (
+                      <Pressable
+                        key={a.id}
+                        onPress={() => setActivityId(on ? null : a.id)}
+                        style={{
+                          flexDirection: 'row',
+                          alignItems: 'center',
+                          gap: 6,
+                          backgroundColor: on ? colors.ink : colors.surface,
+                          borderRadius: radius.pill,
+                          borderWidth: 1,
+                          borderColor: on ? colors.ink : colors.hairline2,
+                          paddingHorizontal: 12,
+                          paddingVertical: 7,
+                        }}
+                      >
+                        <Text style={{ fontSize: 14 }}>{a.emoji}</Text>
+                        <Text variant="label" weight="medium" color={on ? '#fff' : colors.ink2}>
+                          {i18n.language === 'th' ? a.labelTh : a.label}
+                        </Text>
+                      </Pressable>
+                    );
+                  })}
+                </View>
+              </ScrollView>
+            </View>
+          ) : null}
+
+          <LocationField value={location} onChange={setLocation} />
 
           {/* actions */}
           {step === 'input' ? (
