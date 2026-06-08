@@ -214,6 +214,7 @@ export default function StatsScreen() {
                 <Card>
                   <Text variant="title">{t('stats.activityTitle')}</Text>
                   <Text variant="label" color={colors.ink3}>{t('stats.activitySub', { n: d.total })}</Text>
+                  <Text variant="label" color={colors.ink3} style={{ marginTop: -4 }}>{t('stats.activityHint')}</Text>
                   <View style={{ gap: space.md, marginTop: space.xs }}>
                     {d.activityInsight.map((a) => (
                       <ActivityRow key={a.id} a={a} />
@@ -265,9 +266,12 @@ export default function StatsScreen() {
           <View style={{ position: 'absolute', left: '50%', top: 0, bottom: 0, width: 1, backgroundColor: colors.hairline2 }} />
           <View style={{ position: 'absolute', top: 0, bottom: 0, left: pos ? '50%' : `${50 - w}%`, width: `${w}%`, backgroundColor: pos ? brand.mint : '#F4A8A8' }} />
         </View>
-        <Text variant="label" weight="bold" color={pos ? colors.success : colors.danger} style={{ width: 44, textAlign: 'right' }}>
-          {pos ? '+' : ''}{a.impact}
-        </Text>
+        <View style={{ width: 78, alignItems: 'flex-end' }}>
+          <Text variant="label" weight="bold" color={pos ? colors.success : colors.danger}>
+            {pos ? '↑' : '↓'} {t(pos ? 'stats.activityBetter' : 'stats.activityWorse')}
+          </Text>
+          <Text variant="label" color={colors.ink3}>{Math.abs(a.impact)}%</Text>
+        </View>
       </View>
     );
   }

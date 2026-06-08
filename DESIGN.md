@@ -303,8 +303,9 @@ clamped 3 lines, Free → generic copy + a `PRO` chip; "ดูเพิ่มเ
 cards** (2×2: avg mood + delta ↑/↓, entries, streak 🔥, top mood emoji + label·%); the
 **mood-trend line chart** (`MoodLineChart`, §below); **mood mix** (stacked bar + featured
 top-mood tile `mood.color+22` + top-5 list with track bars); **activity impact** (Pro →
-diverging bars from `activityInsight`: emoji+label, centre-anchored bar `min(|impact|/2,50)%`
-mint right / `#F4A8A8` left, signed value; Free → a whole-card teaser → subscription).
+a plain-language hint line + diverging bars from `activityInsight`: emoji+label, centre-anchored
+bar `min(|impact|/2,50)%` mint right / `#F4A8A8` left, and a readable value `↑ better / ↓ worse`
++ `|impact|%` (never a bare signed number); Free → a whole-card teaser → subscription).
 States: **TooFew** (`total < 7`) replaces content — 📊 + "ต้องการอีก N วัน" + 7 progress dots
 (done = purple ✓) + "+ บันทึกวันนี้"; loading shows static gray skeleton blocks.
 Premium read from `useProfile().user.isPremium`.
