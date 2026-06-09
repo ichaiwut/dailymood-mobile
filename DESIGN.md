@@ -77,6 +77,36 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   Brief confirmation pill at **top-center** (below the status bar; white sheet, soft
   shadow, check/✕ glyph), auto-dismiss ~2.6s. Fired on entry save (drawer + edit).
   Success/error tones.
+- **`OfflineNotice`** (`src/components/OfflineNotice.tsx`) — global "no internet" gate.
+  Mounted once in root `_layout` (inside `ToastProvider`); subscribes to **NetInfo**
+  and, when connectivity is definitively lost (`isConnected === false ||
+  isInternetReachable === false`; `null`/unknown counts as online so it never flashes
+  on cold start), blocks the app with a centered Paper Desk `Modal` — dim scrim
+  (`rgba(26,19,32,.46)`), folder-seam card (`8/26/26/26`), peach washi, a `WifiOffIcon`
+  in a soft `dangerBg` disc (`danger` icon), `offline.title`/`offline.body` copy, and a
+  peach **Try again** button (`common.retry` → `NetInfo.refresh()`). No close ✕ — it's a
+  required-connection gate that closes itself on reconnect. `app/_layout` also wires
+  TanStack Query's `onlineManager` to NetInfo, so every screen's queries refetch the
+  instant the connection returns. A `__DEV__` `FORCE_OFFLINE_PREVIEW` constant previews
+  it without going offline. **Native needs a dev build** (NetInfo is a native module); on
+  **web** it uses `navigator.onLine` (DevTools → Network → Offline triggers it). Edge
+  case: losing connectivity while another `Modal`/sheet is already open stacks two native
+  modals (platform-dependent); the common case — offline on a normal screen — is solid.
+- **`PushPrimerSheet`** (`src/components/PushPrimerSheet.tsx`) — soft opt-in for daily
+  reminders: a Paper Desk `BottomSheet` (peach washi, `BellIcon` in a peach-tint disc,
+  title/body + peach **Turn on reminders** / paper **Not now**). Shown **once** after login
+  by `NotificationsProvider` while OS notification permission is still `undetermined`;
+  either choice persists a "seen" flag (`expo-secure-store`) so it never nags. "Turn on"
+  fires the OS prompt then registers the Expo push token; a denial shows a gentle
+  `notifications.deniedHint` toast. The rest of the push lifecycle lives in
+  `src/notifications/` (`push.ts` — the only `expo-notifications` importer, native-only,
+  no-ops on web like `purchases.ts`; `NotificationsProvider` mirrors `PurchasesProvider`):
+  register on login/restore, re-register on token rotation, **unregister inside
+  `signOut`** (before tokens clear, since the DELETE is Bearer-authed), and route a
+  notification tap to `data.url`/`data.type` (deep-link, incl. cold start). Backend owns
+  the notification copy; v1 routes only `/` (home). Copy: `notifications.*`. **Native +
+  real device only** (no Expo push token on web / simulator); needs a dev build + the
+  `expo-notifications` plugin, plus APNs (iOS) / FCM (Android) creds for real delivery.
 - **`Button`** (`src/components/Button.tsx`) — variants `primary`(peach) / `ink` /
   `paper`(white) / `ghost` / `purple`, each with its chunky `boxShadow`. Height 54,
   radius 14, settles `translateY(2)` on press.
@@ -490,7 +520,9 @@ the form (mint washi + ✅ + "back to profile"); no re-login needed. Loading = g
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
 `stroke = currentColor`, color/size props. Available: `SparkleIcon`, `CalendarIcon`,
-`CameraIcon`, `PinIcon`, `PinFilledIcon` (location-chosen state), `CloseIcon`, `MicIcon`.
+`CameraIcon`, `PinIcon`, `PinFilledIcon` (location-chosen state), `CloseIcon`, `MicIcon`,
+`WifiOffIcon` (wifi arcs + slash — the no-internet popup, see `OfflineNotice` §3),
+`BellIcon` (daily-reminder / notifications pre-prompt).
 **Use these instead of system emoji for all chrome.**
 
 ---
@@ -506,3 +538,10 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
   insights, profile, subscription screens.
 - Deferred features: native Google/Apple sign-in (needs dev build), voice input (mic
   button is still a "coming soon" stub), reminder & privacy toggles, dark mode, share cards.
+- **Push notifications (daily reminder):** the mobile client side is built — Expo push
+  token registration (login/restore/rotation/logout), the soft opt-in `PushPrimerSheet`,
+  and notification-tap deep-linking (`src/notifications/`). Still deferred: the reminder
+  **schedule UI** (time / day-of-week, backed by `reminderEnabled`/`reminderTime`/
+  `reminderDays`), a re-entry point if the user dismisses the primer, a per-channel picker,
+  and push for weekly-digest / AI-coach (still email-only). Real delivery needs APNs/FCM
+  creds on the Expo project.

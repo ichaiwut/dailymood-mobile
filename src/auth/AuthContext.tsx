@@ -19,6 +19,7 @@ import {
 } from 'react';
 import { restoreSession, setSessionExpiredHandler } from '../api/client';
 import { logout as apiLogout } from '../api/auth';
+import { unregisterFromPush } from '../notifications/push';
 import { tokenStore } from './token-store';
 import { setAppLanguage } from '../i18n';
 import type { AuthUser, TokenPair } from '../api/types';
@@ -62,9 +63,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         // logout is best-effort; we clear locally regardless
       }
     }
+    // Unregister this device's push token BEFORE clearing tokens — the DELETE is
+    // Bearer-authed and the access token is gone after clear(). Best-effort.
+    await unregisterFromPush().catch(() => {});
     await tokenStore.clear();
-    // RevenueCat logout is handled by PurchasesProvider reacting to status →
-    // 'unauthenticated' (covers sign-out AND session-expiry in one place).
+    // RevenueCat logout (and push re-register) follow the status change in their
+    // providers; only the authed unregister above must run before the token clears.
     setUser(null);
     setStatus('unauthenticated');
   }, []);

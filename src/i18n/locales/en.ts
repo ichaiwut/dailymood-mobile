@@ -650,4 +650,15 @@ export default {
     rateLimitSave: 'Save mood instead',
     goPro: 'Go Pro',
   },
+  offline: {
+    title: 'No internet connection',
+    body: 'Check your wi-fi or mobile data, then try again.',
+  },
+  notifications: {
+    primerTitle: 'Turn on daily reminders?',
+    primerBody: "A gentle nudge to check in with how you're feeling — only on days you haven't logged yet.",
+    primerEnable: 'Turn on reminders',
+    primerLater: 'Not now',
+    deniedHint: 'Notifications are off — you can turn them on anytime in Settings.',
+  },
 };
