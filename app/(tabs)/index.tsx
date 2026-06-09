@@ -17,6 +17,7 @@ import { GreetingFolder } from '../../src/components/paper/today/GreetingFolder'
 import { TodayTimeline } from '../../src/components/paper/today/TodayTimeline';
 import { AiWeeklyFolder } from '../../src/components/paper/today/AiWeeklyFolder';
 import { StreakCard } from '../../src/components/paper/today/StreakCard';
+import { MiniCalendarFolder } from '../../src/components/paper/today/MiniCalendarFolder';
 import { EmptyToday } from '../../src/components/paper/today/EmptyToday';
 import { EntryFolderCard } from '../../src/components/paper/EntryFolderCard';
 import { useTheme } from '../../src/theme/ThemeProvider';
@@ -84,6 +85,10 @@ export default function TodayScreen() {
           <StreakCard streak={profile.data.stats.streak} />
         </Appear>
       ) : null}
+
+      <Appear delay={240}>
+        <MiniCalendarFolder />
+      </Appear>
     </Screen>
   );
 }

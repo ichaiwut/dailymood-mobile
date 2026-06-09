@@ -556,6 +556,7 @@ export default {
     reanalyzing: 'Re-analyzing…',
   },
   today: {
+    viewAll: 'View all →',
     greeting: 'How is today?',
     goodMorning: 'Good morning',
     goodAfternoon: 'Good afternoon',

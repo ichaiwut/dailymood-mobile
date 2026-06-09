@@ -124,6 +124,10 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   hidden): premium sees the cached weekly `summary` (markdown stripped), free sees
   `previewHeadline`/teaser + a PRO badge. Button → `/insights` (premium) or
   `/profile/subscription` (free). Data from `useInsights()`.
+- **`MiniCalendarFolder`** (`paper/today/`) — mint-tab folder at the bottom of Today: current
+  month (`monthLong year`), "ดูทั้งหมด →" → `/calendar`, and a 7-col grid (Sunday-first, narrow
+  weekday headers) with today ringed (`surface2` + purple border) and logged days tinted by their
+  mood colour. Data from `useCalendarMonth(year, month)` (`entries[].moodTypeId`).
 - **`MoodPicker`** — two layouts:
   - `grid` (Today greeting): 5-col circular discs, soft tinted rings (kept soft per
     user feedback — full saturation read as neon).

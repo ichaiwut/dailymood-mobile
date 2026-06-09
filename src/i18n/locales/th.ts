@@ -557,6 +557,7 @@ const th: typeof en = {
     reanalyzing: 'กำลังวิเคราะห์…',
   },
   today: {
+    viewAll: 'ดูทั้งหมด →',
     greeting: 'วันนี้เป็นยังไงบ้าง',
     goodMorning: 'สวัสดีตอนเช้า',
     goodAfternoon: 'สวัสดีตอนบ่าย',
