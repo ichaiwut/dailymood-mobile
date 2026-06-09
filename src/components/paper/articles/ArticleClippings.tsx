@@ -16,7 +16,7 @@ import { Button } from '../../Button';
 import { PAClip } from '../PAClip';
 import { WashiTape } from '../WashiTape';
 import { PASticker } from '../PASticker';
-import { MoodIcon } from '../MoodIcon';
+import { MoodFace, faceForMood } from '../MoodFace';
 import { useTheme } from '../../../theme/ThemeProvider';
 import { useBookmarks, useReactions, useMoods } from '../../../hooks/queries';
 import { useGoBack } from '../../../hooks/useGoBack';
@@ -151,7 +151,7 @@ export function ArticleClippings({ variant }: { variant: 'saved' | 'reactions' }
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', gap: 8 }}>
               {mood ? (
                 <View style={{ flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: mood.color + '2E', borderRadius: 100, paddingHorizontal: 10, paddingVertical: 5 }}>
-                  <MoodIcon moodId={mood.id} size={20} />
+                  <MoodFace face={faceForMood(mood.id)} size={20} />
                   <Text variant="label" weight="bold" style={{ fontSize: 14 }}>{moodLabel(mood, i18n.language)}</Text>
                 </View>
               ) : null}

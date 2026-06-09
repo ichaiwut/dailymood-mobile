@@ -3,7 +3,8 @@ import type { Mood } from '../api/types';
 
 export function moodLabel(mood: Mood | undefined, lang: string): string {
   if (!mood) return '';
-  return lang === 'th' ? mood.labelTh : mood.label;
+  // custom moods may only have `label` (labelTh null) — fall back so they're never blank.
+  return lang === 'th' ? mood.labelTh || mood.label : mood.label || mood.labelTh || '';
 }
 
 export function findMood(moods: Mood[] | undefined, id: string | null | undefined): Mood | undefined {

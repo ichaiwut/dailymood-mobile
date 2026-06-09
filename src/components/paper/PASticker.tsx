@@ -1,12 +1,12 @@
 /**
  * Mood sticker — colored disc + white border + soft "peel" shadow (handoff
- * `.sticker`). Renders, in priority: an emoji glyph (badges) → the user's real
- * mood-PACK icon from R2 (mood contexts) → line-art MoodFace fallback.
- * The mood-color disc shows as a thin ring behind the face (matches the design).
+ * `.sticker`). Renders, in priority: an emoji glyph (badges) → the brand line-art
+ * MoodFace for moods. (The R2 mood-PACK SVGs render unreliably through
+ * react-native-svg's SvgUri — offset viewBoxes show as solid black — so the
+ * always-clean MoodFace is the default; `pack` is kept for API compatibility.)
  */
 import { View } from 'react-native';
 import { Text } from '../Text';
-import { MoodIcon } from './MoodIcon';
 import { MoodFace, faceForMood, type FaceType } from './MoodFace';
 import { useTheme } from '../../theme/ThemeProvider';
 import { DEFAULT_MOOD_PACK } from '../../config';
@@ -40,7 +40,7 @@ export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji
   } else if (face) {
     content = <MoodFace face={face} size={size * 0.84} />;
   } else if (moodId != null) {
-    content = <MoodIcon moodId={moodId} pack={pack} size={size * 0.88} />;
+    content = <MoodFace face={faceForMood(moodId)} size={size * 0.84} />;
   } else {
     content = null;
   }
