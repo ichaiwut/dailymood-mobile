@@ -27,6 +27,7 @@ import { fetchStats, fetchInsights, fetchInsightsAll, sendInsightFeedback } from
 import { fetchAskThreads, fetchAskSuggested } from '../api/askai';
 import { fetchBookmarks, fetchReactions } from '../api/articles';
 import { fetchPersonalEvents, createEvent, deleteEvent } from '../api/events';
+import { fetchPasswordStatus, changePassword } from '../api/account';
 import { todayKey } from '../lib/time';
 import type {
   ConfirmEntryInput,
@@ -240,6 +241,14 @@ export function useDeleteMood() {
 
 export function usePersonalEvents() {
   return useQuery({ queryKey: queryKeys.personalEvents, queryFn: fetchPersonalEvents });
+}
+
+export function usePasswordStatus() {
+  return useQuery({ queryKey: ['account', 'password'], queryFn: fetchPasswordStatus });
+}
+
+export function useChangePassword() {
+  return useMutation({ mutationFn: (body: { currentPassword?: string; newPassword: string }) => changePassword(body) });
 }
 
 export function useCreateEvent() {

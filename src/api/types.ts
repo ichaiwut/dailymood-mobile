@@ -542,5 +542,9 @@ export type ApiErrorCode =
   | 'rate_limited'
   | 'auth_required'
   | 'limit_reached'
+  | 'weak_password'
+  | 'current_password_required'
+  | 'wrong_current_password'
+  | 'same_password'
   | 'network_error'
   | 'unknown';

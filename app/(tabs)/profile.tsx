@@ -316,6 +316,8 @@ export default function ProfileScreen() {
               ) : (
                 <View style={{ padding: space.lg }}><PremiumTeaser text={t('profile.hidePreviewTeaser')} /></View>
               )}
+              <Divider />
+              <NavRow bg="#A673F1" icon="🔑" title={t('profile.passwordRow')} onPress={() => router.push('/profile/password')} />
             </SettingCard>
           </Section>
 

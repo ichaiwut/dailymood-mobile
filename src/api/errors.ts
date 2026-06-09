@@ -28,6 +28,10 @@ const KNOWN_CODES: ReadonlySet<string> = new Set([
   'rate_limited',
   'auth_required',
   'limit_reached',
+  'weak_password',
+  'current_password_required',
+  'wrong_current_password',
+  'same_password',
 ]);
 
 /** Normalize any raw `{ error }` string from the API into a known code. */

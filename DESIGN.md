@@ -465,6 +465,18 @@ earned → "✓ ปลดล็อก · {date}" + share; in-progress → `curre
 "🔒" pill + hint. **Share** uses RN `Share.share` (text). **Deferred vs web:** rendering the badge
 as a share-card image (`ViewShot`/canvas).
 
+## 4n. Change / set password — `app/profile/password.tsx` (`/api/account/password`)
+
+Reached from Profile → Privacy (🔑 row). One screen, **two modes from `GET /api/account/password`
+→ `hasPassword`**: **change** (current-password field + "ลืมรหัสเดิม?" → `/(auth)/forgot`) vs **set**
+(Google/Apple-only user adding a password — no current field, explains email login). Back button,
+h1 + intro, then a `pa-sheet` form: `Field`s (label + input + 👁 show/hide) for current (change
+only) / new (≥8, placeholder) / confirm. **Client-validates** (≥8, match) before `POST`; ink submit
+button disabled until valid. Errors → human copy via the registered codes (`weak_password` /
+`current_password_required` / `wrong_current_password` / `same_password`, added to `ApiErrorCode` +
+`errors.*`); **429** shows a "try again in N min" countdown from `retryAfter`. **Success** replaces
+the form (mint washi + ✅ + "back to profile"); no re-login needed. Loading = gray skeleton sheet.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
