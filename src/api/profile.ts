@@ -4,13 +4,39 @@
  */
 import { apiFetch } from './client';
 import { appendImagePart } from '../lib/image';
+import { API_BASE_URL } from '../config';
+import { tokenStore } from '../auth/token-store';
 import type { Profile, AchievementsData, UpdateProfileInput } from './types';
 
 export function fetchProfile(): Promise<Profile> {
   return apiFetch<Profile>('/api/profile');
 }
 
-/** PATCH /api/profile — name, bio, accentColor, locale. */
+/** DELETE /api/profile/clear — wipe all of the user's entries (irreversible). */
+export function clearEntries(): Promise<unknown> {
+  return apiFetch('/api/profile/clear', { method: 'DELETE' });
+}
+
+/** GET /api/feedback — cooldown status for the feedback form. */
+export function fetchFeedbackStatus(): Promise<{ cooldown: boolean; remainMin: number }> {
+  return apiFetch('/api/feedback');
+}
+
+/** POST /api/feedback — submit a feedback message (rate-limited → 429). */
+export function submitFeedback(message: string): Promise<unknown> {
+  return apiFetch('/api/feedback', { method: 'POST', body: { message } });
+}
+
+/** GET /api/profile/export — the user's entries as CSV text (raw, not JSON). */
+export async function exportEntriesCsv(): Promise<string> {
+  const res = await fetch(`${API_BASE_URL}/api/profile/export`, {
+    headers: { Authorization: `Bearer ${tokenStore.getAccessToken() ?? ''}` },
+  });
+  if (!res.ok) throw new Error(`export_failed_${res.status}`);
+  return res.text();
+}
+
+/** PATCH /api/profile — name, bio, accentColor, locale, weeklyDigestEnabled, aiCoachEnabled. */
 export function updateProfile(input: UpdateProfileInput): Promise<unknown> {
   return apiFetch('/api/profile', { method: 'PATCH', body: input });
 }

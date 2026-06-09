@@ -1,46 +1,69 @@
 /**
  * Mood sticker — colored disc + white border + soft "peel" shadow (handoff
- * `.sticker`). Renders, in priority: an emoji glyph (badges) → the user's real
- * mood-PACK icon from R2 (mood contexts) → line-art MoodFace fallback.
- * The mood-color disc shows as a thin ring behind the face (matches the design).
+ * `.sticker`). Render priority:
+ *   • `iconKey` → the R2 custom-emoji image (custom moods)
+ *   • `face`    → forced brand line-art face
+ *   • moodId    → the user's mood-PACK icon from R2 (custom `emoji` if given) →
+ *                 brand `MoodFace` if the image can't load
+ *   • `emoji`   → badge glyph (full-color disc)
+ *
+ * Pack icons are rendered via <Image> (renders SVG/PNG/WEBP on web; PNG/WEBP on
+ * native) rather than react-native-svg's SvgUri, which renders these packs'
+ * offset-viewBox SVGs as solid black. On error we fall back to MoodFace.
  */
-import { View } from 'react-native';
+import { useState } from 'react';
+import { View, Image } from 'react-native';
 import { Text } from '../Text';
-import { MoodIcon } from './MoodIcon';
 import { MoodFace, faceForMood, type FaceType } from './MoodFace';
 import { useTheme } from '../../theme/ThemeProvider';
-import { DEFAULT_MOOD_PACK } from '../../config';
+import { DEFAULT_MOOD_PACK, R2_PUBLIC_URL, moodIconUrl } from '../../config';
 
 export interface PAStickerProps {
   color: string;
   moodId?: string | null;
   /** Mood-pack id (defaults to the user's default pack). */
   pack?: string;
-  /** Force the line-art face instead of the pack icon. */
+  /** Pack icon format (svg/png/webp) — from the pack's `iconFormat`. */
+  packFormat?: string;
+  /** Force the line-art face. */
   face?: FaceType;
-  /** Emoji fallback when no mood (e.g. achievement badges). */
-  emoji?: string;
+  /** Custom-mood R2 icon (e.g. `custom-emojis/emoji_1_02.png`). */
+  iconKey?: string | null;
+  /** Emoji — a badge glyph (no moodId) or a custom mood's own emoji (with moodId). */
+  emoji?: string | null;
   size?: number;
   halo?: boolean;
-  /** Explicit disc background (overrides the soft mood tint) — used by the
-   *  Smart Log tiles where unselected = neutral and selected = full mood color. */
+  /** Explicit disc background (overrides the soft mood tint). */
   discBg?: string;
 }
 
-export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, face, emoji, size = 56, halo, discBg }: PAStickerProps) {
+/** Pack icon via <Image>, falling back to the line-art face if it fails to load. */
+function PackOrFace({ moodId, pack, format, size }: { moodId: string; pack: string; format: string; size: number }) {
+  const [failed, setFailed] = useState(false);
+  if (failed) return <MoodFace face={faceForMood(moodId)} size={size} />;
+  return (
+    <Image
+      source={{ uri: moodIconUrl(moodId, pack, format) }}
+      style={{ width: size, height: size }}
+      resizeMode="contain"
+      onError={() => setFailed(true)}
+    />
+  );
+}
+
+export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, packFormat = 'svg', face, iconKey, emoji, size = 56, halo, discBg }: PAStickerProps) {
   const { shadow } = useTheme();
 
-  // Badges (emoji) keep a full-color disc. Mood stickers show the pack face on
-  // a SOFT tint of the mood color (a gentle ring), matching the design — the
-  // saturated API colors as a full ring read as neon.
-  const isMood = !emoji;
+  const isMood = moodId != null || face != null || !!iconKey;
   let content: React.ReactNode;
-  if (emoji) {
-    content = <Text style={{ fontSize: size * 0.46 }}>{emoji}</Text>;
+  if (iconKey) {
+    content = <Image source={{ uri: `${R2_PUBLIC_URL}/${iconKey}` }} style={{ width: size * 0.7, height: size * 0.7 }} resizeMode="contain" />;
   } else if (face) {
     content = <MoodFace face={face} size={size * 0.84} />;
   } else if (moodId != null) {
-    content = <MoodIcon moodId={moodId} pack={pack} size={size * 0.88} />;
+    content = emoji ? <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text> : <PackOrFace moodId={moodId} pack={pack} format={packFormat} size={size * 0.84} />;
+  } else if (emoji) {
+    content = <Text style={{ fontSize: size * 0.46 }}>{emoji}</Text>;
   } else {
     content = null;
   }

@@ -53,12 +53,16 @@ export interface Profile {
     emailVerified: boolean;
     image: string | null;
     imageUrl: string | null;
+    imageKey: string | null;
     locale: 'th' | 'en';
     isPremium: boolean;
     bio: string | null;
     accentColor: string;
     moodPack: string;
     createdAt: string;
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+    planInterval: string | null;
     // settings
     reminderEnabled: boolean;
     reminderTime: string;
@@ -66,6 +70,7 @@ export interface Profile {
     hidePreview: boolean;
     anonymousInsights: boolean;
     weeklyDigestEnabled: boolean;
+    aiCoachEnabled: boolean;
   };
   stats: {
     streak: number;
@@ -86,7 +91,16 @@ export interface Profile {
     hasSufficientData: boolean;
   };
   achievements: AchievementsData;
-  tier: string;
+  packs: MoodPack[];
+  tier: 'guest' | 'free' | 'premium' | string;
+}
+
+/** A mood-icon pack (GET /api/profile `packs`). Icons live at R2_PUBLIC_URL/{id}/{mood}.{iconFormat}. */
+export interface MoodPack {
+  id: string;
+  label: string;
+  premium: boolean;
+  iconFormat: string;
 }
 
 export interface BadgeSummary {
@@ -111,6 +125,10 @@ export interface AchievementsData {
 export interface SubscriptionData {
   isPremium: boolean;
   hasStripeCustomer: boolean;
+  /** True when Pro came from a native store purchase (App Store / Play). */
+  hasIapSubscription: boolean;
+  /** Which store the IAP subscription is on, for manage/cancel deep links. */
+  iapSource: 'apple' | 'google' | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   planInterval: string | null;
@@ -127,6 +145,14 @@ export interface UpdateProfileInput {
   bio?: string;
   accentColor?: string;
   locale?: 'th' | 'en';
+  weeklyDigestEnabled?: boolean;
+  aiCoachEnabled?: boolean;
+  hidePreview?: boolean;
+  anonymousInsights?: boolean;
+  moodPack?: string;
+  reminderEnabled?: boolean;
+  reminderTime?: string;
+  reminderDays?: string;
 }
 
 /** A saved mood entry (GET /api/log). Shapes verified against the live API. */
@@ -279,6 +305,16 @@ export interface MonthEvents {
   events: MonthEvent[];
 }
 
+/** A user's yearly special day (GET /api/events with no query — manager list). */
+export interface PersonalEvent {
+  id: string;
+  label: string;
+  labelTh: string | null;
+  month: number;
+  day: number;
+  emoji: string;
+}
+
 /** Lighter entry shape for the timeline feed (GET /api/calendar/timeline). */
 export interface TimelineEntry {
   id: string;
@@ -408,6 +444,96 @@ export interface InsightsData {
 
 export type InsightReaction = 'up' | 'down' | 'routine';
 
+// --- Articles (GET /api/articles/bookmarks | /reactions) ---
+export interface ArticleItem {
+  slug: string;
+  titleTh: string;
+  titleEn: string;
+  excerptTh: string;
+  excerptEn: string;
+  coverImageUrl: string | null;
+  categoryLabelTh: string | null;
+  categoryLabelEn: string | null;
+  readingTimeMinutes: number;
+  tone: string;
+  /** present on /reactions — the mood the user picked after reading. */
+  moodTypeId?: string | null;
+}
+
+// --- Ask AI chat (GET/POST /api/ask-ai/*) ---
+export interface AskAiSource {
+  kind: string; // e.g. 'entry'
+  ref: string; // e.g. a date key
+  snippet: string;
+}
+export interface AskAiMessage {
+  id: string;
+  role: 'user' | 'ai' | string;
+  content: string;
+  createdAt: string;
+  sourcesJson?: AskAiSource[];
+  entriesUsed?: number;
+  feedback?: 'up' | 'down' | null;
+}
+export interface AskAiThread {
+  id: string;
+  title: string;
+  createdAt?: string;
+  updatedAt?: string;
+}
+export interface AskAiSendResult {
+  userMessage: AskAiMessage;
+  aiMessage: AskAiMessage;
+}
+
+// --- Insights "all" (GET /api/insights/all) — the rich weekly dashboard ---
+export interface InsightsForecast {
+  factors: { label: string; direction: '+' | '-' | string }[];
+  miniTrend: number[];
+  reasoning: string;
+  confidence: number; // 0..1
+  predictedMood: string; // moodId
+}
+export interface InsightsEnergy {
+  hourly: number[]; // 24 values 0..1
+  peakHour: number;
+  troughHour: number;
+}
+export interface InsightsTheme {
+  color: string;
+  count: number;
+  label: string;
+}
+export interface InsightsDna {
+  axes: { calm: number; depth: number; bright: number; energy: number; social: number };
+  archetype: string;
+  description: string;
+  archetypeIcon: string;
+}
+export interface InsightsAll {
+  status: { ready: boolean; entryCount: number; aiQuota: number | null; tier: 'free' | 'premium' | string };
+  weekKey: string;
+  stats: {
+    avgMood: number;
+    avgMoodDelta: number;
+    goodDays: number;
+    patternsCount: number;
+    wellnessScore: number;
+    wellnessDelta: number;
+  };
+  streak: number;
+  headline: string;
+  summary: string;
+  patterns: InsightPattern[];
+  suggestion: InsightSuggestion | null;
+  forecast: InsightsForecast | null;
+  energy: InsightsEnergy | null;
+  themes: { themes: InsightsTheme[] } | null;
+  dna: InsightsDna | null;
+  empty?: boolean;
+  tooFewEntries?: boolean;
+}
+
 /**
  * Error codes the API returns in `{ error }`. We map these to human TH/EN copy
  * before they reach the UI (handover rule §6.1) — raw codes must never be shown.
@@ -420,5 +546,10 @@ export type ApiErrorCode =
   | 'rate_limited'
   | 'auth_required'
   | 'limit_reached'
+  | 'weak_password'
+  | 'current_password_required'
+  | 'wrong_current_password'
+  | 'same_password'
+  | 'iap_failed'
   | 'network_error'
   | 'unknown';

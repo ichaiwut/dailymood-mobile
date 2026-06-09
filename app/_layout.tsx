@@ -15,6 +15,7 @@ import { StatusBar } from 'expo-status-bar';
 import { ThemeProvider } from '../src/theme/ThemeProvider';
 import { ToastProvider } from '../src/components/Toast';
 import { AuthProvider, useAuth } from '../src/auth/AuthContext';
+import { PurchasesProvider } from '../src/iap/PurchasesProvider';
 import { fontMap } from '../src/theme/typography';
 import '../src/i18n';
 
@@ -61,10 +62,12 @@ export default function RootLayout() {
         <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              <ToastProvider>
-                <StatusBar style="dark" />
-                <RootNav />
-              </ToastProvider>
+              <PurchasesProvider>
+                <ToastProvider>
+                  <StatusBar style="dark" />
+                  <RootNav />
+                </ToastProvider>
+              </PurchasesProvider>
             </AuthProvider>
           </QueryClientProvider>
         </ThemeProvider>

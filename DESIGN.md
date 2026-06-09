@@ -97,12 +97,20 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
 - **`LocationField`** — "เพิ่มสถานที่" chip → `PlaceSearchBox` → collapses to
   `LocationPill`. Parent holds the `{name, lat?, lng?}` value. Used by Edit Entry; the
   Smart Log drawer wires `PlaceSearchBox` directly under its toolbar pin.
-- **`MoodFace`** — line-art fallback faces; `MoodIcon` renders the user's R2 pack SVG
-  via `SvgUri`, falling back to `MoodFace`.
+- **`MoodFace` / `PASticker` mood rendering** — priority: `iconKey` (custom-mood R2 image) →
+  forced `face` → moodId (custom `emoji` on tint, else **the user's mood-PACK icon** from R2) →
+  badge `emoji`. Pack icons render via **`<Image>`** (`moodIconUrl(moodId, pack, iconFormat)`) —
+  RN-web `<img>` renders SVG/PNG/WEBP, native renders PNG/WEBP — **not** `react-native-svg`'s
+  `SvgUri`, which rendered these packs' offset-viewBox SVGs as solid black. On image error it
+  falls back to the brand `MoodFace`. `MoodPicker` takes `pack` + `packFormat` (Greeting passes the
+  user's pack + its `iconFormat` from `profile.packs`); custom moods pass their own `iconKey`/`emoji`.
+  (Native SVG packs still fall back to MoodFace; PNG/WEBP packs render everywhere.)
+- `moodLabel` falls back to `label` when `labelTh` is null (custom moods only set `label`).
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
   ICT hour (`((h-6)/15)*100`, clamped 3–92%), yellow washi strip. (No "Now" pill — removed
-  as it collided with the 21:00 tick.) Shown above the entry cards when the day has entries.
+  as it collided with the 21:00 tick.) **Always shown on the Today screen** (even with 0 entries —
+  the axis renders empty with a "0 รายการ" count); entry cards or the `EmptyToday` prompt sit below it.
 - **`FloatingNav`** (`paper/`) — mobile bottom nav: white pill (76px tall, radius 38, soft
   float shadow `0 14px 40px rgba(0,0,0,.10)` + 1px hairline), 4 route tabs (Home / Calendar
   / Stats / Profile, SVG glyphs from `Glyphs`), and a raised peach **FAB** (56px, `-28`
@@ -118,6 +126,10 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   hidden): premium sees the cached weekly `summary` (markdown stripped), free sees
   `previewHeadline`/teaser + a PRO badge. Button → `/insights` (premium) or
   `/profile/subscription` (free). Data from `useInsights()`.
+- **`MiniCalendarFolder`** (`paper/today/`) — mint-tab folder at the bottom of Today: current
+  month (`monthLong year`), "ดูทั้งหมด →" → `/calendar`, and a 7-col grid (Sunday-first, narrow
+  weekday headers) with today ringed (`surface2` + purple border) and logged days tinted by their
+  mood colour. Data from `useCalendarMonth(year, month)` (`entries[].moodTypeId`).
 - **`MoodPicker`** — two layouts:
   - `grid` (Today greeting): 5-col circular discs, soft tinted rings (kept soft per
     user feedback — full saturation read as neon).
@@ -322,6 +334,157 @@ pins** from `annotations` (`ChartAnnotation`): Pro → glowing purple pin + ✦,
 dark tooltip with `labelTh/En` + `tagRefs`; Free → one blurred lavender ghost pin + an
 "✦ Unlock AI Annotations — PRO" chip → subscription. **Deferred vs web:** pulsing pin
 animation (static glow here) and holiday/personal timeline markers.
+
+## 4h. AI Insights — `app/insights.tsx` (Pro, `/api/insights/all` + `/api/insights/feedback`)
+
+Weekly AI dashboard (`useInsightsAll(locale, week, enabled=premium)`). Top: a back chevron +
+**AiSubTabs** (`✨ Insights` active ink pill w/ chunky `0 6px 0 -2px #000`, `💬 Ask AI`). **Non-premium
+→ whole-page FreeGate**: eyebrow + h1 + a purple-tab **CTA folder** (gradient `#F9A870→#C89BF5→#A673F1`
++ PAClip, 5 bullets, white "✨ สมัคร Pro" → `/profile/subscription`, ฿99/mo) + a dimmed teaser.
+Premium: header (eyebrow "AI INSIGHTS · Week N" from `weekKey`, h1, prev/next week pills — next
+only when viewing the past, via `isoWeekKey` + `weekOffset`); a disclaimer note (AI-tint + ✨);
+the **hero recap folder** (purple tab + PAClip + gradient sheet `#A673F1→#C89BF5→#FCA45B`, white
+RichText headline, "อ่านเต็ม" expands `summary`, glass buttons, and a 2×2 **glass-tile** grid
+avg/good-days/patterns/wellness with ↑/↓ deltas); a **4-feature grid** (2-col): 🔮 Forecast
+(predicted-mood sticker + confidence% + ± factor rows), 🧬 Mood DNA (`RadarChart` 5-axis +
+archetype), 🔁 Themes (color-bar list ≤5 + `N×`), ⏰ Energy Clock (`EnergyRadial` 24 spokes +
+peak), each → a "✨ generating…" placeholder when its datum is null; up to 3 **pattern cards**
+(tag badge 📌/↗/⚠️ + title + desc + 7-bar `MoodBarChart` when `miniVizData`); a **suggestion**
+card (warm gradient + washi, 💡 SUGGESTION badge, 👍/👎 `FeedbackPill`s → `/api/insights/feedback`,
+one-shot then disabled). New viz live in `src/components/paper/insights/`. **States:** loading
+skeleton, error (😵 + retry), and `status.ready === false` → TooFew (📝, <7 entries) / Empty (🔮).
+**Footer toggles** (`ToggleRow` + `TogglePill` 44×24): 🤖 AI Coach (gradient icon tile) + 📩 Weekly
+Digest, bound to `profile.aiCoachEnabled` / `weeklyDigestEnabled` and persisted via
+`PATCH /api/profile` (`useUpdateProfile`, toast on save). The Ask-AI tab routes to `/ask-ai` (§4i).
+
+## 4i. Ask AI chat — `app/ask-ai.tsx` (Pro, `/api/ask-ai/*`)
+
+Full-screen multi-turn chat grounded in real entries. Top bar = the shared AiSubTabs
+(`✨ Insights` → `/insights`, `💬 Ask AI` active) + a `📋 {N}` history button that opens a
+**threads drawer** (left panel + scrim): "+ คำถามใหม่" (ink button), "ก่อนหน้า" list (active =
+`#F3ECF9` + 3px purple left border). Chat column is a `KeyboardAvoidingView` (`ScrollView`
+auto-scrolls to bottom). **Empty state** = gradient ✦ tile + "ถามอะไรก็ได้เกี่ยวกับคุณ" +
+suggested-question cards (`/api/ask-ai/suggested`, tap → send). **User bubble** right (`#F3ECF9`,
+radius 16/4-corner, "คุณเอง · time"); **AI bubble** = gradient ✦ avatar + paper sheet with eyebrow
+"DAILYMOOD AI · ดู N ENTRIES", RichText answer, and a pill row 👍/👎 (one-shot →
+`POST /api/ask-ai/messages {messageId,feedback}`) + 📋 copy. **Thinking** = avatar + "กำลังคิด…".
+**Input bar** pinned bottom (pill + ↑ send, Enter sends) + disclaimer. **Non-premium** → whole-page
+FreeGate (plum CTA folder `#2C2435→#3D2E50→#A673F1` + PAClip + bullets + ฿99/mo).
+**History is DB-backed** (cross-platform): a new chat first calls **`POST /api/ask-ai/threads`**
+to get a server `threadId`, *then* `POST /messages {threadId, content, locale}` (returns
+`{userMessage, aiMessage{sourcesJson, entriesUsed}}`); the server sets the title + `lastMessageAt`
+from the first message. After sending we `refetch` the thread list. `GET threads` (the drawer) and
+`GET messages` (on thread select) return everything on reload — no client persistence needed.
+Feedback uses **PATCH** /api/ask-ai/messages (POST is for new questions). Copy uses
+`navigator.clipboard` on web, Share on native.
+
+## 4j. Profile + settings — `app/(tabs)/profile.tsx` (`GET/PATCH /api/profile`, `/api/feedback`, export, clear)
+
+Everything from one `GET /api/profile`. Header = title + ✏️ edit button → `/profile/edit`.
+**Hero**: accent **gradient** card (6-colour map keyed by `accentColor`, default purple) + **PAClip**
++ tappable avatar (imageUrl or initials, ✏️ peach badge → edit), name / "สมาชิกตั้งแต่ …" / ● PRO
+pill, and a 3-cell **stats row** (streak → achievements, entries → calendar, avg+emoji → stats).
+**Mood Signature** (`pa-sheet` + mint washi): premium+data → headline (`moodSigYou`/`moodSigMix`) +
+`distribution`-coloured stacked bar + top-3 line; premium-no-data → "ยังมีข้อมูลไม่พอ"; free →
+`PremiumTeaser`. **Achievements** row (earned badges, ≤6, `N/total →`). **Settings sections**
+(`Section` eyebrow + `SettingCard` rounded card with `NavRow`/`ToggleRow`/`RadioRow`/`Divider`):
+Account (subscription → `/profile/subscription`, value renews/expires/free), Language (en/th radios
+→ `i18n.changeLanguage` + PATCH `locale`), Privacy (premium ToggleRow `hidePreview` PATCH / free
+teaser), **Mood-icon pack** picker (when `packs.length>1`: 2-col cards, 4 R2 preview icons via
+`PackIcon` with onError fallback + `iconFormat`; premium pack while `tier!=='premium'` → 🔒/upgrade →
+subscription, else PATCH `moodPack` + toast), Data (export → CSV via `exportEntriesCsv` →
+web download / native Share, free → upgrade; red **delete-all** → clear sheet), About (feedback sheet,
+terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out → sheet + version line.
+**3 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`), and
+feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
+`isPremium`; mood-pack uses `tier`. Between achievements and settings, two **article link cards**
+(♥ saved articles → `/profile/saved-articles`, ☺ article reactions → `/profile/article-reactions`,
+§4m). Settings §5 **Custom moods** (`CustomMoodManager`, Pro-only — Free sees a teaser) and §6
+**Special days** (`PersonalEventsManager`, both tiers) are inline managers inside their `SettingCard`s
+(`src/components/paper/profile/`): **CustomMoodManager** — icon picker (typed emoji OR an R2
+`custom-emojis/` grid of 50, mutually exclusive) + name + colour palette → `POST /api/moods`, list
+with delete; **PersonalEventsManager** — emoji (12 presets) + name + month/day chip pickers →
+`POST /api/events`, list with delete, Free capped at 3 then a Pro teaser (`limit_reached`). Native
+color picker → palette swatches; native date picker → chip rows. **Deferred vs web:** theme picker
+(dark mode is `FORCE_LIGHT`).
+
+## 4m. Saved articles + reactions — `app/profile/saved-articles.tsx`, `app/profile/article-reactions.tsx`
+
+Two near-identical "clipping" lists sharing `ArticleClippings` (`src/components/paper/articles/`),
+keyed by `variant`. `GET /api/articles/bookmarks` (♥) / `/reactions` (💭, adds `moodTypeId`).
+Back button, eyebrow (📎 "คลังของคุณ" / 💭 "ความรู้สึกของคุณ"), **marker-highlight h1** (peach /
+lavender), subtitle + count. **Clipping card** (`pa-sheet`, `overflow:visible`, tilted via a `TILT`
+cycle, **paperclip** top-left): 96px white-framed **cover** (image or generative `ArticleArt` by
+`tone` — SVG gradient + circles; `toneHue`/`toneBg`), category pill, 2-line title + excerpt, footer
+⏱ reading-time pill + "อ่านต่อ →". **Reactions variant** adds a `PASticker` mood stamp on the cover
+corner + a `MoodIcon` + label **mood pill** in the footer (`findMood(moods, moodTypeId)`). Cards
+open the article on the web via `Linking` (`/articles/{slug}` — in-app reader not built). Loading =
+3 tilted skeletons; **empty** = washi sheet (lav/mint) + 🔖 / `PASticker` + CTA → web `/articles`.
+**Deferred vs web:** the in-app article reader.
+
+## 4k. Pricing + Subscription — `app/pricing.tsx`, `app/profile/subscription.tsx`
+
+**Payment platform rule** (`src/hooks/useBilling`): web → Stripe **Checkout/Portal** URL opened
+via `Linking`; **native → in-app purchase via RevenueCat** (`react-native-purchases`, Apple/Google
+require IAP for digital goods — never an external purchase URL). Purchase → `POST /api/iap/reconcile`
+(backend pulls the RC entitlement and flips `isPremium`) → caches refresh → success toast →
+`router.replace('/profile/subscription')`. The **14-day trial is not a purchase**
+(`POST /api/trial/activate`) so it works everywhere. Pro brand gradient = `#FCA45B→#A673F1`;
+web copy ฿99/mo · ฿790/yr (save 33%) — **native shows the live localized store price** from the RC
+offering (`useBilling.prices`), falling back to the copy while loading. `PRO_FEATURES` (6 cards) is
+shared by both pages. RevenueCat is native-only; all SDK calls no-op on web.
+
+**`/pricing`** (guest-viewable, maxW 720): success state (`?success` → 🎉 welcome), cancelled banner
+(`?cancelled`), else hero (Pro pill + gradient headline) → optional **trial CTA** (only `!hasUsedTrial
+&& tier==='free'`, lav washi → `TrialConfirmSheet`) → **plan picker** (monthly / yearly w/ "Save 33%"
+badge + ฿66/mo, default yearly) → **main gradient CTA** (chunky shadow → `useBilling.subscribe`) →
+features grid → **Free-vs-Pro comparison folder** (ink tab + PAClip + 9-row table) → terms/privacy
+links. `useSubscription` is gated on auth so guests don't 401. The "secure" subline is store-aware
+(`secureNative` on native), and a native-only **"Restore purchases"** link (purpleStrong label, App
+Store requirement) sits under the CTA → `useBilling.restore`.
+
+**`/profile/subscription`** (login-required, back button, maxW 880) — `GET /api/subscription` →
+three states: **A Free** (trial gradient card or expired warm banner + Free card with Smart-Log
+progress + Pro gradient card → `/pricing`; native adds a **"Restore purchases"** link below);
+**B Trialing** (status gradient card — turns `#D94444→#FCA45B` when `trialDaysLeft ≤ 3` —
+"เหลืออีก N วัน" + ends date + subscribe → `/pricing`, then features grid); **C Active Pro** (plum
+folder `#2C2435→#3D2E50` + PAClip showing comped / canceling / auto-renew status). Management is
+**source-aware, not platform-aware** — `comped` is only true when neither `hasStripeCustomer` nor
+`hasIapSubscription` (a native sub must not be mistaken for a comp): Stripe subs → glass **Manage
+billing** → portal + **Cancel** → cancel sheet; **store subs** (`hasIapSubscription`) → single glass
+**Manage subscription** → `openStoreSubscription` (RC `managementURL`, where the user also cancels);
+canceling warm banner → resubscribe routes to store or portal by source; features grid + unlimited
+usage cards. Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep
+Pro, Stripe only). Dates via `formatDateKey`.
+
+## 4l. Achievements — `app/profile/achievements.tsx` (`GET /api/profile/achievements`)
+
+Scrapbook sticker album (the endpoint **auto-grants** completed badges, so a fresh load shows new
+unlocks). Rail: back pill → `/profile`, "🏆 สมุดสะสม" chip, h1 with a **marker-highlight** word
+(nested `Text` + `brand.yellow` bg, in place of web's `PAMark`), a **SVG progress ring**
+(`react-native-svg` `Circle`, r68/strokeWidth12, peach arc via `strokeDasharray` + `rotate(-90)`,
+`{pct}%` + `{earned}/{total}` center), and **filter pills** (all/earned/in-progress/locked with
+counts; active = ink + chunky shadow). **Sticker grid** (2-col): each `BadgeCard` tilts via a
+`ROT` cycle — **locked stays flat** — with **washi tape** (earned, colour-matched), **paperclip**
+(in-progress), or **dashed border + .72 opacity** (locked). `BadgeSticker` = 66px disc, white 4px
+border; earned = full colour, in-progress = `color+26`, locked = `surface3` + dimmed emoji. Earned
+shows a tilted "✓ {date}" stamp; in-progress a progress bar. Tapping opens a **detail
+`BottomSheet`** (96px hero + colour halo, title/desc from i18n `badges.{id}`/`badges.desc_{id}`):
+earned → "✓ ปลดล็อก · {date}" + share; in-progress → `current/target` + bar + "อีก N…"; locked →
+"🔒" pill + hint. **Share** uses RN `Share.share` (text). **Deferred vs web:** rendering the badge
+as a share-card image (`ViewShot`/canvas).
+
+## 4n. Change / set password — `app/profile/password.tsx` (`/api/account/password`)
+
+Reached from Profile → Privacy (🔑 row). One screen, **two modes from `GET /api/account/password`
+→ `hasPassword`**: **change** (current-password field + "ลืมรหัสเดิม?" → `/(auth)/forgot`) vs **set**
+(Google/Apple-only user adding a password — no current field, explains email login). Back button,
+h1 + intro, then a `pa-sheet` form: `Field`s (label + input + 👁 show/hide) for current (change
+only) / new (≥8, placeholder) / confirm. **Client-validates** (≥8, match) before `POST`; ink submit
+button disabled until valid. Errors → human copy via the registered codes (`weak_password` /
+`current_password_required` / `wrong_current_password` / `same_password`, added to `ApiErrorCode` +
+`errors.*`); **429** shows a "try again in N min" countdown from `retryAfter`. **Success** replaces
+the form (mint washi + ✅ + "back to profile"); no re-login needed. Loading = gray skeleton sheet.
 
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 

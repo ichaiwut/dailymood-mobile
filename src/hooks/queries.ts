@@ -3,7 +3,7 @@
  * consistent across screens.
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchMoods } from '../api/moods';
+import { fetchMoods, createMood, deleteMood } from '../api/moods';
 import { fetchActivities } from '../api/activities';
 import {
   fetchProfile,
@@ -23,7 +23,11 @@ import {
   askCalendar,
   fetchEvents,
 } from '../api/calendar';
-import { fetchStats, fetchInsights, sendInsightFeedback } from '../api/stats';
+import { fetchStats, fetchInsights, fetchInsightsAll, sendInsightFeedback } from '../api/stats';
+import { fetchAskThreads, fetchAskSuggested } from '../api/askai';
+import { fetchBookmarks, fetchReactions } from '../api/articles';
+import { fetchPersonalEvents, createEvent, deleteEvent } from '../api/events';
+import { fetchPasswordStatus, changePassword } from '../api/account';
 import { todayKey } from '../lib/time';
 import type {
   ConfirmEntryInput,
@@ -46,8 +50,15 @@ export const queryKeys = {
   entry: (id: string) => ['entry', id] as const,
   stats: (period: StatsPeriod) => ['stats', period] as const,
   insights: ['insights'] as const,
+  insightsAll: (week?: string) => ['insights-all', week ?? 'current'] as const,
+  askThreads: ['ask-ai', 'threads'] as const,
+  askSuggested: (locale: string) => ['ask-ai', 'suggested', locale] as const,
+  bookmarks: ['articles', 'bookmarks'] as const,
+  reactions: ['articles', 'reactions'] as const,
+  personalEvents: ['personal-events'] as const,
   achievements: ['achievements'] as const,
   subscription: ['subscription'] as const,
+  iapOfferings: ['iap', 'offerings'] as const,
 };
 
 export function useMoods() {
@@ -197,6 +208,76 @@ export function useInsights() {
   return useQuery({ queryKey: queryKeys.insights, queryFn: fetchInsights });
 }
 
+export function useInsightsAll(locale: string, week?: string, enabled = true) {
+  return useQuery({ queryKey: queryKeys.insightsAll(week), queryFn: () => fetchInsightsAll(locale, week), enabled });
+}
+
+export function useAskThreads(enabled = true) {
+  return useQuery({ queryKey: queryKeys.askThreads, queryFn: fetchAskThreads, enabled });
+}
+
+export function useAskSuggested(locale: string, enabled = true) {
+  return useQuery({ queryKey: queryKeys.askSuggested(locale), queryFn: () => fetchAskSuggested(locale), enabled, staleTime: 60 * 60_000 });
+}
+
+export function useBookmarks() {
+  return useQuery({ queryKey: queryKeys.bookmarks, queryFn: fetchBookmarks });
+}
+
+export function useCreateMood() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { emoji: string; label: string; color: string; iconKey?: string }) => createMood(input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.moods }),
+  });
+}
+
+export function useDeleteMood() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteMood(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.moods }),
+  });
+}
+
+export function usePersonalEvents() {
+  return useQuery({ queryKey: queryKeys.personalEvents, queryFn: fetchPersonalEvents });
+}
+
+export function usePasswordStatus() {
+  return useQuery({ queryKey: ['account', 'password'], queryFn: fetchPasswordStatus });
+}
+
+export function useChangePassword() {
+  return useMutation({ mutationFn: (body: { currentPassword?: string; newPassword: string }) => changePassword(body) });
+}
+
+export function useCreateEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { label: string; month: number; day: number; emoji: string }) => createEvent(input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.personalEvents });
+      qc.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+}
+
+export function useDeleteEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteEvent(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.personalEvents });
+      qc.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+}
+
+export function useReactions() {
+  return useQuery({ queryKey: queryKeys.reactions, queryFn: fetchReactions });
+}
+
 export function useInsightFeedback() {
   return useMutation({
     mutationFn: (body: { weekKey: string; suggestionTitle: string; reaction: InsightReaction }) =>
@@ -208,8 +289,8 @@ export function useAchievements() {
   return useQuery({ queryKey: queryKeys.achievements, queryFn: fetchAchievements });
 }
 
-export function useSubscription() {
-  return useQuery({ queryKey: queryKeys.subscription, queryFn: fetchSubscription });
+export function useSubscription(enabled = true) {
+  return useQuery({ queryKey: queryKeys.subscription, queryFn: fetchSubscription, enabled });
 }
 
 export function useUpdateProfile() {
