@@ -301,6 +301,16 @@ export interface MonthEvents {
   events: MonthEvent[];
 }
 
+/** A user's yearly special day (GET /api/events with no query — manager list). */
+export interface PersonalEvent {
+  id: string;
+  label: string;
+  labelTh: string | null;
+  month: number;
+  day: number;
+  emoji: string;
+}
+
 /** Lighter entry shape for the timeline feed (GET /api/calendar/timeline). */
 export interface TimelineEntry {
   id: string;

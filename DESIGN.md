@@ -388,8 +388,14 @@ terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out 
 feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
 `isPremium`; mood-pack uses `tier`. Between achievements and settings, two **article link cards**
 (♥ saved articles → `/profile/saved-articles`, ☺ article reactions → `/profile/article-reactions`,
-§4m). **Deferred vs web:** theme picker (dark mode is `FORCE_LIGHT`) and the custom-mood /
-personal-event managers.
+§4m). Settings §5 **Custom moods** (`CustomMoodManager`, Pro-only — Free sees a teaser) and §6
+**Special days** (`PersonalEventsManager`, both tiers) are inline managers inside their `SettingCard`s
+(`src/components/paper/profile/`): **CustomMoodManager** — icon picker (typed emoji OR an R2
+`custom-emojis/` grid of 50, mutually exclusive) + name + colour palette → `POST /api/moods`, list
+with delete; **PersonalEventsManager** — emoji (12 presets) + name + month/day chip pickers →
+`POST /api/events`, list with delete, Free capped at 3 then a Pro teaser (`limit_reached`). Native
+color picker → palette swatches; native date picker → chip rows. **Deferred vs web:** theme picker
+(dark mode is `FORCE_LIGHT`).
 
 ## 4m. Saved articles + reactions — `app/profile/saved-articles.tsx`, `app/profile/article-reactions.tsx`
 

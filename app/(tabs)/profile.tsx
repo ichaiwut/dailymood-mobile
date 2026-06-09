@@ -25,6 +25,8 @@ import { BottomSheet } from '../../src/components/BottomSheet';
 import { SparkleIcon } from '../../src/components/icons/Glyphs';
 import { PAClip } from '../../src/components/paper/PAClip';
 import { WashiTape } from '../../src/components/paper/WashiTape';
+import { CustomMoodManager } from '../../src/components/paper/profile/CustomMoodManager';
+import { PersonalEventsManager } from '../../src/components/paper/profile/PersonalEventsManager';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useAuth } from '../../src/auth/AuthContext';
 import { useProfile, useUpdateProfile } from '../../src/hooks/queries';
@@ -315,6 +317,20 @@ export default function ProfileScreen() {
                 <View style={{ padding: space.lg }}><PremiumTeaser text={t('profile.hidePreviewTeaser')} /></View>
               )}
             </SettingCard>
+          </Section>
+
+          {/* E5. custom moods (Pro only — Free sees teaser) */}
+          <Section label={t('profile.secCustomMoods')}>
+            <View style={{ backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, boxShadow: shadow.sm }}>
+              {premium ? <CustomMoodManager /> : <PremiumTeaser text={t('profile.customMoodTeaser')} />}
+            </View>
+          </Section>
+
+          {/* E6. special days (Free 3 + teaser, Pro unlimited) */}
+          <Section label={t('profile.secSpecialDays')}>
+            <View style={{ backgroundColor: colors.surface, borderRadius: 18, borderWidth: 1, borderColor: colors.hairline, padding: space.lg, boxShadow: shadow.sm }}>
+              <PersonalEventsManager isPremium={premium} />
+            </View>
           </Section>
 
           {/* E7. mood pack */}

@@ -3,7 +3,7 @@
  * consistent across screens.
  */
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
-import { fetchMoods } from '../api/moods';
+import { fetchMoods, createMood, deleteMood } from '../api/moods';
 import { fetchActivities } from '../api/activities';
 import {
   fetchProfile,
@@ -26,6 +26,7 @@ import {
 import { fetchStats, fetchInsights, fetchInsightsAll, sendInsightFeedback } from '../api/stats';
 import { fetchAskThreads, fetchAskSuggested } from '../api/askai';
 import { fetchBookmarks, fetchReactions } from '../api/articles';
+import { fetchPersonalEvents, createEvent, deleteEvent } from '../api/events';
 import { todayKey } from '../lib/time';
 import type {
   ConfirmEntryInput,
@@ -53,6 +54,7 @@ export const queryKeys = {
   askSuggested: (locale: string) => ['ask-ai', 'suggested', locale] as const,
   bookmarks: ['articles', 'bookmarks'] as const,
   reactions: ['articles', 'reactions'] as const,
+  personalEvents: ['personal-events'] as const,
   achievements: ['achievements'] as const,
   subscription: ['subscription'] as const,
 };
@@ -218,6 +220,48 @@ export function useAskSuggested(locale: string, enabled = true) {
 
 export function useBookmarks() {
   return useQuery({ queryKey: queryKeys.bookmarks, queryFn: fetchBookmarks });
+}
+
+export function useCreateMood() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { emoji: string; label: string; color: string; iconKey?: string }) => createMood(input),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.moods }),
+  });
+}
+
+export function useDeleteMood() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteMood(id),
+    onSuccess: () => qc.invalidateQueries({ queryKey: queryKeys.moods }),
+  });
+}
+
+export function usePersonalEvents() {
+  return useQuery({ queryKey: queryKeys.personalEvents, queryFn: fetchPersonalEvents });
+}
+
+export function useCreateEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (input: { label: string; month: number; day: number; emoji: string }) => createEvent(input),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.personalEvents });
+      qc.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
+}
+
+export function useDeleteEvent() {
+  const qc = useQueryClient();
+  return useMutation({
+    mutationFn: (id: string) => deleteEvent(id),
+    onSuccess: () => {
+      qc.invalidateQueries({ queryKey: queryKeys.personalEvents });
+      qc.invalidateQueries({ queryKey: ['events'] });
+    },
+  });
 }
 
 export function useReactions() {

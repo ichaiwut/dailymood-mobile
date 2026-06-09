@@ -10,3 +10,13 @@ export function fetchMoods(): Promise<Mood[]> {
   // (premium) moods are included for the signed-in user.
   return apiFetch<{ moods: Mood[] }>('/api/moods').then((r) => r.moods);
 }
+
+/** POST /api/moods — create a custom mood (Pro only; 403 premium_required). */
+export function createMood(input: { emoji: string; label: string; color: string; iconKey?: string }): Promise<unknown> {
+  return apiFetch('/api/moods', { method: 'POST', body: input });
+}
+
+/** DELETE /api/moods/{id} — remove a custom mood. */
+export function deleteMood(id: string): Promise<unknown> {
+  return apiFetch(`/api/moods/${id}`, { method: 'DELETE' });
+}
