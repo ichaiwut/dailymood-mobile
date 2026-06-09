@@ -44,7 +44,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
                     : { padding: 2 }
                 }
               >
-                <PASticker color={m.color} moodId={m.id} pack={pack} size={50} />
+                <PASticker color={m.color} moodId={m.id} pack={pack} iconKey={m.isDefault ? undefined : m.iconKey} emoji={m.isDefault ? undefined : m.emoji} size={50} />
               </View>
               <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
                 {moodLabel(m, i18n.language)}
@@ -87,6 +87,8 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
                 color={m.color}
                 moodId={m.id}
                 pack={pack}
+                iconKey={m.isDefault ? undefined : m.iconKey}
+                emoji={m.isDefault ? undefined : m.emoji}
                 size={44}
                 discBg={selected ? m.color : colors.surface3}
               />

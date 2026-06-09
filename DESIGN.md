@@ -97,11 +97,12 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
 - **`LocationField`** — "เพิ่มสถานที่" chip → `PlaceSearchBox` → collapses to
   `LocationPill`. Parent holds the `{name, lat?, lng?}` value. Used by Edit Entry; the
   Smart Log drawer wires `PlaceSearchBox` directly under its toolbar pin.
-- **`MoodFace`** — the brand line-art faces, and **the mood visual everywhere**: `PASticker`
-  renders `MoodFace(faceForMood(moodId))` for moods. (The R2 mood-PACK SVGs render unreliably
-  through `react-native-svg`'s `SvgUri` — some have offset viewBoxes that show as solid black —
-  so `MoodIcon`/pack SVGs are **not used for display**; the `pack` prop is kept for API compat.
-  Reviving real pack icons needs a different renderer, e.g. PNG packs or fetch-then-`SvgXml`.)
+- **`MoodFace` / `PASticker` mood rendering** — priority: `iconKey` (custom-mood R2 image) →
+  forced `face` → moodId (custom `emoji` on tint, else brand `MoodFace`) → badge `emoji`. **System**
+  moods use `MoodFace` because the R2 system-pack SVGs render as solid black through
+  `react-native-svg`'s `SvgUri` (offset viewBoxes); **custom** moods carry their own
+  `iconKey`/`emoji` and render those (`MoodPicker` passes them for `!isDefault` moods). `pack` prop
+  kept for API compat; reviving system pack icons needs a different renderer (PNG packs / fetch-`SvgXml`).
 - `moodLabel` falls back to `label` when `labelTh` is null (custom moods only set `label`).
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
