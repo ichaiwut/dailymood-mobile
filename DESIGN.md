@@ -389,6 +389,32 @@ feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที
 `isPremium`; mood-pack uses `tier`. **Deferred vs web:** theme picker (dark mode is `FORCE_LIGHT`),
 saved-articles / article-reactions cards, and the custom-mood / personal-event managers.
 
+## 4k. Pricing + Subscription — `app/pricing.tsx`, `app/profile/subscription.tsx`
+
+**Payment platform rule** (`src/hooks/useBilling`): web → Stripe **Checkout/Portal** URL opened
+via `Linking`; **native → in-app purchase is required for digital goods and isn't integrated yet,
+so subscribe shows a "coming soon" toast** (`pricing.iapPending`) — never an external purchase URL
+(App Store / Play rule). The **14-day trial is not a purchase** (`POST /api/trial/activate`) so it
+works everywhere. Pro brand gradient = `#FCA45B→#A673F1`; prices ฿99/mo · ฿790/yr (save 33%).
+`PRO_FEATURES` (6 cards) is shared by both pages.
+
+**`/pricing`** (guest-viewable, maxW 720): success state (`?success` → 🎉 welcome), cancelled banner
+(`?cancelled`), else hero (Pro pill + gradient headline) → optional **trial CTA** (only `!hasUsedTrial
+&& tier==='free'`, lav washi → `TrialConfirmSheet`) → **plan picker** (monthly / yearly w/ "Save 33%"
+badge + ฿66/mo, default yearly) → **main gradient CTA** (chunky shadow → `useBilling.subscribe`) →
+features grid → **Free-vs-Pro comparison folder** (ink tab + PAClip + 9-row table) → terms/privacy
+links. `useSubscription` is gated on auth so guests don't 401.
+
+**`/profile/subscription`** (login-required, back button, maxW 880) — `GET /api/subscription` →
+three states: **A Free** (trial gradient card or expired warm banner + Free card with Smart-Log
+progress + Pro gradient card → `/pricing`); **B Trialing** (status gradient card — turns
+`#D94444→#FCA45B` when `trialDaysLeft ≤ 3` — "เหลืออีก N วัน" + ends date + subscribe → `/pricing`,
+then features grid); **C Active Pro** (plum folder `#2C2435→#3D2E50` + PAClip showing comped /
+canceling / auto-renew status; when `hasStripeCustomer` → glass **Manage billing** → portal +
+**Cancel** → cancel sheet; canceling warm banner → resubscribe; features grid + unlimited usage
+cards). Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep Pro).
+Dates via `formatDateKey`. **Deferred vs web:** real IAP (RevenueCat) for native purchases.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,

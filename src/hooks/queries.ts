@@ -224,8 +224,8 @@ export function useAchievements() {
   return useQuery({ queryKey: queryKeys.achievements, queryFn: fetchAchievements });
 }
 
-export function useSubscription() {
-  return useQuery({ queryKey: queryKeys.subscription, queryFn: fetchSubscription });
+export function useSubscription(enabled = true) {
+  return useQuery({ queryKey: queryKeys.subscription, queryFn: fetchSubscription, enabled });
 }
 
 export function useUpdateProfile() {
