@@ -98,11 +98,13 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   `LocationPill`. Parent holds the `{name, lat?, lng?}` value. Used by Edit Entry; the
   Smart Log drawer wires `PlaceSearchBox` directly under its toolbar pin.
 - **`MoodFace` / `PASticker` mood rendering** — priority: `iconKey` (custom-mood R2 image) →
-  forced `face` → moodId (custom `emoji` on tint, else brand `MoodFace`) → badge `emoji`. **System**
-  moods use `MoodFace` because the R2 system-pack SVGs render as solid black through
-  `react-native-svg`'s `SvgUri` (offset viewBoxes); **custom** moods carry their own
-  `iconKey`/`emoji` and render those (`MoodPicker` passes them for `!isDefault` moods). `pack` prop
-  kept for API compat; reviving system pack icons needs a different renderer (PNG packs / fetch-`SvgXml`).
+  forced `face` → moodId (custom `emoji` on tint, else **the user's mood-PACK icon** from R2) →
+  badge `emoji`. Pack icons render via **`<Image>`** (`moodIconUrl(moodId, pack, iconFormat)`) —
+  RN-web `<img>` renders SVG/PNG/WEBP, native renders PNG/WEBP — **not** `react-native-svg`'s
+  `SvgUri`, which rendered these packs' offset-viewBox SVGs as solid black. On image error it
+  falls back to the brand `MoodFace`. `MoodPicker` takes `pack` + `packFormat` (Greeting passes the
+  user's pack + its `iconFormat` from `profile.packs`); custom moods pass their own `iconKey`/`emoji`.
+  (Native SVG packs still fall back to MoodFace; PNG/WEBP packs render everywhere.)
 - `moodLabel` falls back to `label` when `labelTh` is null (custom moods only set `label`).
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by

@@ -21,7 +21,7 @@ export const R2_PUBLIC_URL = 'https://pub-f0f688a68f884179942645789862cf54.r2.de
 /** Default mood-pack id (matches the backend default). */
 export const DEFAULT_MOOD_PACK = 'set_486038';
 
-/** Mood-pack icon URL: {base}/{packId}/{moodId}.svg */
-export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK): string {
-  return `${R2_PUBLIC_URL}/${pack}/${moodId}.svg`;
+/** Mood-pack icon URL: {base}/{packId}/{moodId}.{format} (format from the pack's iconFormat). */
+export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, format = 'svg'): string {
+  return `${R2_PUBLIC_URL}/${pack}/${moodId}.${format}`;
 }

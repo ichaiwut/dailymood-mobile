@@ -17,9 +17,10 @@ export interface MoodPickerProps {
   onSelect: (mood: Mood) => void;
   layout?: 'scroll' | 'grid';
   pack?: string;
+  packFormat?: string;
 }
 
-export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pack }: MoodPickerProps) {
+export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pack, packFormat }: MoodPickerProps) {
   const { i18n } = useTranslation();
   const { colors, radius, space, shadow } = useTheme();
 
@@ -44,7 +45,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
                     : { padding: 2 }
                 }
               >
-                <PASticker color={m.color} moodId={m.id} pack={pack} iconKey={m.isDefault ? undefined : m.iconKey} emoji={m.isDefault ? undefined : m.emoji} size={50} />
+                <PASticker color={m.color} moodId={m.id} pack={pack} packFormat={packFormat} iconKey={m.isDefault ? undefined : m.iconKey} emoji={m.isDefault ? undefined : m.emoji} size={50} />
               </View>
               <Text variant="label" weight={selected ? 'bold' : 'medium'} center numberOfLines={1}>
                 {moodLabel(m, i18n.language)}
@@ -87,6 +88,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
                 color={m.color}
                 moodId={m.id}
                 pack={pack}
+                packFormat={packFormat}
                 iconKey={m.isDefault ? undefined : m.iconKey}
                 emoji={m.isDefault ? undefined : m.emoji}
                 size={44}
