@@ -367,6 +367,28 @@ from the first message. After sending we `refetch` the thread list. `GET threads
 Feedback uses **PATCH** /api/ask-ai/messages (POST is for new questions). Copy uses
 `navigator.clipboard` on web, Share on native.
 
+## 4j. Profile + settings — `app/(tabs)/profile.tsx` (`GET/PATCH /api/profile`, `/api/feedback`, export, clear)
+
+Everything from one `GET /api/profile`. Header = title + ✏️ edit button → `/profile/edit`.
+**Hero**: accent **gradient** card (6-colour map keyed by `accentColor`, default purple) + **PAClip**
++ tappable avatar (imageUrl or initials, ✏️ peach badge → edit), name / "สมาชิกตั้งแต่ …" / ● PRO
+pill, and a 3-cell **stats row** (streak → achievements, entries → calendar, avg+emoji → stats).
+**Mood Signature** (`pa-sheet` + mint washi): premium+data → headline (`moodSigYou`/`moodSigMix`) +
+`distribution`-coloured stacked bar + top-3 line; premium-no-data → "ยังมีข้อมูลไม่พอ"; free →
+`PremiumTeaser`. **Achievements** row (earned badges, ≤6, `N/total →`). **Settings sections**
+(`Section` eyebrow + `SettingCard` rounded card with `NavRow`/`ToggleRow`/`RadioRow`/`Divider`):
+Account (subscription → `/profile/subscription`, value renews/expires/free), Language (en/th radios
+→ `i18n.changeLanguage` + PATCH `locale`), Privacy (premium ToggleRow `hidePreview` PATCH / free
+teaser), **Mood-icon pack** picker (when `packs.length>1`: 2-col cards, 4 R2 preview icons via
+`PackIcon` with onError fallback + `iconFormat`; premium pack while `tier!=='premium'` → 🔒/upgrade →
+subscription, else PATCH `moodPack` + toast), Data (export → CSV via `exportEntriesCsv` →
+web download / native Share, free → upgrade; red **delete-all** → clear sheet), About (feedback sheet,
+terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out → sheet + version line.
+**3 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`), and
+feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
+`isPremium`; mood-pack uses `tier`. **Deferred vs web:** theme picker (dark mode is `FORCE_LIGHT`),
+saved-articles / article-reactions cards, and the custom-mood / personal-event managers.
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,

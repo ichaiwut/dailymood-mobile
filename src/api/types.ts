@@ -53,12 +53,16 @@ export interface Profile {
     emailVerified: boolean;
     image: string | null;
     imageUrl: string | null;
+    imageKey: string | null;
     locale: 'th' | 'en';
     isPremium: boolean;
     bio: string | null;
     accentColor: string;
     moodPack: string;
     createdAt: string;
+    currentPeriodEnd: string | null;
+    cancelAtPeriodEnd: boolean;
+    planInterval: string | null;
     // settings
     reminderEnabled: boolean;
     reminderTime: string;
@@ -87,7 +91,16 @@ export interface Profile {
     hasSufficientData: boolean;
   };
   achievements: AchievementsData;
-  tier: string;
+  packs: MoodPack[];
+  tier: 'guest' | 'free' | 'premium' | string;
+}
+
+/** A mood-icon pack (GET /api/profile `packs`). Icons live at R2_PUBLIC_URL/{id}/{mood}.{iconFormat}. */
+export interface MoodPack {
+  id: string;
+  label: string;
+  premium: boolean;
+  iconFormat: string;
 }
 
 export interface BadgeSummary {
@@ -130,6 +143,12 @@ export interface UpdateProfileInput {
   locale?: 'th' | 'en';
   weeklyDigestEnabled?: boolean;
   aiCoachEnabled?: boolean;
+  hidePreview?: boolean;
+  anonymousInsights?: boolean;
+  moodPack?: string;
+  reminderEnabled?: boolean;
+  reminderTime?: string;
+  reminderDays?: string;
 }
 
 /** A saved mood entry (GET /api/log). Shapes verified against the live API. */
