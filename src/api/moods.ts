@@ -7,8 +7,11 @@ import type { Mood } from './types';
 
 export function fetchMoods(): Promise<Mood[]> {
   // /api/moods is tier "any" but we send the Bearer when available so custom
-  // (premium) moods are included for the signed-in user.
-  return apiFetch<{ moods: Mood[] }>('/api/moods').then((r) => r.moods);
+  // (premium) moods are included for the signed-in user. Order: the 7 system
+  // moods first (by `order`), then custom moods — the API may return custom first.
+  return apiFetch<{ moods: Mood[] }>('/api/moods').then((r) =>
+    [...r.moods].sort((a, b) => (a.isDefault !== b.isDefault ? (a.isDefault ? -1 : 1) : (a.order ?? 0) - (b.order ?? 0))),
+  );
 }
 
 /** POST /api/moods — create a custom mood (Pro only; 403 premium_required). */
