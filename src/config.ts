@@ -40,8 +40,12 @@ export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, fo
  *   3. Paste the iOS/Android public SDK keys here. No store ids are needed in the
  *      app — purchases key off the offering's packages, not raw product ids.
  */
-export const RC_API_KEY_IOS = 'appl_REPLACE_WITH_IOS_PUBLIC_SDK_KEY';
-export const RC_API_KEY_ANDROID = 'goog_REPLACE_WITH_ANDROID_PUBLIC_SDK_KEY';
+// DEV: RevenueCat **Test Store** key (single key, not store-specific) — lets us
+// test the SDK/paywall/entitlement flow without App Store/Play setup. For
+// production, create real app configs in RevenueCat and swap in the per-platform
+// public SDK keys (iOS `appl_…`, Android `goog_…`).
+export const RC_API_KEY_IOS = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
+export const RC_API_KEY_ANDROID = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
 
 /** RevenueCat entitlement id that grants Pro (configured in the RC dashboard). */
 export const RC_ENTITLEMENT_ID = 'pro';
