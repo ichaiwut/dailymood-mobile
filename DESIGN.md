@@ -415,6 +415,23 @@ canceling / auto-renew status; when `hasStripeCustomer` → glass **Manage billi
 cards). Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep Pro).
 Dates via `formatDateKey`. **Deferred vs web:** real IAP (RevenueCat) for native purchases.
 
+## 4l. Achievements — `app/profile/achievements.tsx` (`GET /api/profile/achievements`)
+
+Scrapbook sticker album (the endpoint **auto-grants** completed badges, so a fresh load shows new
+unlocks). Rail: back pill → `/profile`, "🏆 สมุดสะสม" chip, h1 with a **marker-highlight** word
+(nested `Text` + `brand.yellow` bg, in place of web's `PAMark`), a **SVG progress ring**
+(`react-native-svg` `Circle`, r68/strokeWidth12, peach arc via `strokeDasharray` + `rotate(-90)`,
+`{pct}%` + `{earned}/{total}` center), and **filter pills** (all/earned/in-progress/locked with
+counts; active = ink + chunky shadow). **Sticker grid** (2-col): each `BadgeCard` tilts via a
+`ROT` cycle — **locked stays flat** — with **washi tape** (earned, colour-matched), **paperclip**
+(in-progress), or **dashed border + .72 opacity** (locked). `BadgeSticker` = 66px disc, white 4px
+border; earned = full colour, in-progress = `color+26`, locked = `surface3` + dimmed emoji. Earned
+shows a tilted "✓ {date}" stamp; in-progress a progress bar. Tapping opens a **detail
+`BottomSheet`** (96px hero + colour halo, title/desc from i18n `badges.{id}`/`badges.desc_{id}`):
+earned → "✓ ปลดล็อก · {date}" + share; in-progress → `current/target` + bar + "อีก N…"; locked →
+"🔒" pill + hint. **Share** uses RN `Share.share` (text). **Deferred vs web:** rendering the badge
+as a share-card image (`ViewShot`/canvas).
+
 ## 5. UI glyph icons — `src/components/icons/Glyphs.tsx`
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
