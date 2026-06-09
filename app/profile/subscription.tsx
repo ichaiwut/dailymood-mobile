@@ -2,8 +2,9 @@
  * Subscription (/profile/subscription) — manage your plan. GET /api/subscription
  * picks one of three states: Free (A), Trialing (B), Active Pro (C). The 14-day
  * trial activates in-app (no card). Paid subscribe goes through `useBilling`
- * (web → Stripe Checkout via /pricing; native → IAP, pending). Billing
- * management = Stripe Portal (opened in browser) when `hasStripeCustomer`.
+ * (web → Stripe Checkout via /pricing; native → RevenueCat IAP). Management is
+ * source-aware: Stripe subs → Stripe Portal; store subs (`hasIapSubscription`)
+ * → the App Store / Play subscription settings (where the user also cancels).
  */
 import { useState } from 'react';
 import { View, Pressable, ActivityIndicator } from 'react-native';
@@ -160,6 +161,12 @@ export default function SubscriptionScreen() {
             </LinearGradient>
           </View>
         </View>
+
+        {billing.supportsIap ? (
+          <Pressable onPress={billing.restore} disabled={billing.busy} hitSlop={8} style={{ alignSelf: 'center', paddingVertical: space.xs }}>
+            <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('pricing.restorePurchases')}</Text>
+          </Pressable>
+        ) : null}
       </View>
     );
   }
@@ -190,7 +197,9 @@ export default function SubscriptionScreen() {
   function ActiveState() {
     const planLabel = d!.planInterval === 'year' ? t('subscription.proYearly') : d!.planInterval === 'month' ? t('subscription.proMonthly') : 'Pro';
     const priceLabel = d!.planInterval === 'year' ? t('pricing.perYear') : t('pricing.perMonth');
-    const comped = !d!.hasStripeCustomer;
+    const isIap = d!.hasIapSubscription;
+    const isStripe = d!.hasStripeCustomer && !isIap; // IAP wins if both are flagged (it's the active store sub)
+    const comped = !isStripe && !isIap; // truly comped only when neither source owns it
     return (
       <View style={{ gap: space.lg }}>
         <Text variant="h1">Pro</Text>
@@ -212,7 +221,7 @@ export default function SubscriptionScreen() {
                   <Text variant="label" style={{ color: 'rgba(255,255,255,0.85)' }}>{priceLabel}</Text>
                 </>
               )}
-              {d!.hasStripeCustomer ? (
+              {isStripe ? (
                 <View style={{ flexDirection: 'row', gap: space.sm, marginTop: space.xs }}>
                   <Pressable onPress={billing.openPortal} style={{ flex: 1, backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: radius.md, paddingVertical: 12, alignItems: 'center' }}>
                     <Text variant="label" weight="bold" color="#fff">{t('subscription.manage')}</Text>
@@ -223,6 +232,11 @@ export default function SubscriptionScreen() {
                     </Pressable>
                   ) : null}
                 </View>
+              ) : isIap ? (
+                // Store subs are managed (and cancelled) in the App Store / Play settings.
+                <Pressable onPress={billing.openStoreSubscription} style={{ backgroundColor: 'rgba(255,255,255,0.2)', borderRadius: radius.md, paddingVertical: 12, alignItems: 'center', marginTop: space.xs }}>
+                  <Text variant="label" weight="bold" color="#fff">{t('subscription.manageStore')}</Text>
+                </Pressable>
               ) : null}
             </LinearGradient>
           </View>
@@ -231,7 +245,7 @@ export default function SubscriptionScreen() {
         {d!.cancelAtPeriodEnd ? (
           <View style={{ backgroundColor: '#FFF6EA', borderRadius: radius.md, padding: space.lg, gap: space.sm }}>
             <Text variant="label" weight="bold">⏳ {t('subscription.cancelingNotice')}</Text>
-            <Button variant="purple" label={t('subscription.resubscribe')} onPress={billing.openPortal} style={{ alignSelf: 'flex-start' }} />
+            <Button variant="purple" label={t('subscription.resubscribe')} onPress={isIap ? billing.openStoreSubscription : billing.openPortal} style={{ alignSelf: 'flex-start' }} />
           </View>
         ) : null}
 

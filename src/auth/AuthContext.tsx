@@ -63,6 +63,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
     }
     await tokenStore.clear();
+    // RevenueCat logout is handled by PurchasesProvider reacting to status →
+    // 'unauthenticated' (covers sign-out AND session-expiry in one place).
     setUser(null);
     setStatus('unauthenticated');
   }, []);

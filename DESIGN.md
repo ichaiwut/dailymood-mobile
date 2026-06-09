@@ -425,28 +425,37 @@ open the article on the web via `Linking` (`/articles/{slug}` — in-app reader 
 ## 4k. Pricing + Subscription — `app/pricing.tsx`, `app/profile/subscription.tsx`
 
 **Payment platform rule** (`src/hooks/useBilling`): web → Stripe **Checkout/Portal** URL opened
-via `Linking`; **native → in-app purchase is required for digital goods and isn't integrated yet,
-so subscribe shows a "coming soon" toast** (`pricing.iapPending`) — never an external purchase URL
-(App Store / Play rule). The **14-day trial is not a purchase** (`POST /api/trial/activate`) so it
-works everywhere. Pro brand gradient = `#FCA45B→#A673F1`; prices ฿99/mo · ฿790/yr (save 33%).
-`PRO_FEATURES` (6 cards) is shared by both pages.
+via `Linking`; **native → in-app purchase via RevenueCat** (`react-native-purchases`, Apple/Google
+require IAP for digital goods — never an external purchase URL). Purchase → `POST /api/iap/reconcile`
+(backend pulls the RC entitlement and flips `isPremium`) → caches refresh → success toast →
+`router.replace('/profile/subscription')`. The **14-day trial is not a purchase**
+(`POST /api/trial/activate`) so it works everywhere. Pro brand gradient = `#FCA45B→#A673F1`;
+web copy ฿99/mo · ฿790/yr (save 33%) — **native shows the live localized store price** from the RC
+offering (`useBilling.prices`), falling back to the copy while loading. `PRO_FEATURES` (6 cards) is
+shared by both pages. RevenueCat is native-only; all SDK calls no-op on web.
 
 **`/pricing`** (guest-viewable, maxW 720): success state (`?success` → 🎉 welcome), cancelled banner
 (`?cancelled`), else hero (Pro pill + gradient headline) → optional **trial CTA** (only `!hasUsedTrial
 && tier==='free'`, lav washi → `TrialConfirmSheet`) → **plan picker** (monthly / yearly w/ "Save 33%"
 badge + ฿66/mo, default yearly) → **main gradient CTA** (chunky shadow → `useBilling.subscribe`) →
 features grid → **Free-vs-Pro comparison folder** (ink tab + PAClip + 9-row table) → terms/privacy
-links. `useSubscription` is gated on auth so guests don't 401.
+links. `useSubscription` is gated on auth so guests don't 401. The "secure" subline is store-aware
+(`secureNative` on native), and a native-only **"Restore purchases"** link (purpleStrong label, App
+Store requirement) sits under the CTA → `useBilling.restore`.
 
 **`/profile/subscription`** (login-required, back button, maxW 880) — `GET /api/subscription` →
 three states: **A Free** (trial gradient card or expired warm banner + Free card with Smart-Log
-progress + Pro gradient card → `/pricing`); **B Trialing** (status gradient card — turns
-`#D94444→#FCA45B` when `trialDaysLeft ≤ 3` — "เหลืออีก N วัน" + ends date + subscribe → `/pricing`,
-then features grid); **C Active Pro** (plum folder `#2C2435→#3D2E50` + PAClip showing comped /
-canceling / auto-renew status; when `hasStripeCustomer` → glass **Manage billing** → portal +
-**Cancel** → cancel sheet; canceling warm banner → resubscribe; features grid + unlimited usage
-cards). Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep Pro).
-Dates via `formatDateKey`. **Deferred vs web:** real IAP (RevenueCat) for native purchases.
+progress + Pro gradient card → `/pricing`; native adds a **"Restore purchases"** link below);
+**B Trialing** (status gradient card — turns `#D94444→#FCA45B` when `trialDaysLeft ≤ 3` —
+"เหลืออีก N วัน" + ends date + subscribe → `/pricing`, then features grid); **C Active Pro** (plum
+folder `#2C2435→#3D2E50` + PAClip showing comped / canceling / auto-renew status). Management is
+**source-aware, not platform-aware** — `comped` is only true when neither `hasStripeCustomer` nor
+`hasIapSubscription` (a native sub must not be mistaken for a comp): Stripe subs → glass **Manage
+billing** → portal + **Cancel** → cancel sheet; **store subs** (`hasIapSubscription`) → single glass
+**Manage subscription** → `openStoreSubscription` (RC `managementURL`, where the user also cancels);
+canceling warm banner → resubscribe routes to store or portal by source; features grid + unlimited
+usage cards. Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep
+Pro, Stripe only). Dates via `formatDateKey`.
 
 ## 4l. Achievements — `app/profile/achievements.tsx` (`GET /api/profile/achievements`)
 

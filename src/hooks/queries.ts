@@ -58,6 +58,7 @@ export const queryKeys = {
   personalEvents: ['personal-events'] as const,
   achievements: ['achievements'] as const,
   subscription: ['subscription'] as const,
+  iapOfferings: ['iap', 'offerings'] as const,
 };
 
 export function useMoods() {

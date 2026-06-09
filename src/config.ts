@@ -25,3 +25,35 @@ export const DEFAULT_MOOD_PACK = 'set_486038';
 export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, format = 'svg'): string {
   return `${R2_PUBLIC_URL}/${pack}/${moodId}.${format}`;
 }
+
+/**
+ * RevenueCat (native in-app purchases — iOS App Store / Google Play). Web keeps
+ * using Stripe; native must use IAP per Apple/Google policy. These are the
+ * PUBLIC SDK keys (safe to commit, like a Stripe publishable key) — the RC
+ * SECRET key lives only on the backend, which validates entitlements.
+ *
+ * TODO(iap): replace the placeholders below once the RevenueCat project exists.
+ *   1. Create monthly + yearly subscription products in App Store Connect and
+ *      Google Play Console (suggested ids in IAP_PRODUCT_IDS, for reference).
+ *   2. In RevenueCat, attach both products to an Offering whose `monthly` and
+ *      `annual` packages map to them, and to an Entitlement named RC_ENTITLEMENT_ID.
+ *   3. Paste the iOS/Android public SDK keys here. No store ids are needed in the
+ *      app — purchases key off the offering's packages, not raw product ids.
+ */
+export const RC_API_KEY_IOS = 'appl_REPLACE_WITH_IOS_PUBLIC_SDK_KEY';
+export const RC_API_KEY_ANDROID = 'goog_REPLACE_WITH_ANDROID_PUBLIC_SDK_KEY';
+
+/** RevenueCat entitlement id that grants Pro (configured in the RC dashboard). */
+export const RC_ENTITLEMENT_ID = 'pro';
+
+/** Reference product ids to create in the stores (the app buys via RC packages). */
+export const IAP_PRODUCT_IDS = {
+  monthly: 'me.dailymood.app.pro.monthly',
+  yearly: 'me.dailymood.app.pro.yearly',
+} as const;
+
+/** Where to send users to manage/cancel a store subscription if RC has no managementURL. */
+export const STORE_SUBSCRIPTIONS_URL = {
+  ios: 'https://apps.apple.com/account/subscriptions',
+  android: 'https://play.google.com/store/account/subscriptions',
+} as const;

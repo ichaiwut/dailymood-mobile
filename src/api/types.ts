@@ -125,6 +125,10 @@ export interface AchievementsData {
 export interface SubscriptionData {
   isPremium: boolean;
   hasStripeCustomer: boolean;
+  /** True when Pro came from a native store purchase (App Store / Play). */
+  hasIapSubscription: boolean;
+  /** Which store the IAP subscription is on, for manage/cancel deep links. */
+  iapSource: 'apple' | 'google' | null;
   currentPeriodEnd: string | null;
   cancelAtPeriodEnd: boolean;
   planInterval: string | null;
@@ -546,5 +550,6 @@ export type ApiErrorCode =
   | 'current_password_required'
   | 'wrong_current_password'
   | 'same_password'
+  | 'iap_failed'
   | 'network_error'
   | 'unknown';
