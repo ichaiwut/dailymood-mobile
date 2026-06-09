@@ -430,6 +430,22 @@ export interface InsightsData {
 
 export type InsightReaction = 'up' | 'down' | 'routine';
 
+// --- Articles (GET /api/articles/bookmarks | /reactions) ---
+export interface ArticleItem {
+  slug: string;
+  titleTh: string;
+  titleEn: string;
+  excerptTh: string;
+  excerptEn: string;
+  coverImageUrl: string | null;
+  categoryLabelTh: string | null;
+  categoryLabelEn: string | null;
+  readingTimeMinutes: number;
+  tone: string;
+  /** present on /reactions — the mood the user picked after reading. */
+  moodTypeId?: string | null;
+}
+
 // --- Ask AI chat (GET/POST /api/ask-ai/*) ---
 export interface AskAiSource {
   kind: string; // e.g. 'entry'

@@ -280,8 +280,8 @@ export default function ProfileScreen() {
 
           {/* D. article links */}
           <View style={{ gap: space.md }}>
-            <ArticleCard icon="♥" title={t('profile.savedArticles')} sub={t('profile.savedArticlesSub')} />
-            <ArticleCard icon="☺" title={t('profile.articleReactions')} sub={t('profile.articleReactionsSub')} />
+            <ArticleCard icon="♥" title={t('profile.savedArticles')} sub={t('profile.savedArticlesSub')} onPress={() => router.push('/profile/saved-articles')} />
+            <ArticleCard icon="☺" title={t('profile.articleReactions')} sub={t('profile.articleReactionsSub')} onPress={() => router.push('/profile/article-reactions')} />
           </View>
 
           {/* E1. account / subscription */}
@@ -455,9 +455,9 @@ export default function ProfileScreen() {
     );
   }
 
-  function ArticleCard({ icon, title, sub }: { icon: string; title: string; sub: string }) {
+  function ArticleCard({ icon, title, sub, onPress }: { icon: string; title: string; sub: string; onPress: () => void }) {
     return (
-      <Pressable onPress={() => toast.show(t('profile.articlesSoon'))} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: 16, padding: space.lg, boxShadow: shadow.sm }}>
+      <Pressable onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: 16, padding: space.lg, boxShadow: shadow.sm }}>
         <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>{icon}</Text></View>
         <View style={{ flex: 1 }}>
           <Text variant="label" weight="bold">{title}</Text>

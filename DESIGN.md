@@ -387,10 +387,23 @@ terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out 
 **3 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`), and
 feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
 `isPremium`; mood-pack uses `tier`. Between achievements and settings, two **article link cards**
-(♥ saved articles, ☺ article reactions) are shown for visual parity — they toast "coming soon"
-until the article pages/API are handed off. **Deferred vs web:** theme picker (dark mode is
-`FORCE_LIGHT`), the saved-articles / article-reactions *destinations*, and the custom-mood /
+(♥ saved articles → `/profile/saved-articles`, ☺ article reactions → `/profile/article-reactions`,
+§4m). **Deferred vs web:** theme picker (dark mode is `FORCE_LIGHT`) and the custom-mood /
 personal-event managers.
+
+## 4m. Saved articles + reactions — `app/profile/saved-articles.tsx`, `app/profile/article-reactions.tsx`
+
+Two near-identical "clipping" lists sharing `ArticleClippings` (`src/components/paper/articles/`),
+keyed by `variant`. `GET /api/articles/bookmarks` (♥) / `/reactions` (💭, adds `moodTypeId`).
+Back button, eyebrow (📎 "คลังของคุณ" / 💭 "ความรู้สึกของคุณ"), **marker-highlight h1** (peach /
+lavender), subtitle + count. **Clipping card** (`pa-sheet`, `overflow:visible`, tilted via a `TILT`
+cycle, **paperclip** top-left): 96px white-framed **cover** (image or generative `ArticleArt` by
+`tone` — SVG gradient + circles; `toneHue`/`toneBg`), category pill, 2-line title + excerpt, footer
+⏱ reading-time pill + "อ่านต่อ →". **Reactions variant** adds a `PASticker` mood stamp on the cover
+corner + a `MoodIcon` + label **mood pill** in the footer (`findMood(moods, moodTypeId)`). Cards
+open the article on the web via `Linking` (`/articles/{slug}` — in-app reader not built). Loading =
+3 tilted skeletons; **empty** = washi sheet (lav/mint) + 🔖 / `PASticker` + CTA → web `/articles`.
+**Deferred vs web:** the in-app article reader.
 
 ## 4k. Pricing + Subscription — `app/pricing.tsx`, `app/profile/subscription.tsx`
 
