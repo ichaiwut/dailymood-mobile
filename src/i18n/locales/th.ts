@@ -218,6 +218,11 @@ const th: typeof en = {
     feedbackSend: 'ส่ง',
     feedbackThanks: 'ขอบคุณ 💜',
     feedbackCooldown: 'ลองใหม่อีก {{n}} นาที',
+    savedArticles: 'บทความที่บันทึกไว้',
+    savedArticlesSub: 'อ่านซ้ำบทความที่ชอบ',
+    articleReactions: 'อารมณ์หลังอ่านบทความ',
+    articleReactionsSub: 'บทความไหนทำให้คุณรู้สึกยังไง',
+    articlesSoon: 'ฟีเจอร์บทความกำลังจะมาเร็วๆ นี้',
   },
   settings: {
     reminderEnabled: 'เตือนให้เช็คอินทุกวัน',

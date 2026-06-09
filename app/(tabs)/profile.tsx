@@ -278,6 +278,12 @@ export default function ProfileScreen() {
             </View>
           ) : null}
 
+          {/* D. article links */}
+          <View style={{ gap: space.md }}>
+            <ArticleCard icon="♥" title={t('profile.savedArticles')} sub={t('profile.savedArticlesSub')} />
+            <ArticleCard icon="☺" title={t('profile.articleReactions')} sub={t('profile.articleReactionsSub')} />
+          </View>
+
           {/* E1. account / subscription */}
           <Section label={t('profile.secAccount')}>
             <SettingCard>
@@ -445,6 +451,19 @@ export default function ProfileScreen() {
           <Text variant="label" color={colors.ink2}>{text}</Text>
         </View>
         <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('profile.upgrade')}</Text>
+      </Pressable>
+    );
+  }
+
+  function ArticleCard({ icon, title, sub }: { icon: string; title: string; sub: string }) {
+    return (
+      <Pressable onPress={() => toast.show(t('profile.articlesSoon'))} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: 16, padding: space.lg, boxShadow: shadow.sm }}>
+        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>{icon}</Text></View>
+        <View style={{ flex: 1 }}>
+          <Text variant="label" weight="bold">{title}</Text>
+          <Text variant="label" color={colors.ink3}>{sub}</Text>
+        </View>
+        <Text style={{ fontSize: 18, color: colors.ink3 }}>›</Text>
       </Pressable>
     );
   }

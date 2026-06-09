@@ -386,8 +386,11 @@ web download / native Share, free → upgrade; red **delete-all** → clear shee
 terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out → sheet + version line.
 **3 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`), and
 feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
-`isPremium`; mood-pack uses `tier`. **Deferred vs web:** theme picker (dark mode is `FORCE_LIGHT`),
-saved-articles / article-reactions cards, and the custom-mood / personal-event managers.
+`isPremium`; mood-pack uses `tier`. Between achievements and settings, two **article link cards**
+(♥ saved articles, ☺ article reactions) are shown for visual parity — they toast "coming soon"
+until the article pages/API are handed off. **Deferred vs web:** theme picker (dark mode is
+`FORCE_LIGHT`), the saved-articles / article-reactions *destinations*, and the custom-mood /
+personal-event managers.
 
 ## 4k. Pricing + Subscription — `app/pricing.tsx`, `app/profile/subscription.tsx`
 

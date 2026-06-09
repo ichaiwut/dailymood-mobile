@@ -217,6 +217,11 @@ export default {
     feedbackSend: 'Send',
     feedbackThanks: 'Thank you 💜',
     feedbackCooldown: 'Try again in {{n}} min',
+    savedArticles: 'Saved articles',
+    savedArticlesSub: 'Re-read the ones you loved',
+    articleReactions: 'How articles made you feel',
+    articleReactionsSub: 'Which reads moved you',
+    articlesSoon: 'Articles are coming to the app soon.',
   },
   settings: {
     reminderEnabled: 'Daily check-in reminder',
