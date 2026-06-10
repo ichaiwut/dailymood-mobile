@@ -60,10 +60,17 @@ function refreshSubscriptionCaches(
   qc.invalidateQueries({ queryKey: queryKeys.profile });
 }
 
-/** Reconcile after the store confirms. Never throws — failure becomes `pending`. */
+/**
+ * Reconcile after the store confirms. Never throws — failure becomes `pending`.
+ * A 200 that hasn't actually granted Pro yet (entitlement not visible to the
+ * backend / webhook lagging) is ALSO treated as `pending`, so we never show
+ * "Welcome to Pro" while the account is still free — the webhook activates it
+ * shortly and the user sees Pro on the next refresh.
+ */
 async function reconcileOutcome(): Promise<IapOutcome> {
   try {
-    return { status: 'ok', sub: await reconcileIap(iapPlatform()) };
+    const sub = await reconcileIap(iapPlatform());
+    return sub.isPremium ? { status: 'ok', sub } : { status: 'pending' };
   } catch {
     return { status: 'pending' };
   }
