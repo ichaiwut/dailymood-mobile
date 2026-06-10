@@ -239,7 +239,7 @@ export default function ProfileScreen() {
               <Text variant="eyebrow">{t('profile.moodSigEyebrow')}</Text>
               {!premium ? (
                 <PremiumTeaser text={t('profile.moodSigTeaser')} />
-              ) : sig?.hasSufficientData && sig.distribution.length ? (
+              ) : sig?.hasSufficientData && sig.distribution?.length ? (
                 <>
                   <Text variant="title">
                     {sig.distribution.length >= 2 && sig.distribution[1].percent >= 25
@@ -271,7 +271,7 @@ export default function ProfileScreen() {
                 </Pressable>
               </View>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 14 }}>
-                {ach.badges.filter((b) => b.status === 'earned').slice(0, 6).map((b) => (
+                {(ach.badges ?? []).filter((b) => b.status === 'earned').slice(0, 6).map((b) => (
                   <View key={b.id} style={{ width: 62, height: 62, borderRadius: 31, backgroundColor: b.color, borderWidth: 4, borderColor: '#fff', alignItems: 'center', justifyContent: 'center', boxShadow: shadow.sm }}>
                     <Text style={{ fontSize: 26 }}>{b.icon}</Text>
                   </View>

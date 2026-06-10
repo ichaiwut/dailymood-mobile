@@ -218,7 +218,7 @@ export function CalendarAiPanel({
         {answer ? (
           <View style={{ backgroundColor: AI_TINT, borderRadius: radius.md, padding: space.lg, gap: space.sm }}>
             <RichText text={answer.answer} style={{ lineHeight: 22 }} />
-            {answer.matchingDates.length ? (
+            {answer.matchingDates?.length ? (
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6 }}>
                 {answer.matchingDates.map((dt) => (
                   <Chip key={dt} label={shortDate(dt)} onPress={() => onPickDate(dt)} />

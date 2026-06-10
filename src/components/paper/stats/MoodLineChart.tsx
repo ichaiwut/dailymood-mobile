@@ -45,7 +45,7 @@ export function MoodLineChart({
   const [w, setW] = useState(320);
   const [sel, setSel] = useState<number | null>(null);
 
-  const n = points.length;
+  const n = points?.length ?? 0;
   if (n === 0) return null;
 
   const innerW = VBW - PAD.left - PAD.right;

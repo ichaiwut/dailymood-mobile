@@ -19,7 +19,7 @@ export function EnergyRadial({ hourly, peakLabel }: { hourly: number[]; peakLabe
   return (
     <View style={{ width: SIZE, height: SIZE, alignItems: 'center', justifyContent: 'center' }}>
       <Svg width={SIZE} height={SIZE} viewBox={`0 0 ${SIZE} ${SIZE}`} style={{ position: 'absolute' }}>
-        {hourly.slice(0, 24).map((v, i) => {
+        {(hourly ?? []).slice(0, 24).map((v, i) => {
           const ang = (i / 24) * 2 * Math.PI - Math.PI / 2;
           const len = INNER + Math.max(0, Math.min(1, v)) * (OUTER - INNER);
           return (
