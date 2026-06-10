@@ -47,8 +47,13 @@ export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, fo
 export const RC_API_KEY_IOS = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
 export const RC_API_KEY_ANDROID = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
 
-/** RevenueCat entitlement id that grants Pro (configured in the RC dashboard). */
-export const RC_ENTITLEMENT_ID = 'pro';
+/**
+ * RevenueCat entitlement IDENTIFIER that grants Pro. Must match the entitlement's
+ * **Identifier** in the RC dashboard EXACTLY (RC REST keys entitlements by identifier)
+ * AND the backend's REVENUECAT_ENTITLEMENT_ID. All three must stay in sync —
+ * changing one alone silently breaks restore (client) + the Pro grant (backend).
+ */
+export const RC_ENTITLEMENT_ID = 'Dailymood Pro';
 
 /** Reference product ids to create in the stores (the app buys via RC packages). */
 export const IAP_PRODUCT_IDS = {
