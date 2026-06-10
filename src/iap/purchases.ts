@@ -39,6 +39,10 @@ export function configurePurchases(): void {
   if (__DEV__ && apiKey.includes('REPLACE_WITH')) {
     console.warn('[IAP] RevenueCat SDK key is a placeholder — purchases will fail until set in src/config.ts.');
   }
+  if (!__DEV__ && apiKey.startsWith('test_')) {
+    // Guard: a Test Store key in a production build means real purchases won't work.
+    console.error('[IAP] Production build is using a RevenueCat TEST STORE key — set the live appl_/goog_ SDK key in src/config.ts before release.');
+  }
   Purchases.setLogLevel(__DEV__ ? LOG_LEVEL.DEBUG : LOG_LEVEL.ERROR);
   Purchases.configure({ apiKey });
 }

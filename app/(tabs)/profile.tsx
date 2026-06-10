@@ -34,6 +34,7 @@ import { useToast } from '../../src/components/Toast';
 import { initials } from '../../src/lib/avatar';
 import { formatDateKey } from '../../src/lib/time';
 import { clearEntries, exportEntriesCsv, fetchFeedbackStatus, submitFeedback } from '../../src/api/profile';
+import { deleteAccount } from '../../src/api/account';
 import { R2_PUBLIC_URL, API_BASE_URL } from '../../src/config';
 import { ApiError, errorMessageKey } from '../../src/api/errors';
 import type { MoodPack } from '../../src/api/types';
@@ -49,7 +50,7 @@ const GRADIENTS: Record<string, [string, string, ...string[]]> = {
 };
 const DANGER = '#D94444';
 
-type SheetKind = 'signout' | 'clear' | 'feedback' | null;
+type SheetKind = 'signout' | 'clear' | 'delete' | 'feedback' | null;
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -175,6 +176,20 @@ export default function ProfileScreen() {
     setBusy(true);
     try {
       await signOut();
+    } finally {
+      setBusy(false);
+      setSheet(null);
+    }
+  };
+
+  const onDeleteAccount = async () => {
+    setBusy(true);
+    try {
+      await deleteAccount();
+      toast.show(t('profile.deleteAccountDone'));
+      await signOut(); // session token is dead now — drop to login
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
     } finally {
       setBusy(false);
       setSheet(null);
@@ -374,6 +389,11 @@ export default function ProfileScreen() {
                 <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: DANGER + '18', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>🗑️</Text></View>
                 <Text variant="label" weight="bold" color={DANGER} style={{ flex: 1 }}>{t('profile.clearAll')}</Text>
               </Pressable>
+              <Divider />
+              <Pressable onPress={() => setSheet('delete')} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg }}>
+                <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: DANGER + '18', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>⚠️</Text></View>
+                <Text variant="label" weight="bold" color={DANGER} style={{ flex: 1 }}>{t('profile.deleteAccount')}</Text>
+              </Pressable>
             </SettingCard>
           </Section>
 
@@ -414,6 +434,17 @@ export default function ProfileScreen() {
           <View style={{ flexDirection: 'row', gap: space.md, marginTop: space.sm }}>
             <View style={{ flex: 1 }}><Button variant="paper" label={t('common.cancel')} onPress={() => setSheet(null)} /></View>
             <View style={{ flex: 1 }}><DangerBtn label={t('profile.clearConfirm')} onPress={onClear} loading={busy} /></View>
+          </View>
+        </View>
+      </BottomSheet>
+
+      <BottomSheet visible={sheet === 'delete'} onClose={() => setSheet(null)}>
+        <View style={{ gap: space.md }}>
+          <Text variant="h2" center>{t('profile.deleteAccountTitle')}</Text>
+          <Text variant="body" color={colors.ink2} center>{t('profile.deleteAccountBody')}</Text>
+          <View style={{ flexDirection: 'row', gap: space.md, marginTop: space.sm }}>
+            <View style={{ flex: 1 }}><Button variant="paper" label={t('common.cancel')} onPress={() => setSheet(null)} /></View>
+            <View style={{ flex: 1 }}><DangerBtn label={t('profile.deleteAccount')} onPress={onDeleteAccount} loading={busy} /></View>
           </View>
         </View>
       </BottomSheet>

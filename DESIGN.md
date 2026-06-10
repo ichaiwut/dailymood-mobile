@@ -423,7 +423,9 @@ Account (subscription → `/profile/subscription`, value renews/expires/free), L
 teaser), **Mood-icon pack** picker (when `packs.length>1`: 2-col cards, 4 R2 preview icons via
 `PackIcon` with onError fallback + `iconFormat`; premium pack while `tier!=='premium'` → 🔒/upgrade →
 subscription, else PATCH `moodPack` + toast), Data (export → CSV via `exportEntriesCsv` →
-web download / native Share, free → upgrade; red **delete-all** → clear sheet), About (feedback sheet,
+web download / native Share, free → upgrade; red **delete-all** → clear sheet, plus a red
+**delete-account** → confirm sheet → `DELETE /api/account` then sign-out — store
+account-deletion requirement), About (feedback sheet,
 terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out → sheet + version line.
 **3 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`), and
 feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
