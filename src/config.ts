@@ -40,12 +40,18 @@ export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, fo
  *   3. Paste the iOS/Android public SDK keys here. No store ids are needed in the
  *      app — purchases key off the offering's packages, not raw product ids.
  */
-// DEV: RevenueCat **Test Store** key (single key, not store-specific) — lets us
-// test the SDK/paywall/entitlement flow without App Store/Play setup. For
-// production, create real app configs in RevenueCat and swap in the per-platform
-// public SDK keys (iOS `appl_…`, Android `goog_…`).
-export const RC_API_KEY_IOS = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
-export const RC_API_KEY_ANDROID = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
+// The RevenueCat **Test Store** key (single key, not store-specific) lets us test
+// the SDK/paywall/entitlement flow without an App Store/Play sandbox login.
+//
+// iOS: real App Store public SDK key (`appl_…`) in production builds; Test Store
+// in dev. TestFlight/production builds have `__DEV__ === false`, so they hit the
+// real App Store — sandbox testers included. (purchases.ts errors if a prod build
+// is ever caught using a `test_` key.)
+const RC_TEST_STORE_KEY = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
+export const RC_API_KEY_IOS = __DEV__ ? RC_TEST_STORE_KEY : 'appl_WypvAbsAkbWStKvvPJITKZyVbuY';
+// Android: Play Store config still pending (account identity verification blocked),
+// so Test Store for now. Swap in the `goog_…` key once Play is set up.
+export const RC_API_KEY_ANDROID = RC_TEST_STORE_KEY;
 
 /**
  * RevenueCat entitlement IDENTIFIER that grants Pro. Must match the entitlement's
