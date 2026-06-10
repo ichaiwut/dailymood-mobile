@@ -47,6 +47,7 @@ export default function PricingScreen() {
   const isPremium = sub.data?.isPremium ?? false;
   const tier = isPremium ? 'premium' : authed ? 'free' : 'guest';
   const hasUsedTrial = isPremium || !!sub.data?.trialActivatedAt;
+  const isTrialing = sub.data?.isTrialing ?? false;
   const [plan, setPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [trialSheet, setTrialSheet] = useState(false);
 
@@ -69,6 +70,22 @@ export default function PricingScreen() {
         <Text variant="h1" center>{t('pricing.successTitle')}</Text>
         <Text variant="body" color={colors.ink2} center>{t('pricing.successSub')}</Text>
         <Button variant="ink" label={t('pricing.startUsing')} onPress={() => router.replace('/(tabs)')} style={{ alignSelf: 'stretch', marginTop: space.md }} />
+      </Screen>
+    );
+  }
+
+  // Already an active (paid) Pro member — skip the sales page. Trialing users still
+  // pass through so they can upgrade to a paid plan.
+  if (authed && isPremium && !isTrialing) {
+    return (
+      <Screen scroll contentStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: space.md, padding: space.x2 }}>
+        <Pressable onPress={goBack} hitSlop={10} style={{ position: 'absolute', top: space.lg, left: space.lg, width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', boxShadow: shadow.sm }}>
+          <Text weight="bold" style={{ fontSize: 22, lineHeight: 26, color: colors.ink2 }}>‹</Text>
+        </Pressable>
+        <Text style={{ fontSize: 56 }}>✨</Text>
+        <Text variant="h1" center>{t('pricing.alreadyPro')}</Text>
+        <Text variant="body" color={colors.ink2} center>{t('pricing.alreadyProSub')}</Text>
+        <Button variant="ink" label={t('pricing.alreadyProCta')} onPress={() => router.replace('/profile/subscription')} style={{ alignSelf: 'stretch', marginTop: space.md }} />
       </Screen>
     );
   }

@@ -59,7 +59,7 @@ export function useBilling() {
           return;
         }
         toast.show(t('pricing.purchaseSuccess'));
-        router.replace('/profile/subscription');
+        router.replace({ pathname: '/pricing', params: { success: '1' } }); // → 🎉 "Welcome to Pro"
       } catch (e) {
         toast.show(t(billingErrorKey(e)), 'error');
       }
