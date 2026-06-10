@@ -538,8 +538,16 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 - Live API mood set/colors differ from the design mock (backend data, not fixable here).
 - Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:
   insights, profile, subscription screens.
-- Deferred features: native Google/Apple sign-in (needs dev build), voice input (mic
-  button is still a "coming soon" stub), reminder & privacy toggles, dark mode, share cards.
+- **Auth is email/password only (v1).** The Google/Apple social buttons were removed from
+  the login screen before the App Store submission — non-functional stubs fail review
+  (Guideline 2.1), and offering Google would trigger 4.8 (Sign in with Apple required). A
+  web Google-only user (email exists, no password) lands on the `googleOnly` step, which now
+  routes to `/(auth)/forgot` to set a password via the reset link, then signs in. The
+  `SocialButtons` component was deleted; the `continueWithGoogle/Apple/or/socialNeedsDevBuild`
+  i18n keys are kept for when native social sign-in returns.
+- Deferred features: native Google/Apple sign-in (needs backend OAuth client IDs +
+  Sign in with Apple), voice input (mic button is still a "coming soon" stub), reminder &
+  privacy toggles, dark mode, share cards.
 - **Push notifications (daily reminder):** the mobile client side is built — Expo push
   token registration (login/restore/rotation/logout), the soft opt-in `PushPrimerSheet`,
   and notification-tap deep-linking (`src/notifications/`). Still deferred: the reminder

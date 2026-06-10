@@ -18,7 +18,6 @@ import { TextField } from '../../src/components/TextField';
 import { Button } from '../../src/components/Button';
 import { Text } from '../../src/components/Text';
 import { Notice } from '../../src/components/Notice';
-import { SocialButtons } from '../../src/components/auth/SocialButtons';
 import { useTheme } from '../../src/theme/ThemeProvider';
 import { useAuth } from '../../src/auth/AuthContext';
 import { checkEmail, loginWithPassword } from '../../src/api/auth';
@@ -146,18 +145,14 @@ export default function LoginScreen() {
       ) : null}
 
       {step === 'email' ? (
-        <>
-          <Button label={t('auth.continueWithEmail')} onPress={onContinue} loading={busy} />
-          <SocialButtons
-            onUnavailable={() => setNotice({ msg: t('auth.socialNeedsDevBuild'), tone: 'info' })}
-          />
-        </>
+        <Button label={t('auth.continueWithEmail')} onPress={onContinue} loading={busy} />
       ) : null}
 
       {step === 'googleOnly' ? (
         <>
-          <SocialButtons
-            onUnavailable={() => setNotice({ msg: t('auth.socialNeedsDevBuild'), tone: 'info' })}
+          <Button
+            label={t('auth.setPasswordCta')}
+            onPress={() => router.push({ pathname: '/(auth)/forgot', params: { email } })}
           />
           <Pressable onPress={resetToEmail} hitSlop={8} style={{ marginTop: space.xs }}>
             <Text variant="label" color={colors.ink3}>
