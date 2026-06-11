@@ -49,9 +49,10 @@ export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, fo
 // is ever caught using a `test_` key.)
 const RC_TEST_STORE_KEY = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
 export const RC_API_KEY_IOS = __DEV__ ? RC_TEST_STORE_KEY : 'appl_WypvAbsAkbWStKvvPJITKZyVbuY';
-// Android: Play Store config still pending (account identity verification blocked),
-// so Test Store for now. Swap in the `goog_…` key once Play is set up.
-export const RC_API_KEY_ANDROID = RC_TEST_STORE_KEY;
+// Android: real Play Store public SDK key (`goog_…`) in production builds; Test
+// Store in dev. RevenueCat HARD-CLOSES a release build that ships a `test_` key,
+// so production must use the `goog_` key (and dev/Expo Go keeps the Test Store).
+export const RC_API_KEY_ANDROID = __DEV__ ? RC_TEST_STORE_KEY : 'goog_ZoavEJJkcFAwoMhUpuFJwGuYbuV';
 
 /**
  * RevenueCat entitlement IDENTIFIER that grants Pro. Must match the entitlement's
