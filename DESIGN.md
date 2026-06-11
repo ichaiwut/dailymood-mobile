@@ -540,15 +540,21 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 - Live API mood set/colors differ from the design mock (backend data, not fixable here).
 - Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:
   insights, profile, subscription screens.
-- **Auth is email/password only (v1).** The Google/Apple social buttons were removed from
-  the login screen before the App Store submission — non-functional stubs fail review
-  (Guideline 2.1), and offering Google would trigger 4.8 (Sign in with Apple required). A
-  web Google-only user (email exists, no password) lands on the `googleOnly` step, which now
-  routes to `/(auth)/forgot` to set a password via the reset link, then signs in. The
-  `SocialButtons` component was deleted; the `continueWithGoogle/Apple/or/socialNeedsDevBuild`
-  i18n keys are kept for when native social sign-in returns.
-- Deferred features: native Google/Apple sign-in (needs backend OAuth client IDs +
-  Sign in with Apple), voice input (mic button is still a "coming soon" stub), reminder &
+- **Auth = email/password + Google + Apple (v1).** The login screen's `SocialButtons`
+  run real native flows: Google via `@react-native-google-signin`, Apple via
+  `expo-apple-authentication` (iOS only, shown when `isAvailableAsync()` resolves true —
+  required by App Store §4.8 once Google is offered). `src/auth/socialSignIn.ts` gets the
+  provider ID token → backend `/api/auth/mobile/{google,apple}` → `TokenPair` →
+  `AuthContext.signIn`; cancellation is silent, other failures surface via the login
+  `Notice`. A web no-password user (check-email → exists, `hasPassword:false`) lands on the
+  `googleOnly` step, which offers the social buttons AND a "set a password" link (→
+  `/(auth)/forgot`). Client IDs are public OAuth identifiers in `config.ts`
+  (`GOOGLE_WEB_CLIENT_ID` = idToken audience the backend verifies, `GOOGLE_IOS_CLIENT_ID`);
+  the iOS reversed id is the `iosUrlScheme` in app.json, and `ios`'s Sign-in-with-Apple
+  entitlement comes from the `expo-apple-authentication` plugin. The Android Google client
+  (+ signing-key SHA-1) is added at the Android build step. Needs a native build (the SDKs
+  are absent in Expo Go).
+- Deferred features: voice input (mic button is still a "coming soon" stub), reminder &
   privacy toggles, dark mode, share cards.
 - **Push notifications (daily reminder):** the mobile client side is built — Expo push
   token registration (login/restore/rotation/logout), the soft opt-in `PushPrimerSheet`,

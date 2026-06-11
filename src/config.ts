@@ -72,3 +72,17 @@ export const STORE_SUBSCRIPTIONS_URL = {
   ios: 'https://apps.apple.com/account/subscriptions',
   android: 'https://play.google.com/store/account/subscriptions',
 } as const;
+
+/**
+ * Google Sign-In (native OAuth via @react-native-google-signin). We request an ID
+ * token whose audience is the WEB client id (`webClientId`); the backend verifies
+ * it against GOOGLE_WEB_CLIENT_ID. The iOS client id drives the native iOS flow —
+ * its reversed form is the `iosUrlScheme` in app.json. These are OAuth client
+ * IDENTIFIERS (public, safe to commit) — no client secret is used because the
+ * backend verifies the ID token directly (no code exchange). They live in the same
+ * Google Cloud project as the web app but are SEPARATE clients from NextAuth's
+ * (the backend deliberately rejects the web's AUTH_GOOGLE_ID to keep the audience
+ * narrow). The Android client id is added once the signing-key SHA-1 exists.
+ */
+export const GOOGLE_WEB_CLIENT_ID = '388993665217-hf6igjebkhj8cpe3sdjb8ob1104h79jl.apps.googleusercontent.com';
+export const GOOGLE_IOS_CLIENT_ID = '388993665217-vt6oc4maak1b31odr9qbdvp8doc56t90.apps.googleusercontent.com';

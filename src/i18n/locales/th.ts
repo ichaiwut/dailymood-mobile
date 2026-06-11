@@ -33,7 +33,7 @@ const th: typeof en = {
     continueWithApple: 'ดำเนินการต่อด้วย Apple',
     socialNeedsDevBuild: 'การเข้าสู่ระบบด้วย Google และ Apple จะมาในเวอร์ชันถัดไป',
     googleOnlyTitle: 'คุณสมัครด้วย Google ไว้',
-    googleOnlyBody: 'ตั้งรหัสผ่านเพื่อเข้าสู่ระบบบนแอป',
+    googleOnlyBody: 'เข้าสู่ระบบด้วย Google หรือ Apple ด้านล่าง — หรือจะตั้งรหัสผ่านก็ได้',
     setPasswordCta: 'ตั้งรหัสผ่าน',
     verifyTitle: 'เช็กอีเมลของคุณ',
     verifyBody: 'เราส่งลิงก์ไปที่ {{email}} แล้ว เปิดเพื่อยืนยันบัญชี แล้วกลับมาเข้าสู่ระบบได้เลย',

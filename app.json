@@ -58,7 +58,14 @@
           "locationWhenInUsePermission": "DailyMood uses your location only to tag where a mood entry happened. It stays private to your account."
         }
       ],
-      "expo-notifications"
+      "expo-notifications",
+      [
+        "@react-native-google-signin/google-signin",
+        {
+          "iosUrlScheme": "com.googleusercontent.apps.388993665217-vt6oc4maak1b31odr9qbdvp8doc56t90"
+        }
+      ],
+      "expo-apple-authentication"
     ],
     "experiments": {
       "typedRoutes": true

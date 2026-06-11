@@ -32,7 +32,7 @@ export default {
     continueWithApple: 'Continue with Apple',
     socialNeedsDevBuild: 'Google and Apple sign-in arrive in the next build.',
     googleOnlyTitle: 'You signed up with Google',
-    googleOnlyBody: 'Set a password to sign in here.',
+    googleOnlyBody: 'Continue with Google or Apple below — or set a password instead.',
     setPasswordCta: 'Set a password',
     verifyTitle: 'Check your email',
     verifyBody: "We've sent a link to {{email}}. Open it to confirm your account, then sign in.",
