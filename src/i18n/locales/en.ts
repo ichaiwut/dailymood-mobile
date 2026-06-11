@@ -205,6 +205,7 @@ export default {
     deleteAccount: 'Delete account',
     deleteAccountTitle: 'Delete account?',
     deleteAccountBody: 'This permanently deletes your account and all your data — it can’t be undone.',
+    deleteAccountSubNote: 'If you have an active Pro subscription, cancel it in the App Store or Google Play first — deleting your account here won’t stop billing.',
     deleteAccountDone: 'Your account was deleted',
     version: 'DailyMood v{{v}}',
     settings: 'Settings',

@@ -206,6 +206,7 @@ const th: typeof en = {
     deleteAccount: 'ลบบัญชี',
     deleteAccountTitle: 'ลบบัญชี?',
     deleteAccountBody: 'ลบบัญชีและข้อมูลทั้งหมดอย่างถาวร — กู้คืนไม่ได้',
+    deleteAccountSubNote: 'ถ้ามี Pro ที่ใช้งานอยู่ ต้องไปยกเลิกใน App Store หรือ Google Play ก่อน — การลบบัญชีที่นี่ไม่ได้หยุดการเรียกเก็บเงิน',
     deleteAccountDone: 'ลบบัญชีแล้ว',
     version: 'DailyMood v{{v}}',
     settings: 'ตั้งค่า',

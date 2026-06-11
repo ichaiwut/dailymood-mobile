@@ -442,6 +442,7 @@ export default function ProfileScreen() {
         <View style={{ gap: space.md }}>
           <Text variant="h2" center>{t('profile.deleteAccountTitle')}</Text>
           <Text variant="body" color={colors.ink2} center>{t('profile.deleteAccountBody')}</Text>
+          <Text variant="label" color={colors.ink3} center>{t('profile.deleteAccountSubNote')}</Text>
           <View style={{ flexDirection: 'row', gap: space.md, marginTop: space.sm }}>
             <View style={{ flex: 1 }}><Button variant="paper" label={t('common.cancel')} onPress={() => setSheet(null)} /></View>
             <View style={{ flex: 1 }}><DangerBtn label={t('profile.deleteAccount')} onPress={onDeleteAccount} loading={busy} /></View>
