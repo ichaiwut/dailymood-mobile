@@ -12,6 +12,7 @@
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { View, Pressable, Image, TextInput, ActivityIndicator, Share, Platform, Linking } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -578,6 +579,6 @@ export default function ProfileScreen() {
   function PackIcon({ url }: { url: string }) {
     const [failed, setFailed] = useState(false);
     if (failed) return <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors.surface2 }} />;
-    return <Image source={{ uri: url }} style={{ width: 22, height: 22 }} onError={() => setFailed(true)} />;
+    return <ExpoImage source={{ uri: url }} style={{ width: 22, height: 22 }} contentFit="contain" onError={() => setFailed(true)} />;
   }
 }

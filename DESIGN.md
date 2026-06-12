@@ -129,12 +129,14 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   Smart Log drawer wires `PlaceSearchBox` directly under its toolbar pin.
 - **`MoodFace` / `PASticker` mood rendering** — priority: `iconKey` (custom-mood R2 image) →
   forced `face` → moodId (custom `emoji` on tint, else **the user's mood-PACK icon** from R2) →
-  badge `emoji`. Pack icons render via **`<Image>`** (`moodIconUrl(moodId, pack, iconFormat)`) —
-  RN-web `<img>` renders SVG/PNG/WEBP, native renders PNG/WEBP — **not** `react-native-svg`'s
-  `SvgUri`, which rendered these packs' offset-viewBox SVGs as solid black. On image error it
-  falls back to the brand `MoodFace`. `MoodPicker` takes `pack` + `packFormat` (Greeting passes the
-  user's pack + its `iconFormat` from `profile.packs`); custom moods pass their own `iconKey`/`emoji`.
-  (Native SVG packs still fall back to MoodFace; PNG/WEBP packs render everywhere.)
+  badge `emoji`. Pack icons render via **expo-image's `<Image>`** (`moodIconUrl(moodId, pack,
+  iconFormat)`) — which renders **SVG/PNG/WEBP on BOTH web and native**. (Earlier we used RN's
+  `<Image>`, which can't render SVG on native → SVG packs fell back to the line-art face on devices;
+  and `react-native-svg`'s `SvgUri` drew these packs' offset-viewBox SVGs as solid black — both
+  wrong, hence expo-image.) Use `contentFit` (not RN's `resizeMode`). On image error it falls back
+  to the brand `MoodFace`. `MoodPicker` takes `pack` + `packFormat` (Greeting passes the user's pack
+  + its `iconFormat` from `profile.packs`); custom moods pass their own `iconKey`/`emoji`. The
+  profile pack-picker preview (`PackIcon`) likewise uses expo-image so SVG packs preview correctly.
 - `moodLabel` falls back to `label` when `labelTh` is null (custom moods only set `label`).
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
