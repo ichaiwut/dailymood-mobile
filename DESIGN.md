@@ -535,6 +535,10 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 
 ## 6. Known deviations / deferred
 
+- **Splash screen** (`expo-splash-screen`): the Dailymood logo — gradient smiley
+  speech-bubble + "Dailymood" wordmark, transparent PNG at `assets/splash-icon.png`
+  (1416×1289) — centered at `imageWidth: 220` on `#FBF6EE`. Native config: changing it
+  needs a rebuild (not OTA).
 - **`expo-linear-gradient`** is installed and used by `AiWeeklyFolder`. The sparkle square
   & PRO teaser still use solid `brand.purple` (not yet upgraded to the spec's
   `135deg #A673F1→#C9A6F5` gradient) — can adopt LinearGradient there too if wanted.
