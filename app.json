@@ -19,7 +19,7 @@
       "package": "me.dailymood.app",
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#FFFFFF"
+        "backgroundColor": "#FBF6EE"
       },
       "predictiveBackGestureEnabled": false,
       "permissions": [
