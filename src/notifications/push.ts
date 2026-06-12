@@ -68,8 +68,14 @@ export async function getPermissionState(): Promise<PermissionState> {
 async function fetchExpoToken(): Promise<string | null> {
   if (!isPushSupported() || !Device.isDevice) return null;
   try {
-    const { data } = await Notifications.getExpoPushTokenAsync({ projectId: projectId() });
-    return data ?? null;
+    // `getExpoPushTokenAsync` can hang on Android without FCM credentials, so cap
+    // it with a timeout — a missing token must never block the caller (registration
+    // is best-effort and runs on a background mount).
+    const res = await Promise.race([
+      Notifications.getExpoPushTokenAsync({ projectId: projectId() }),
+      new Promise<null>((resolve) => setTimeout(() => resolve(null), 8000)),
+    ]);
+    return res?.data ?? null;
   } catch {
     // Offline / Expo request failed — try again on the next authenticated launch.
     return null;
@@ -111,11 +117,12 @@ export async function requestAndRegister(): Promise<boolean> {
  * token still exists — i.e. inside signOut, before tokenStore.clear().
  */
 export async function unregisterFromPush(): Promise<void> {
-  if (!isPushSupported()) return;
-  let token = cachedToken;
-  // Restored-session-then-immediate-logout: we may not have registered this run.
-  if (!token) token = await fetchExpoToken();
-  if (!token) return;
+  // Only unregister a token we actually obtained this session. We deliberately do
+  // NOT fetch a fresh token here: `getExpoPushTokenAsync` can hang on Android
+  // without FCM credentials, and this runs inside signOut — a missing push token
+  // must never block sign-out. Un-unregistered tokens are pruned server-side.
+  const token = cachedToken;
+  if (!isPushSupported() || !token) return;
   cachedToken = null;
   try {
     await unregisterPushToken(token);
