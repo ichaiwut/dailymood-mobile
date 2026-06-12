@@ -7,11 +7,13 @@
  * layout then redirects to the tabs, same as password login). Cancellation is
  * silent; any other failure is surfaced via `onError` (already mapped to copy).
  *
- * Apple is shown on iOS only — it is required there by App Store §4.8 once a
- * third-party (Google) sign-in is offered.
+ * Apple is shown on iOS only — required there by App Store §4.8 once Google is
+ * offered. We render Apple's OFFICIAL `AppleAuthenticationButton` (Apple logo +
+ * compliant styling); a custom button without the logo is an App Store reject.
  */
 import { useEffect, useState } from 'react';
 import { View, Platform } from 'react-native';
+import * as AppleAuthentication from 'expo-apple-authentication';
 import { Button } from '../Button';
 import { Text } from '../Text';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -22,7 +24,7 @@ import { errorMessageKey } from '../../api/errors';
 
 export function SocialButtons({ onError }: { onError: (msg: string) => void }) {
   const { t } = useTranslation();
-  const { colors, space } = useTheme();
+  const { colors, space, radius } = useTheme();
   const { signIn } = useAuth();
   const [busy, setBusy] = useState<'google' | 'apple' | null>(null);
   const [appleReady, setAppleReady] = useState(false);
@@ -66,16 +68,12 @@ export function SocialButtons({ onError }: { onError: (msg: string) => void }) {
         }
       />
       {Platform.OS === 'ios' && appleReady ? (
-        <Button
-          variant="ink"
-          label={t('auth.continueWithApple')}
+        <AppleAuthentication.AppleAuthenticationButton
+          buttonType={AppleAuthentication.AppleAuthenticationButtonType.CONTINUE}
+          buttonStyle={AppleAuthentication.AppleAuthenticationButtonStyle.BLACK}
+          cornerRadius={radius.md}
+          style={{ height: 50, width: '100%' }}
           onPress={() => run('apple')}
-          loading={busy === 'apple'}
-          leading={
-            <Text variant="label" color="#fff">
-
-            </Text>
-          }
         />
       ) : null}
     </View>
