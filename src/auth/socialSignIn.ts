@@ -86,3 +86,17 @@ export function isAppleAuthAvailable(): Promise<boolean> {
   if (Platform.OS !== 'ios') return Promise.resolve(false);
   return AppleAuthentication.isAvailableAsync();
 }
+
+/**
+ * Clear the native Google session so the next sign-in shows the account picker
+ * (helps users switch accounts). Best-effort and fire-and-forget — a no-op /
+ * ignored error if the user didn't sign in via Google. Apple has no sign-out
+ * (Sign in with Apple is a one-shot credential, not a session). NEVER throw.
+ */
+export async function signOutSocial(): Promise<void> {
+  try {
+    await GoogleSignin.signOut();
+  } catch {
+    /* not signed in via Google / not configured — ignore */
+  }
+}

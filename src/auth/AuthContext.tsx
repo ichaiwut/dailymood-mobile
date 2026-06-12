@@ -20,6 +20,7 @@ import {
 import { restoreSession, setSessionExpiredHandler } from '../api/client';
 import { logout as apiLogout } from '../api/auth';
 import { unregisterFromPush } from '../notifications/push';
+import { signOutSocial } from './socialSignIn';
 import { tokenStore } from './token-store';
 import { setAppLanguage } from '../i18n';
 import type { AuthUser, TokenPair } from '../api/types';
@@ -55,22 +56,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   );
 
   const signOut = useCallback(async () => {
+    // Flip to unauthenticated FIRST so the root layout redirects to login
+    // immediately — sign-out must NEVER block on a network / SDK / push call.
+    // Everything below is best-effort and detached (the logout endpoint is
+    // idempotent; a missed call is harmless — the token is revoked on next login
+    // and expires server-side regardless).
     const refreshToken = await tokenStore.getRefreshToken();
-    if (refreshToken) {
-      try {
-        await apiLogout(refreshToken);
-      } catch {
-        // logout is best-effort; we clear locally regardless
-      }
-    }
-    // Unregister this device's push token BEFORE clearing tokens — the DELETE is
-    // Bearer-authed and the access token is gone after clear(). Best-effort.
-    await unregisterFromPush().catch(() => {});
-    await tokenStore.clear();
-    // RevenueCat logout (and push re-register) follow the status change in their
-    // providers; only the authed unregister above must run before the token clears.
     setUser(null);
     setStatus('unauthenticated');
+    // Clear the Google session so the next sign-in shows the account picker
+    // (no-op if not signed in via Google). Fire-and-forget; never throws.
+    void signOutSocial();
+    // Server + push cleanup, then clear local tokens. Detached: does not block
+    // the UI. The push unregister + logout are Bearer-authed, so tokens are
+    // cleared only after they run. RevenueCat logout / push re-register follow
+    // the status change in their own providers.
+    void (async () => {
+      await unregisterFromPush().catch(() => {});
+      if (refreshToken) await apiLogout(refreshToken).catch(() => {});
+      await tokenStore.clear();
+    })();
   }, []);
 
   // Drop to login when a mid-session refresh fails.
