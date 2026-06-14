@@ -12,6 +12,7 @@
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { View, Pressable, Image, TextInput, ActivityIndicator, Share, Platform, Linking } from 'react-native';
+import { Image as ExpoImage } from 'expo-image';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -34,6 +35,7 @@ import { useToast } from '../../src/components/Toast';
 import { initials } from '../../src/lib/avatar';
 import { formatDateKey } from '../../src/lib/time';
 import { clearEntries, exportEntriesCsv, fetchFeedbackStatus, submitFeedback } from '../../src/api/profile';
+import { deleteAccount } from '../../src/api/account';
 import { R2_PUBLIC_URL, API_BASE_URL } from '../../src/config';
 import { ApiError, errorMessageKey } from '../../src/api/errors';
 import type { MoodPack } from '../../src/api/types';
@@ -49,7 +51,7 @@ const GRADIENTS: Record<string, [string, string, ...string[]]> = {
 };
 const DANGER = '#D94444';
 
-type SheetKind = 'signout' | 'clear' | 'feedback' | null;
+type SheetKind = 'signout' | 'clear' | 'delete' | 'feedback' | null;
 
 export default function ProfileScreen() {
   const { t, i18n } = useTranslation();
@@ -181,6 +183,20 @@ export default function ProfileScreen() {
     }
   };
 
+  const onDeleteAccount = async () => {
+    setBusy(true);
+    try {
+      await deleteAccount();
+      toast.show(t('profile.deleteAccountDone'));
+      await signOut(); // session token is dead now — drop to login
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    } finally {
+      setBusy(false);
+      setSheet(null);
+    }
+  };
+
   return (
     <Screen scroll contentStyle={{ gap: space.lg, paddingBottom: 120 }}>
       {/* header */}
@@ -239,7 +255,7 @@ export default function ProfileScreen() {
               <Text variant="eyebrow">{t('profile.moodSigEyebrow')}</Text>
               {!premium ? (
                 <PremiumTeaser text={t('profile.moodSigTeaser')} />
-              ) : sig?.hasSufficientData && sig.distribution.length ? (
+              ) : sig?.hasSufficientData && sig.distribution?.length ? (
                 <>
                   <Text variant="title">
                     {sig.distribution.length >= 2 && sig.distribution[1].percent >= 25
@@ -271,7 +287,7 @@ export default function ProfileScreen() {
                 </Pressable>
               </View>
               <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 14 }}>
-                {ach.badges.filter((b) => b.status === 'earned').slice(0, 6).map((b) => (
+                {(ach.badges ?? []).filter((b) => b.status === 'earned').slice(0, 6).map((b) => (
                   <View key={b.id} style={{ width: 62, height: 62, borderRadius: 31, backgroundColor: b.color, borderWidth: 4, borderColor: '#fff', alignItems: 'center', justifyContent: 'center', boxShadow: shadow.sm }}>
                     <Text style={{ fontSize: 26 }}>{b.icon}</Text>
                   </View>
@@ -374,6 +390,11 @@ export default function ProfileScreen() {
                 <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: DANGER + '18', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>🗑️</Text></View>
                 <Text variant="label" weight="bold" color={DANGER} style={{ flex: 1 }}>{t('profile.clearAll')}</Text>
               </Pressable>
+              <Divider />
+              <Pressable onPress={() => setSheet('delete')} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg }}>
+                <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: DANGER + '18', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>⚠️</Text></View>
+                <Text variant="label" weight="bold" color={DANGER} style={{ flex: 1 }}>{t('profile.deleteAccount')}</Text>
+              </Pressable>
             </SettingCard>
           </Section>
 
@@ -414,6 +435,18 @@ export default function ProfileScreen() {
           <View style={{ flexDirection: 'row', gap: space.md, marginTop: space.sm }}>
             <View style={{ flex: 1 }}><Button variant="paper" label={t('common.cancel')} onPress={() => setSheet(null)} /></View>
             <View style={{ flex: 1 }}><DangerBtn label={t('profile.clearConfirm')} onPress={onClear} loading={busy} /></View>
+          </View>
+        </View>
+      </BottomSheet>
+
+      <BottomSheet visible={sheet === 'delete'} onClose={() => setSheet(null)}>
+        <View style={{ gap: space.md }}>
+          <Text variant="h2" center>{t('profile.deleteAccountTitle')}</Text>
+          <Text variant="body" color={colors.ink2} center>{t('profile.deleteAccountBody')}</Text>
+          <Text variant="label" color={colors.ink3} center>{t('profile.deleteAccountSubNote')}</Text>
+          <View style={{ flexDirection: 'row', gap: space.md, marginTop: space.sm }}>
+            <View style={{ flex: 1 }}><Button variant="paper" label={t('common.cancel')} onPress={() => setSheet(null)} /></View>
+            <View style={{ flex: 1 }}><DangerBtn label={t('profile.deleteAccount')} onPress={onDeleteAccount} loading={busy} /></View>
           </View>
         </View>
       </BottomSheet>
@@ -546,6 +579,6 @@ export default function ProfileScreen() {
   function PackIcon({ url }: { url: string }) {
     const [failed, setFailed] = useState(false);
     if (failed) return <View style={{ width: 22, height: 22, borderRadius: 11, backgroundColor: colors.surface2 }} />;
-    return <Image source={{ uri: url }} style={{ width: 22, height: 22 }} onError={() => setFailed(true)} />;
+    return <ExpoImage source={{ uri: url }} style={{ width: 22, height: 22 }} contentFit="contain" onError={() => setFailed(true)} />;
   }
 }

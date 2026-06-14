@@ -31,7 +31,12 @@ export function fetchTimeline(year: number, month: number): Promise<TimelineEntr
 
 /** GET /api/year-in-pixels?year=Y — year-of-moods + AI summary + stats (Pro). */
 export function fetchYearInPixels(year: number, locale: string): Promise<YearInPixels> {
-  return apiFetch<YearInPixels>(`/api/year-in-pixels?year=${year}&locale=${locale}`);
+  // Normalize dayMap to {} — the backend can send null, and it's read via
+  // Object.entries/values + indexing in several places (would throw on null).
+  return apiFetch<YearInPixels>(`/api/year-in-pixels?year=${year}&locale=${locale}`).then((d) => ({
+    ...d,
+    dayMap: d.dayMap ?? {},
+  }));
 }
 
 /** GET /api/calendar/ai?year=Y&month=MM — monthly AI summary + patterns (Pro). */

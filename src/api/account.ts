@@ -13,3 +13,12 @@ export function fetchPasswordStatus(): Promise<{ hasPassword: boolean }> {
 export function changePassword(body: { currentPassword?: string; newPassword: string }): Promise<{ ok: boolean; hadPassword: boolean }> {
   return apiFetch('/api/account/password', { method: 'POST', body });
 }
+
+/**
+ * DELETE /api/account — permanently delete the signed-in user + all their data
+ * (Bearer auth). Required by the Play Store / App Store account-deletion policy.
+ * The caller signs out afterwards (the session token is dead once this returns).
+ */
+export function deleteAccount(): Promise<{ ok: boolean }> {
+  return apiFetch('/api/account', { method: 'DELETE' });
+}

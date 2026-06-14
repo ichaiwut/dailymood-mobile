@@ -1,20 +1,30 @@
 /**
  * Billing actions, centralizing the payment-platform rule:
  *   • web    → Stripe Checkout / Portal URL opened in the browser
- *   • native → in-app purchase (Apple/Google) is REQUIRED for digital goods, and
- *              isn't integrated yet, so subscribe shows a "coming soon" toast.
- *              (The 14-day trial is not a purchase and works everywhere.)
- * Stripe billing-portal management is a web URL, so it's opened via Linking on
- * any platform for web-created subscriptions.
+ *   • native → in-app purchase via RevenueCat (Apple/Google REQUIRE IAP for
+ *              digital goods). Purchase → backend reconcile → Pro reflects.
+ *
+ * Subscription management splits by source, not platform:
+ *   • Stripe-created subs  → `openPortal()` (hosted URL, any platform)
+ *   • store-created subs   → `openStoreSubscription()` (App Store / Play settings)
+ *
+ * The 14-day trial is not a purchase and works everywhere (see useActivateTrial).
  */
 import { useState } from 'react';
-import { Linking, Platform } from 'react-native';
+import { Linking } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
 import { createCheckout, createPortal } from '../api/subscription';
 import { useToast } from '../components/Toast';
 import { useAuth } from '../auth/AuthContext';
-import { errorMessageKey } from '../api/errors';
+import { ApiError, errorMessageKey } from '../api/errors';
+import { useOfferings, usePurchase, useRestore } from '../iap/hooks';
+import { getManagementUrl, isIapSupported, packageForPlan, priceStringForPlan } from '../iap/purchases';
+
+/** Map any thrown billing error to a friendly i18n key (RC errors aren't ApiErrors). */
+function billingErrorKey(e: unknown): string {
+  return e instanceof ApiError ? errorMessageKey(e) : 'errors.iap_failed';
+}
 
 export function useBilling() {
   const [busy, setBusy] = useState(false);
@@ -23,17 +33,40 @@ export function useBilling() {
   const router = useRouter();
   const { status } = useAuth();
 
+  const native = isIapSupported();
+  const offerings = useOfferings(); // native-only; no-ops on web
+  const purchaseM = usePurchase();
+  const restoreM = useRestore();
+
   const subscribe = async (plan: 'monthly' | 'yearly') => {
     if (status !== 'authenticated') {
       toast.show(t('pricing.loginFirst'));
       router.push('/(auth)/login');
       return;
     }
-    if (Platform.OS !== 'web') {
-      // App Store / Play forbid selling digital subs via an external URL.
-      toast.show(t('pricing.iapPending'));
+
+    if (native) {
+      const pkg = packageForPlan(offerings.data ?? null, plan);
+      if (!pkg) {
+        toast.show(t('pricing.offeringsUnavailable'), 'error');
+        return;
+      }
+      try {
+        const res = await purchaseM.mutateAsync(pkg);
+        if (res.status === 'cancelled') return; // user dismissed the sheet — silent
+        if (res.status === 'pending') {
+          toast.show(t('pricing.purchasePending')); // charged; webhook will activate Pro
+          return;
+        }
+        toast.show(t('pricing.purchaseSuccess'));
+        router.replace({ pathname: '/pricing', params: { success: '1' } }); // → 🎉 "Welcome to Pro"
+      } catch (e) {
+        toast.show(t(billingErrorKey(e)), 'error');
+      }
       return;
     }
+
+    // web → Stripe Checkout
     setBusy(true);
     try {
       const { url } = await createCheckout(plan);
@@ -45,11 +78,13 @@ export function useBilling() {
     }
   };
 
+  /** Stripe Customer Portal (web-created subscriptions) — a hosted URL. */
   const openPortal = async () => {
     setBusy(true);
     try {
       const { url } = await createPortal();
       await Linking.openURL(url);
+      toast.show(t('subscription.openingBrowser'));
     } catch (e) {
       toast.show(t(errorMessageKey(e)), 'error');
     } finally {
@@ -57,7 +92,43 @@ export function useBilling() {
     }
   };
 
-  return { subscribe, openPortal, busy };
+  /** App Store / Play manage-subscription screen (store-created subscriptions). */
+  const openStoreSubscription = async () => {
+    setBusy(true);
+    try {
+      await Linking.openURL(await getManagementUrl());
+    } catch {
+      toast.show(t('errors.iap_failed'), 'error');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  /** Restore prior store purchases (required by the App Store). Native only. */
+  const restore = async () => {
+    try {
+      const res = await restoreM.mutateAsync();
+      if (res.status === 'ok') toast.show(t('pricing.restoreSuccess'));
+      else if (res.status === 'pending') toast.show(t('pricing.purchasePending'));
+      else toast.show(t('pricing.restoreNothing')); // notFound
+    } catch (e) {
+      toast.show(t(billingErrorKey(e)), 'error');
+    }
+  };
+
+  return {
+    subscribe,
+    openPortal,
+    openStoreSubscription,
+    restore,
+    /** Live localized store prices (native); null on web or while loading. */
+    prices: {
+      monthly: priceStringForPlan(offerings.data ?? null, 'monthly'),
+      yearly: priceStringForPlan(offerings.data ?? null, 'yearly'),
+    },
+    supportsIap: native,
+    busy: busy || purchaseM.isPending || restoreM.isPending,
+  };
 }
 
 /** The six Pro feature cards, shared by /pricing and /profile/subscription. */

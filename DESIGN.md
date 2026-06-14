@@ -77,6 +77,36 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   Brief confirmation pill at **top-center** (below the status bar; white sheet, soft
   shadow, check/✕ glyph), auto-dismiss ~2.6s. Fired on entry save (drawer + edit).
   Success/error tones.
+- **`OfflineNotice`** (`src/components/OfflineNotice.tsx`) — global "no internet" gate.
+  Mounted once in root `_layout` (inside `ToastProvider`); subscribes to **NetInfo**
+  and, when connectivity is definitively lost (`isConnected === false ||
+  isInternetReachable === false`; `null`/unknown counts as online so it never flashes
+  on cold start), blocks the app with a centered Paper Desk `Modal` — dim scrim
+  (`rgba(26,19,32,.46)`), folder-seam card (`8/26/26/26`), peach washi, a `WifiOffIcon`
+  in a soft `dangerBg` disc (`danger` icon), `offline.title`/`offline.body` copy, and a
+  peach **Try again** button (`common.retry` → `NetInfo.refresh()`). No close ✕ — it's a
+  required-connection gate that closes itself on reconnect. `app/_layout` also wires
+  TanStack Query's `onlineManager` to NetInfo, so every screen's queries refetch the
+  instant the connection returns. A `__DEV__` `FORCE_OFFLINE_PREVIEW` constant previews
+  it without going offline. **Native needs a dev build** (NetInfo is a native module); on
+  **web** it uses `navigator.onLine` (DevTools → Network → Offline triggers it). Edge
+  case: losing connectivity while another `Modal`/sheet is already open stacks two native
+  modals (platform-dependent); the common case — offline on a normal screen — is solid.
+- **`PushPrimerSheet`** (`src/components/PushPrimerSheet.tsx`) — soft opt-in for daily
+  reminders: a Paper Desk `BottomSheet` (peach washi, `BellIcon` in a peach-tint disc,
+  title/body + peach **Turn on reminders** / paper **Not now**). Shown **once** after login
+  by `NotificationsProvider` while OS notification permission is still `undetermined`;
+  either choice persists a "seen" flag (`expo-secure-store`) so it never nags. "Turn on"
+  fires the OS prompt then registers the Expo push token; a denial shows a gentle
+  `notifications.deniedHint` toast. The rest of the push lifecycle lives in
+  `src/notifications/` (`push.ts` — the only `expo-notifications` importer, native-only,
+  no-ops on web like `purchases.ts`; `NotificationsProvider` mirrors `PurchasesProvider`):
+  register on login/restore, re-register on token rotation, **unregister inside
+  `signOut`** (before tokens clear, since the DELETE is Bearer-authed), and route a
+  notification tap to `data.url`/`data.type` (deep-link, incl. cold start). Backend owns
+  the notification copy; v1 routes only `/` (home). Copy: `notifications.*`. **Native +
+  real device only** (no Expo push token on web / simulator); needs a dev build + the
+  `expo-notifications` plugin, plus APNs (iOS) / FCM (Android) creds for real delivery.
 - **`Button`** (`src/components/Button.tsx`) — variants `primary`(peach) / `ink` /
   `paper`(white) / `ghost` / `purple`, each with its chunky `boxShadow`. Height 54,
   radius 14, settles `translateY(2)` on press.
@@ -99,12 +129,14 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   Smart Log drawer wires `PlaceSearchBox` directly under its toolbar pin.
 - **`MoodFace` / `PASticker` mood rendering** — priority: `iconKey` (custom-mood R2 image) →
   forced `face` → moodId (custom `emoji` on tint, else **the user's mood-PACK icon** from R2) →
-  badge `emoji`. Pack icons render via **`<Image>`** (`moodIconUrl(moodId, pack, iconFormat)`) —
-  RN-web `<img>` renders SVG/PNG/WEBP, native renders PNG/WEBP — **not** `react-native-svg`'s
-  `SvgUri`, which rendered these packs' offset-viewBox SVGs as solid black. On image error it
-  falls back to the brand `MoodFace`. `MoodPicker` takes `pack` + `packFormat` (Greeting passes the
-  user's pack + its `iconFormat` from `profile.packs`); custom moods pass their own `iconKey`/`emoji`.
-  (Native SVG packs still fall back to MoodFace; PNG/WEBP packs render everywhere.)
+  badge `emoji`. Pack icons render via **expo-image's `<Image>`** (`moodIconUrl(moodId, pack,
+  iconFormat)`) — which renders **SVG/PNG/WEBP on BOTH web and native**. (Earlier we used RN's
+  `<Image>`, which can't render SVG on native → SVG packs fell back to the line-art face on devices;
+  and `react-native-svg`'s `SvgUri` drew these packs' offset-viewBox SVGs as solid black — both
+  wrong, hence expo-image.) Use `contentFit` (not RN's `resizeMode`). On image error it falls back
+  to the brand `MoodFace`. `MoodPicker` takes `pack` + `packFormat` (Greeting passes the user's pack
+  + its `iconFormat` from `profile.packs`); custom moods pass their own `iconKey`/`emoji`. The
+  profile pack-picker preview (`PackIcon`) likewise uses expo-image so SVG packs preview correctly.
 - `moodLabel` falls back to `label` when `labelTh` is null (custom moods only set `label`).
 - **`TodayTimeline`** (`paper/today/`) — the Today screen's "วันนี้" header + 📌 count
   badge + a day-axis sheet: hour ticks 6:00–21:00, a mood dot per entry positioned by
@@ -393,10 +425,14 @@ Account (subscription → `/profile/subscription`, value renews/expires/free), L
 teaser), **Mood-icon pack** picker (when `packs.length>1`: 2-col cards, 4 R2 preview icons via
 `PackIcon` with onError fallback + `iconFormat`; premium pack while `tier!=='premium'` → 🔒/upgrade →
 subscription, else PATCH `moodPack` + toast), Data (export → CSV via `exportEntriesCsv` →
-web download / native Share, free → upgrade; red **delete-all** → clear sheet), About (feedback sheet,
+web download / native Share, free → upgrade; red **delete-all** → clear sheet, plus a red
+**delete-account** → confirm sheet → `DELETE /api/account` then sign-out — store
+account-deletion requirement; the confirm sheet also warns that an active store (IAP)
+subscription must be cancelled separately in the App Store / Play Store — deleting the
+account doesn't stop billing), About (feedback sheet,
 terms/privacy → `Linking` to the web pages). **Footer**: red-outline sign-out → sheet + version line.
-**3 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`), and
-feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
+**4 bottom sheets** (`BottomSheet`): sign out, clear-entries (`DELETE /api/profile/clear`),
+delete-account (`DELETE /api/account`), and feedback (textarea + `/api/feedback`, GET cooldown → "อีก N นาที", success → 💜). Premium gating uses
 `isPremium`; mood-pack uses `tier`. Between achievements and settings, two **article link cards**
 (♥ saved articles → `/profile/saved-articles`, ☺ article reactions → `/profile/article-reactions`,
 §4m). Settings §5 **Custom moods** (`CustomMoodManager`, Pro-only — Free sees a teaser) and §6
@@ -425,28 +461,37 @@ open the article on the web via `Linking` (`/articles/{slug}` — in-app reader 
 ## 4k. Pricing + Subscription — `app/pricing.tsx`, `app/profile/subscription.tsx`
 
 **Payment platform rule** (`src/hooks/useBilling`): web → Stripe **Checkout/Portal** URL opened
-via `Linking`; **native → in-app purchase is required for digital goods and isn't integrated yet,
-so subscribe shows a "coming soon" toast** (`pricing.iapPending`) — never an external purchase URL
-(App Store / Play rule). The **14-day trial is not a purchase** (`POST /api/trial/activate`) so it
-works everywhere. Pro brand gradient = `#FCA45B→#A673F1`; prices ฿99/mo · ฿790/yr (save 33%).
-`PRO_FEATURES` (6 cards) is shared by both pages.
+via `Linking`; **native → in-app purchase via RevenueCat** (`react-native-purchases`, Apple/Google
+require IAP for digital goods — never an external purchase URL). Purchase → `POST /api/iap/reconcile`
+(backend pulls the RC entitlement and flips `isPremium`) → caches refresh → success toast →
+`router.replace('/profile/subscription')`. The **14-day trial is not a purchase**
+(`POST /api/trial/activate`) so it works everywhere. Pro brand gradient = `#FCA45B→#A673F1`;
+web copy ฿99/mo · ฿790/yr (save 33%) — **native shows the live localized store price** from the RC
+offering (`useBilling.prices`), falling back to the copy while loading. `PRO_FEATURES` (6 cards) is
+shared by both pages. RevenueCat is native-only; all SDK calls no-op on web.
 
 **`/pricing`** (guest-viewable, maxW 720): success state (`?success` → 🎉 welcome), cancelled banner
 (`?cancelled`), else hero (Pro pill + gradient headline) → optional **trial CTA** (only `!hasUsedTrial
 && tier==='free'`, lav washi → `TrialConfirmSheet`) → **plan picker** (monthly / yearly w/ "Save 33%"
 badge + ฿66/mo, default yearly) → **main gradient CTA** (chunky shadow → `useBilling.subscribe`) →
 features grid → **Free-vs-Pro comparison folder** (ink tab + PAClip + 9-row table) → terms/privacy
-links. `useSubscription` is gated on auth so guests don't 401.
+links. `useSubscription` is gated on auth so guests don't 401. The "secure" subline is store-aware
+(`secureNative` on native), and a native-only **"Restore purchases"** link (purpleStrong label, App
+Store requirement) sits under the CTA → `useBilling.restore`.
 
 **`/profile/subscription`** (login-required, back button, maxW 880) — `GET /api/subscription` →
 three states: **A Free** (trial gradient card or expired warm banner + Free card with Smart-Log
-progress + Pro gradient card → `/pricing`); **B Trialing** (status gradient card — turns
-`#D94444→#FCA45B` when `trialDaysLeft ≤ 3` — "เหลืออีก N วัน" + ends date + subscribe → `/pricing`,
-then features grid); **C Active Pro** (plum folder `#2C2435→#3D2E50` + PAClip showing comped /
-canceling / auto-renew status; when `hasStripeCustomer` → glass **Manage billing** → portal +
-**Cancel** → cancel sheet; canceling warm banner → resubscribe; features grid + unlimited usage
-cards). Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep Pro).
-Dates via `formatDateKey`. **Deferred vs web:** real IAP (RevenueCat) for native purchases.
+progress + Pro gradient card → `/pricing`; native adds a **"Restore purchases"** link below);
+**B Trialing** (status gradient card — turns `#D94444→#FCA45B` when `trialDaysLeft ≤ 3` —
+"เหลืออีก N วัน" + ends date + subscribe → `/pricing`, then features grid); **C Active Pro** (plum
+folder `#2C2435→#3D2E50` + PAClip showing comped / canceling / auto-renew status). Management is
+**source-aware, not platform-aware** — `comped` is only true when neither `hasStripeCustomer` nor
+`hasIapSubscription` (a native sub must not be mistaken for a comp): Stripe subs → glass **Manage
+billing** → portal + **Cancel** → cancel sheet; **store subs** (`hasIapSubscription`) → single glass
+**Manage subscription** → `openStoreSubscription` (RC `managementURL`, where the user also cancels);
+canceling warm banner → resubscribe routes to store or portal by source; features grid + unlimited
+usage cards. Sheets: `TrialConfirmSheet` (`/api/trial/activate`) and **Cancel** (😢 → portal / keep
+Pro, Stripe only). Dates via `formatDateKey`.
 
 ## 4l. Achievements — `app/profile/achievements.tsx` (`GET /api/profile/achievements`)
 
@@ -481,13 +526,23 @@ the form (mint washi + ✅ + "back to profile"); no re-login needed. Loading = g
 
 Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 24`,
 `stroke = currentColor`, color/size props. Available: `SparkleIcon`, `CalendarIcon`,
-`CameraIcon`, `PinIcon`, `PinFilledIcon` (location-chosen state), `CloseIcon`, `MicIcon`.
+`CameraIcon`, `PinIcon`, `PinFilledIcon` (location-chosen state), `CloseIcon`, `MicIcon`,
+`WifiOffIcon` (wifi arcs + slash — the no-internet popup, see `OfflineNotice` §3),
+`BellIcon` (daily-reminder / notifications pre-prompt).
 **Use these instead of system emoji for all chrome.**
 
 ---
 
 ## 6. Known deviations / deferred
 
+- **Branding — splash & app icon** (native config; changes need a rebuild, not OTA):
+  - **Splash** (`expo-splash-screen`): the Dailymood logo (gradient smiley speech-bubble +
+    "Dailymood" wordmark, transparent `assets/splash-icon.png` 1416×1289) centered at
+    `imageWidth: 220` on `#FBF6EE`.
+  - **App icon**: gradient smiley speech-bubble on cream. `assets/icon.png` (1024×1024,
+    **flattened opaque on `#FBF6EE`** — iOS rejects icons with an alpha channel). Android
+    `adaptiveIcon.foregroundImage` = `assets/adaptive-icon.png` (same logo) on
+    `backgroundColor: #FBF6EE`.
 - **`expo-linear-gradient`** is installed and used by `AiWeeklyFolder`. The sparkle square
   & PRO teaser still use solid `brand.purple` (not yet upgraded to the spec's
   `135deg #A673F1→#C9A6F5` gradient) — can adopt LinearGradient there too if wanted.
@@ -495,5 +550,26 @@ Inline SVG ported 1:1 from `docs/mobile-handoff/ASSETS.md` §3. viewBox `0 0 24 
 - Live API mood set/colors differ from the design mock (backend data, not fixable here).
 - Still on the old hard-offset styling / not yet migrated to soft Paper Desk shadows:
   insights, profile, subscription screens.
-- Deferred features: native Google/Apple sign-in (needs dev build), voice input (mic
-  button is still a "coming soon" stub), reminder & privacy toggles, dark mode, share cards.
+- **Auth = email/password + Google + Apple (v1).** The login screen's `SocialButtons`
+  run real native flows: Google via `@react-native-google-signin`, Apple via
+  `expo-apple-authentication` (iOS only, shown when `isAvailableAsync()` resolves true —
+  required by App Store §4.8 once Google is offered). `src/auth/socialSignIn.ts` gets the
+  provider ID token → backend `/api/auth/mobile/{google,apple}` → `TokenPair` →
+  `AuthContext.signIn`; cancellation is silent, other failures surface via the login
+  `Notice`. A web no-password user (check-email → exists, `hasPassword:false`) lands on the
+  `googleOnly` step, which offers the social buttons AND a "set a password" link (→
+  `/(auth)/forgot`). Client IDs are public OAuth identifiers in `config.ts`
+  (`GOOGLE_WEB_CLIENT_ID` = idToken audience the backend verifies, `GOOGLE_IOS_CLIENT_ID`);
+  the iOS reversed id is the `iosUrlScheme` in app.json, and `ios`'s Sign-in-with-Apple
+  entitlement comes from the `expo-apple-authentication` plugin. The Android Google client
+  (+ signing-key SHA-1) is added at the Android build step. Needs a native build (the SDKs
+  are absent in Expo Go).
+- Deferred features: voice input (mic button is still a "coming soon" stub), reminder &
+  privacy toggles, dark mode, share cards.
+- **Push notifications (daily reminder):** the mobile client side is built — Expo push
+  token registration (login/restore/rotation/logout), the soft opt-in `PushPrimerSheet`,
+  and notification-tap deep-linking (`src/notifications/`). Still deferred: the reminder
+  **schedule UI** (time / day-of-week, backed by `reminderEnabled`/`reminderTime`/
+  `reminderDays`), a re-entry point if the user dismisses the primer, a per-channel picker,
+  and push for weekly-digest / AI-coach (still email-only). Real delivery needs APNs/FCM
+  creds on the Expo project.

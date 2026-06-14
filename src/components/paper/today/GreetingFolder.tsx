@@ -49,7 +49,7 @@ export function GreetingFolder() {
           layout="grid"
           moods={moods.data ?? []}
           pack={profile.data?.user.moodPack}
-          packFormat={profile.data?.packs.find((p) => p.id === profile.data?.user.moodPack)?.iconFormat}
+          packFormat={profile.data?.packs?.find((p) => p.id === profile.data?.user.moodPack)?.iconFormat}
           onSelect={(m) => smartLog.open({ moodId: m.id })}
         />
       </View>

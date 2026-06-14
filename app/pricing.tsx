@@ -1,11 +1,12 @@
 /**
  * Pricing (/pricing) — the Pro sales page (guest-viewable). Hero, optional trial
  * CTA, monthly/yearly plan picker, the main subscribe CTA, a features grid, and
- * a Free-vs-Pro comparison folder. Payment: web → Stripe Checkout; native → IAP
- * (pending, shows a toast) — see `useBilling`. The 14-day trial works everywhere.
+ * a Free-vs-Pro comparison folder. Payment: web → Stripe Checkout; native →
+ * RevenueCat IAP (with a Restore link + live store prices) — see `useBilling`.
+ * The 14-day trial works everywhere.
  */
 import { useState } from 'react';
-import { View, Pressable } from 'react-native';
+import { View, Pressable, Platform } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useLocalSearchParams, useRouter } from 'expo-router';
 import { useTranslation } from 'react-i18next';
@@ -46,6 +47,7 @@ export default function PricingScreen() {
   const isPremium = sub.data?.isPremium ?? false;
   const tier = isPremium ? 'premium' : authed ? 'free' : 'guest';
   const hasUsedTrial = isPremium || !!sub.data?.trialActivatedAt;
+  const isTrialing = sub.data?.isTrialing ?? false;
   const [plan, setPlan] = useState<'monthly' | 'yearly'>('yearly');
   const [trialSheet, setTrialSheet] = useState(false);
 
@@ -68,6 +70,22 @@ export default function PricingScreen() {
         <Text variant="h1" center>{t('pricing.successTitle')}</Text>
         <Text variant="body" color={colors.ink2} center>{t('pricing.successSub')}</Text>
         <Button variant="ink" label={t('pricing.startUsing')} onPress={() => router.replace('/(tabs)')} style={{ alignSelf: 'stretch', marginTop: space.md }} />
+      </Screen>
+    );
+  }
+
+  // Already an active (paid) Pro member — skip the sales page. Trialing users still
+  // pass through so they can upgrade to a paid plan.
+  if (authed && isPremium && !isTrialing) {
+    return (
+      <Screen scroll contentStyle={{ flexGrow: 1, justifyContent: 'center', alignItems: 'center', gap: space.md, padding: space.x2 }}>
+        <Pressable onPress={goBack} hitSlop={10} style={{ position: 'absolute', top: space.lg, left: space.lg, width: 38, height: 38, borderRadius: 19, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center', boxShadow: shadow.sm }}>
+          <Text weight="bold" style={{ fontSize: 22, lineHeight: 26, color: colors.ink2 }}>‹</Text>
+        </Pressable>
+        <Text style={{ fontSize: 56 }}>✨</Text>
+        <Text variant="h1" center>{t('pricing.alreadyPro')}</Text>
+        <Text variant="body" color={colors.ink2} center>{t('pricing.alreadyProSub')}</Text>
+        <Button variant="ink" label={t('pricing.alreadyProCta')} onPress={() => router.replace('/profile/subscription')} style={{ alignSelf: 'stretch', marginTop: space.md }} />
       </Screen>
     );
   }
@@ -126,10 +144,10 @@ export default function PricingScreen() {
         </View>
       ) : null}
 
-      {/* plan picker */}
+      {/* plan picker — show live store prices on native, fall back to copy */}
       <View style={{ flexDirection: 'row', gap: space.md }}>
-        <PlanCard kind="monthly" price={t('pricing.perMonth')} label={t('pricing.planMonthly')} selected={plan === 'monthly'} onPress={() => setPlan('monthly')} />
-        <PlanCard kind="yearly" price={t('pricing.perYear')} label={t('pricing.planYearly')} selected={plan === 'yearly'} onPress={() => setPlan('yearly')} sub={t('pricing.perMonthYearly')} badge={t('pricing.save33')} />
+        <PlanCard kind="monthly" price={billing.prices.monthly ?? t('pricing.perMonth')} label={t('pricing.planMonthly')} selected={plan === 'monthly'} onPress={() => setPlan('monthly')} />
+        <PlanCard kind="yearly" price={billing.prices.yearly ?? t('pricing.perYear')} label={t('pricing.planYearly')} selected={plan === 'yearly'} onPress={() => setPlan('yearly')} sub={t('pricing.perMonthYearly')} badge={t('pricing.save33')} />
       </View>
 
       {/* main CTA */}
@@ -138,7 +156,12 @@ export default function PricingScreen() {
           <Text weight="extrabold" style={{ fontSize: 17, color: '#fff' }}>{t('pricing.subscribeCta')}</Text>
         </LinearGradient>
       </Pressable>
-      <Text variant="label" color={colors.ink3} center>{t('pricing.secure')}</Text>
+      <Text variant="label" color={colors.ink3} center>{t(billing.supportsIap ? 'pricing.secureNative' : 'pricing.secure')}</Text>
+      {billing.supportsIap ? (
+        <Pressable onPress={billing.restore} disabled={billing.busy} hitSlop={8} style={{ alignSelf: 'center' }}>
+          <Text variant="label" weight="bold" color={brand.purpleStrong} center>{t('pricing.restorePurchases')}</Text>
+        </Pressable>
+      ) : null}
 
       {/* features grid */}
       <Text variant="title" style={{ marginTop: space.sm }}>{t('pricing.featuresTitle')}</Text>

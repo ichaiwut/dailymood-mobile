@@ -148,19 +148,24 @@ export default function LoginScreen() {
       {step === 'email' ? (
         <>
           <Button label={t('auth.continueWithEmail')} onPress={onContinue} loading={busy} />
-          <SocialButtons
-            onUnavailable={() => setNotice({ msg: t('auth.socialNeedsDevBuild'), tone: 'info' })}
-          />
+          <SocialButtons onError={(msg) => setNotice({ msg, tone: 'error' })} />
         </>
       ) : null}
 
       {step === 'googleOnly' ? (
         <>
-          <SocialButtons
-            onUnavailable={() => setNotice({ msg: t('auth.socialNeedsDevBuild'), tone: 'info' })}
-          />
-          <Pressable onPress={resetToEmail} hitSlop={8} style={{ marginTop: space.xs }}>
-            <Text variant="label" color={colors.ink3}>
+          <SocialButtons onError={(msg) => setNotice({ msg, tone: 'error' })} />
+          <Pressable
+            onPress={() => router.push({ pathname: '/(auth)/forgot', params: { email } })}
+            hitSlop={8}
+            style={{ marginTop: space.xs }}
+          >
+            <Text variant="label" color={colors.primary} center>
+              {t('auth.setPasswordCta')}
+            </Text>
+          </Pressable>
+          <Pressable onPress={resetToEmail} hitSlop={8}>
+            <Text variant="label" color={colors.ink3} center>
               {t('common.back')}
             </Text>
           </Pressable>

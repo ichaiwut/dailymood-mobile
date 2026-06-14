@@ -175,7 +175,7 @@ export default function InsightsScreen() {
                         <Text weight="extrabold" style={{ fontSize: 18 }}>{Math.round(d.forecast.confidence * 100)}%</Text>
                       </View>
                       <View style={{ gap: 2 }}>
-                        {d.forecast.factors.slice(0, 3).map((f, i) => (
+                        {(d.forecast.factors ?? []).slice(0, 3).map((f, i) => (
                           <View key={i} style={{ flexDirection: 'row', gap: 6, alignItems: 'center' }}>
                             <Text variant="label" weight="bold" color={f.direction === '+' ? '#2DA963' : '#E05A5A'}>{f.direction === '+' ? '+' : '−'}</Text>
                             <Text variant="label" color={colors.ink2} numberOfLines={1} style={{ flex: 1 }}>{f.label}</Text>

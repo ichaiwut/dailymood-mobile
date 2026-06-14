@@ -257,7 +257,7 @@ export default function StatsScreen() {
 
             {/* activity impact */}
             {premium ? (
-              d.activityInsight.length > 0 ? (
+              (d.activityInsight?.length ?? 0) > 0 ? (
                 <Card>
                   <Text variant="title">{t('stats.activityTitle')}</Text>
                   <Text variant="label" color={colors.ink3}>{t('stats.activitySub', { n: d.total })}</Text>

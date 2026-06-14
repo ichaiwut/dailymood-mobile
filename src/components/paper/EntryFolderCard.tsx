@@ -99,7 +99,7 @@ export function EntryFolderCard({ entry, mood, onPress, rotate = 0 }: EntryFolde
               </Text>
             </View>
           ) : null}
-          {entry.tags.length ? (
+          {entry.tags?.length ? (
             <View style={{ flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 2 }}>
               {entry.tags.slice(0, 4).map((tag) => (
                 <View

@@ -263,7 +263,7 @@ export default function EntryDetailScreen() {
           ) : null}
 
           {/* tags */}
-          {d.tags.length ? (
+          {d.tags?.length ? (
             <View style={{ gap: space.sm }}>
               <Text variant="label" weight="bold" color={colors.ink3} style={{ textTransform: 'uppercase', letterSpacing: 0.8 }}>
                 {t('entry.tagsLabel')}
@@ -279,7 +279,7 @@ export default function EntryDetailScreen() {
           ) : null}
 
           {/* rail: nearby days */}
-          {d.nearby.length ? (
+          {d.nearby?.length ? (
             <PaperSheet tab={t('entry.nearby')} tabColor={colors.ink} tabTextColor="#fff" style={{ marginTop: space.sm }}>
               <View style={{ gap: space.md }}>
                 {d.nearby.map((n) => {

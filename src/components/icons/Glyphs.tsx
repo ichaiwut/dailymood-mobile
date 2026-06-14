@@ -201,3 +201,32 @@ export function MicIcon({ size = 24, color = INK, strokeWidth = 1.8 }: GlyphProp
     </Svg>
   );
 }
+
+/** Wi-Fi signal arcs with a slash — the "no connection" state. */
+export function WifiOffIcon({ size = 24, color = INK, strokeWidth = 1.8 }: GlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path d="M4.5 9.5 Q12 3.5 19.5 9.5" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M7.3 12.3 Q12 7.5 16.7 12.3" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Path d="M9.8 15 Q12 12 14.2 15" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+      <Circle cx={12} cy={17.8} r={1.15} fill={color} />
+      <Path d="M4 4 L20 20" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" />
+    </Svg>
+  );
+}
+
+/** Bell — daily-reminder / notifications. */
+export function BellIcon({ size = 24, color = INK, strokeWidth = 1.8 }: GlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M6 9a6 6 0 0 1 12 0c0 6 2.5 7.5 2.5 7.5h-17S6 15 6 9Z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <Path d="M10.2 20a2 2 0 0 0 3.6 0" stroke={color} strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" />
+    </Svg>
+  );
+}

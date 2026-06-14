@@ -9,12 +9,16 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { QueryClient, QueryClientProvider, onlineManager } from '@tanstack/react-query';
 import { StatusBar } from 'expo-status-bar';
+import NetInfo from '@react-native-community/netinfo';
 
 import { ThemeProvider } from '../src/theme/ThemeProvider';
 import { ToastProvider } from '../src/components/Toast';
 import { AuthProvider, useAuth } from '../src/auth/AuthContext';
+import { PurchasesProvider } from '../src/iap/PurchasesProvider';
+import { OfflineNotice } from '../src/components/OfflineNotice';
+import { NotificationsProvider } from '../src/notifications/NotificationsProvider';
 import { fontMap } from '../src/theme/typography';
 import '../src/i18n';
 
@@ -23,6 +27,15 @@ SplashScreen.preventAutoHideAsync().catch(() => {});
 const queryClient = new QueryClient({
   defaultOptions: { queries: { retry: 1, staleTime: 30_000 } },
 });
+
+// Make React Query offline-aware: when connectivity drops, queries pause instead
+// of erroring; the moment NetInfo reports we're back online, every screen's
+// queries refetch automatically (pairs with the <OfflineNotice /> popup).
+onlineManager.setEventListener((setOnline) =>
+  NetInfo.addEventListener((state) =>
+    setOnline(state.isConnected !== false && state.isInternetReachable !== false),
+  ),
+);
 
 function RootNav() {
   const { status } = useAuth();
@@ -61,10 +74,15 @@ export default function RootLayout() {
         <ThemeProvider>
           <QueryClientProvider client={queryClient}>
             <AuthProvider>
-              <ToastProvider>
-                <StatusBar style="dark" />
-                <RootNav />
-              </ToastProvider>
+              <PurchasesProvider>
+                <ToastProvider>
+                  <NotificationsProvider>
+                    <StatusBar style="dark" />
+                    <RootNav />
+                    <OfflineNotice />
+                  </NotificationsProvider>
+                </ToastProvider>
+              </PurchasesProvider>
             </AuthProvider>
           </QueryClientProvider>
         </ThemeProvider>

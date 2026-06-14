@@ -33,7 +33,7 @@ export function DaySheet({ date, onClose, onOpenEntry }: DaySheetProps) {
   // Special day (holiday / personal) for this date.
   const ref = date ?? todayKey();
   const evQ = useEvents(Number(ref.slice(0, 4)), Number(ref.slice(5, 7)));
-  const event = date ? evQ.data?.events.find((e) => e.date === date) : undefined;
+  const event = date ? evQ.data?.events?.find((e) => e.date === date) : undefined;
 
   const weekday = date ? formatDateKey(date, i18n.language, { weekday: 'long', day: undefined, month: undefined, year: undefined }) : '';
   const dayMonth = date

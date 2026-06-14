@@ -7,12 +7,14 @@
  *                 brand `MoodFace` if the image can't load
  *   • `emoji`   → badge glyph (full-color disc)
  *
- * Pack icons are rendered via <Image> (renders SVG/PNG/WEBP on web; PNG/WEBP on
- * native) rather than react-native-svg's SvgUri, which renders these packs'
- * offset-viewBox SVGs as solid black. On error we fall back to MoodFace.
+ * Pack icons are rendered via expo-image's <Image> (renders SVG/PNG/WEBP on BOTH
+ * web and native) rather than react-native-svg's SvgUri (which draws these packs'
+ * offset-viewBox SVGs as solid black) or RN's <Image> (which can't render SVG on
+ * native at all → packs fell back to the line-art face). On error → MoodFace.
  */
 import { useState } from 'react';
-import { View, Image } from 'react-native';
+import { View } from 'react-native';
+import { Image } from 'expo-image';
 import { Text } from '../Text';
 import { MoodFace, faceForMood, type FaceType } from './MoodFace';
 import { useTheme } from '../../theme/ThemeProvider';
@@ -45,7 +47,7 @@ function PackOrFace({ moodId, pack, format, size }: { moodId: string; pack: stri
     <Image
       source={{ uri: moodIconUrl(moodId, pack, format) }}
       style={{ width: size, height: size }}
-      resizeMode="contain"
+      contentFit="contain"
       onError={() => setFailed(true)}
     />
   );
@@ -57,7 +59,7 @@ export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, packFormat 
   const isMood = moodId != null || face != null || !!iconKey;
   let content: React.ReactNode;
   if (iconKey) {
-    content = <Image source={{ uri: `${R2_PUBLIC_URL}/${iconKey}` }} style={{ width: size * 0.7, height: size * 0.7 }} resizeMode="contain" />;
+    content = <Image source={{ uri: `${R2_PUBLIC_URL}/${iconKey}` }} style={{ width: size * 0.7, height: size * 0.7 }} contentFit="contain" />;
   } else if (face) {
     content = <MoodFace face={face} size={size * 0.84} />;
   } else if (moodId != null) {

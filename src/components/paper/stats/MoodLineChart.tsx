@@ -45,7 +45,7 @@ export function MoodLineChart({
   const [w, setW] = useState(320);
   const [sel, setSel] = useState<number | null>(null);
 
-  const n = points.length;
+  const n = points?.length ?? 0;
   if (n === 0) return null;
 
   const innerW = VBW - PAD.left - PAD.right;
@@ -78,8 +78,9 @@ export function MoodLineChart({
     return day % 5 === 0 ? String(day) : '';
   };
 
-  // annotation pins → map dateKey to a scored point index
-  const pins = annotations
+  // annotation pins → map dateKey to a scored point index.
+  // (API may send `annotations: null`; the `= []` default only covers undefined.)
+  const pins = (annotations ?? [])
     .map((a) => {
       const i = points.findIndex((p) => p.date === a.dateKey && moodScore(p.moodId) != null);
       return i < 0 ? null : { a, i, score: moodScore(points[i].moodId)! };

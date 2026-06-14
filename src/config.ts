@@ -25,3 +25,65 @@ export const DEFAULT_MOOD_PACK = 'set_486038';
 export function moodIconUrl(moodId: string, pack: string = DEFAULT_MOOD_PACK, format = 'svg'): string {
   return `${R2_PUBLIC_URL}/${pack}/${moodId}.${format}`;
 }
+
+/**
+ * RevenueCat (native in-app purchases — iOS App Store / Google Play). Web keeps
+ * using Stripe; native must use IAP per Apple/Google policy. These are the
+ * PUBLIC SDK keys (safe to commit, like a Stripe publishable key) — the RC
+ * SECRET key lives only on the backend, which validates entitlements.
+ *
+ * TODO(iap): replace the placeholders below once the RevenueCat project exists.
+ *   1. Create monthly + yearly subscription products in App Store Connect and
+ *      Google Play Console (suggested ids in IAP_PRODUCT_IDS, for reference).
+ *   2. In RevenueCat, attach both products to an Offering whose `monthly` and
+ *      `annual` packages map to them, and to an Entitlement named RC_ENTITLEMENT_ID.
+ *   3. Paste the iOS/Android public SDK keys here. No store ids are needed in the
+ *      app — purchases key off the offering's packages, not raw product ids.
+ */
+// The RevenueCat **Test Store** key (single key, not store-specific) lets us test
+// the SDK/paywall/entitlement flow without an App Store/Play sandbox login.
+//
+// iOS: real App Store public SDK key (`appl_…`) in production builds; Test Store
+// in dev. TestFlight/production builds have `__DEV__ === false`, so they hit the
+// real App Store — sandbox testers included. (purchases.ts errors if a prod build
+// is ever caught using a `test_` key.)
+const RC_TEST_STORE_KEY = 'test_DUaEZpfgooOErKgGZTfAHGzIFKm';
+export const RC_API_KEY_IOS = __DEV__ ? RC_TEST_STORE_KEY : 'appl_WypvAbsAkbWStKvvPJITKZyVbuY';
+// Android: real Play Store public SDK key (`goog_…`) in production builds; Test
+// Store in dev. RevenueCat HARD-CLOSES a release build that ships a `test_` key,
+// so production must use the `goog_` key (and dev/Expo Go keeps the Test Store).
+export const RC_API_KEY_ANDROID = __DEV__ ? RC_TEST_STORE_KEY : 'goog_ZoavEJJkcFAwoMhUpuFJwGuYbuV';
+
+/**
+ * RevenueCat entitlement IDENTIFIER that grants Pro. Must match the entitlement's
+ * **Identifier** in the RC dashboard EXACTLY (RC REST keys entitlements by identifier)
+ * AND the backend's REVENUECAT_ENTITLEMENT_ID. All three must stay in sync —
+ * changing one alone silently breaks restore (client) + the Pro grant (backend).
+ */
+export const RC_ENTITLEMENT_ID = 'Dailymood Pro';
+
+/** Reference product ids to create in the stores (the app buys via RC packages). */
+export const IAP_PRODUCT_IDS = {
+  monthly: 'me.dailymood.app.pro.monthly',
+  yearly: 'me.dailymood.app.pro.yearly',
+} as const;
+
+/** Where to send users to manage/cancel a store subscription if RC has no managementURL. */
+export const STORE_SUBSCRIPTIONS_URL = {
+  ios: 'https://apps.apple.com/account/subscriptions',
+  android: 'https://play.google.com/store/account/subscriptions',
+} as const;
+
+/**
+ * Google Sign-In (native OAuth via @react-native-google-signin). We request an ID
+ * token whose audience is the WEB client id (`webClientId`); the backend verifies
+ * it against GOOGLE_WEB_CLIENT_ID. The iOS client id drives the native iOS flow —
+ * its reversed form is the `iosUrlScheme` in app.json. These are OAuth client
+ * IDENTIFIERS (public, safe to commit) — no client secret is used because the
+ * backend verifies the ID token directly (no code exchange). They live in the same
+ * Google Cloud project as the web app but are SEPARATE clients from NextAuth's
+ * (the backend deliberately rejects the web's AUTH_GOOGLE_ID to keep the audience
+ * narrow). The Android client id is added once the signing-key SHA-1 exists.
+ */
+export const GOOGLE_WEB_CLIENT_ID = '388993665217-hf6igjebkhj8cpe3sdjb8ob1104h79jl.apps.googleusercontent.com';
+export const GOOGLE_IOS_CLIENT_ID = '388993665217-vt6oc4maak1b31odr9qbdvp8doc56t90.apps.googleusercontent.com';
