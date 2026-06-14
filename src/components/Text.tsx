@@ -8,7 +8,7 @@
  * Use `variant` for the type scale and `weight` for emphasis.
  */
 import { Children } from 'react';
-import { Text as RNText, type TextProps as RNTextProps, type TextStyle } from 'react-native';
+import { Text as RNText, StyleSheet, type TextProps as RNTextProps, type TextStyle } from 'react-native';
 import { useTheme } from '../theme/ThemeProvider';
 import { urbanist, notoThai, type FontWeightName } from '../theme/typography';
 import { MIN_FONT_SIZE } from '../theme/tokens';
@@ -69,16 +69,21 @@ export function Text({
   const thai = hasThai(children);
 
   const resolvedSize = Math.max(fontSize[variant], MIN_FONT_SIZE);
+  // A `style` override can push fontSize past the variant size. The Thai line box
+  // must grow with the *effective* size, else upper vowels/tone marks clip against
+  // a too-tight box (e.g. fontSize:26 + variant-derived lineHeight:24 → "ด้วย"→"ดวย").
+  const flat = (StyleSheet.flatten(style) ?? {}) as TextStyle;
+  const effectiveSize =
+    typeof flat.fontSize === 'number' ? Math.max(flat.fontSize, MIN_FONT_SIZE) : resolvedSize;
   const base: TextStyle = {
     fontFamily: fontFamily(resolvedWeight, thai),
     fontSize: resolvedSize,
     color: color ?? colors.ink,
     textAlign: center ? 'center' : undefined,
   };
-  // Noto Sans Thai's lower vowels/tone marks clip against a tight line box
-  // (e.g. ไทม์ไลน์ inside a pill). Give Thai a roomier default line height; any
-  // explicit lineHeight in `style` still overrides this (style merges after base).
-  if (thai) base.lineHeight = Math.round(resolvedSize * 1.5);
+  // Give Thai a roomier line box (1.5× the effective size); an explicit lineHeight
+  // in `style` still wins (style merges after base).
+  if (thai && flat.lineHeight == null) base.lineHeight = Math.round(effectiveSize * 1.5);
   if (variant === 'eyebrow') {
     base.textTransform = 'uppercase';
     base.letterSpacing = 0.6;
