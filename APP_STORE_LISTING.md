@@ -172,3 +172,70 @@ DailyMood Pro
 ยินดีต้อนรับสู่ DailyMood 💜
 เวอร์ชันแรกของเรา บันทึกอารมณ์ ให้ AI ค้นหารูปแบบ แล้วดูทั้งปีของคุณค่อยๆ มีชีวิต — ทีละพิกเซล มีไอเดียหรือเจอบั๊ก? แตะ "ส่งความคิดเห็น" ในแอปได้ทุกเมื่อ
 ```
+
+---
+
+## App Privacy (App Store Connect → App Privacy)
+
+**Verified: NO analytics / crash / ad / tracking SDK in the mobile app** → **Tracking = No
+for every data type** (no App Tracking Transparency prompt needed). All data is collected
+only to make the app work, and is tied to the user's account.
+
+First question → "Do you or your third-party partners collect data?" → **Yes**.
+
+For EACH data type below: **Used for tracking? → No**. **Linked to identity? → Yes**.
+
+| Data type (Apple category) | Declare? | Purpose |
+|---|---|---|
+| Contact Info → **Email Address** | ✅ Yes | App Functionality |
+| Contact Info → **Name** (display name) | ✅ Yes | App Functionality |
+| User Content → **Photos or Videos** (AI Vision, avatar) | ✅ Yes | App Functionality |
+| User Content → **Other User Content** (moods, notes, tags, custom moods, special days) | ✅ Yes | App Functionality, Product Personalization |
+| Location → **Precise Location** (optional entry tagging) | ✅ Yes | App Functionality |
+| Identifiers → **User ID** (account id) | ✅ Yes | App Functionality |
+| Identifiers → **Device ID** (push token) | ✅ Yes | App Functionality |
+| Purchases → **Purchase History** (subscription status, via RevenueCat) | ✅ Yes | App Functionality |
+
+**RESOLVED — live Privacy Policy + backend confirmation (2026-06-14):**
+- **Health & Fitness → Health: NO.** Policy does NOT frame moods as health/medical data
+  → moods stay under **User Content → Other User Content**.
+- **Usage Data → Product Interaction: NO — do NOT declare.** Backend CONFIRMED (from code)
+  Google Analytics is **web-only**; the mobile app collects NO usage stats. Privacy page
+  updated live to say so explicitly ("แอปมือถือไม่เก็บสถิติการใช้งานเลย"). iOS App Privacy =
+  **no analytics** — consistent with the no-GA-SDK finding. ✅
+- **Audio Data: NOT collected** — voice-to-text is local; audio files not retained.
+- **Photos → Gemini (AI Vision sends images to Google Gemini, confirmed by BE):** iOS App
+  Privacy has NO per-item "shared with third party" toggle (third-party processing is part
+  of your declaration) → keep Photos = collected, Linked: Yes, App Functionality, Tracking:
+  No. ⚠️ For **Google Play Data Safety** (Android, later): mark **Photos as SHARED with a
+  third party** (Gemini).
+
+**NOT collected:** Usage Data / Analytics (GA web-only), Payment Info (App Store handles),
+Browsing/Search History, Contacts, Crash/Performance Diagnostics, Advertising Data, Audio.
+
+**Third-party partners (none for ads/tracking):** Railway (DB), Cloudflare (images/CDN),
+Google Gemini (AI on notes + AI Vision images), Resend (email), Google Maps (location
+lookup), Expo (push), Stripe (web payments only), RevenueCat (mobile purchase verification).
+Google Analytics = web-only (NOT a mobile data partner).
+
+---
+
+## Screenshot brief (for Claude design)
+
+**Format:** iPhone 6.7"/6.9" portrait — **1290 × 2796 px** (PNG, no alpha). Apple needs this
+size for the iPhone slot; reuse for the 6.5" slot too. 6 frames (Apple allows up to 10).
+**Style:** marketing frames (device mockup + the app screen + a short headline above/below),
+brand background **#FBF6EE** (cream), match brand (gradient smiley logo, rounded, warm, gentle —
+see DESIGN.md). Keep headline short, sentence-case, friendly. Localize EN + TH.
+
+| # | App screen to show | Headline EN | Headline TH |
+|---|---|---|---|
+| 1 | Today — pick a mood / log entry | A gentle place for how you feel | พื้นที่อบอุ่นสำหรับความรู้สึกของคุณ |
+| 2 | Smart Log AI (note → mood/themes/recap) | Just write — AI reads your mood | แค่เขียน — AI อ่านอารมณ์ให้ |
+| 3 | Weekly Insights (forecast / Mood DNA / energy) | Your week, decoded by AI | ถอดรหัสสัปดาห์ของคุณด้วย AI |
+| 4 | Calendar (mood colors) | See your moods at a glance | เห็นอารมณ์ทั้งเดือนในพริบตา |
+| 5 | Year in Pixels | Your whole year, one pixel a day | ทั้งปีของคุณ วันละพิกเซล |
+| 6 | Stats (trends/mix) or Ask AI | Spot the patterns behind how you feel | เห็นรูปแบบเบื้องหลังความรู้สึก |
+
+**Do NOT show the paywall** (not required by Apple; hurts conversion). Source the in-app screens
+from build 10 (TestFlight). Same set reusable for Google Play (Play needs min 2, 16:9 or 9:16).
