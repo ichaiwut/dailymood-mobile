@@ -10,7 +10,7 @@ import { MarkSentence } from '../../Mark';
 import { MoodPicker } from '../../MoodPicker';
 import { PaperSheet } from '../PaperSheet';
 import { useTheme } from '../../../theme/ThemeProvider';
-import { useMoods, useProfile } from '../../../hooks/queries';
+import { useMoods, useMoodPack } from '../../../hooks/queries';
 import { useSmartLog } from '../smartlog/SmartLogProvider';
 import { greetingKey } from '../../../lib/time';
 import { APP_TIMEZONE } from '../../../config';
@@ -32,7 +32,7 @@ export function GreetingFolder() {
   const { t, i18n } = useTranslation();
   const { colors, space } = useTheme();
   const moods = useMoods();
-  const profile = useProfile();
+  const { pack, packFormat } = useMoodPack();
   const smartLog = useSmartLog();
 
   return (
@@ -48,8 +48,8 @@ export function GreetingFolder() {
         <MoodPicker
           layout="grid"
           moods={moods.data ?? []}
-          pack={profile.data?.user.moodPack}
-          packFormat={profile.data?.packs?.find((p) => p.id === profile.data?.user.moodPack)?.iconFormat}
+          pack={pack}
+          packFormat={packFormat}
           onSelect={(m) => smartLog.open({ moodId: m.id })}
         />
       </View>

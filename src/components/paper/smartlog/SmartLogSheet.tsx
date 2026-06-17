@@ -22,6 +22,7 @@ import { MoodPicker } from '../../MoodPicker';
 import { useTheme } from '../../../theme/ThemeProvider';
 import {
   useMoods,
+  useMoodPack,
   useAiRemaining,
   useConfirmEntry,
   useJournalPrompt,
@@ -76,6 +77,7 @@ export function SmartLogSheet({
   const toast = useToast();
   const router = useRouter();
   const moods = useMoods();
+  const { pack, packFormat } = useMoodPack();
   const ai = useAiRemaining();
   const confirm = useConfirmEntry();
   const activities = useActivities();
@@ -385,6 +387,8 @@ export function SmartLogSheet({
             <MoodPicker
               moods={moodList}
               selectedId={effectiveMoodId}
+              pack={pack}
+              packFormat={packFormat}
               onSelect={(m) => setMoodId(m.id)}
             />
           </View>

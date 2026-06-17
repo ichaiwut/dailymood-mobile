@@ -77,6 +77,17 @@ export function useProfile() {
   return useQuery({ queryKey: queryKeys.profile, queryFn: fetchProfile });
 }
 
+/**
+ * The user's selected mood-icon pack + its icon format, for `MoodPicker`/`PASticker`.
+ * Always thread these into mood icons so entries render the user's chosen pack
+ * (not the default). Undefined while the profile loads → PASticker's default pack.
+ */
+export function useMoodPack(): { pack: string | undefined; packFormat: string | undefined } {
+  const { data } = useProfile();
+  const pack = data?.user.moodPack;
+  return { pack, packFormat: data?.packs?.find((p) => p.id === pack)?.iconFormat };
+}
+
 export function useEntriesByDate(date: string | null) {
   return useQuery({
     queryKey: queryKeys.entriesByDate(date ?? 'none'),

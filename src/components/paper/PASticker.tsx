@@ -18,6 +18,7 @@ import { Image } from 'expo-image';
 import { Text } from '../Text';
 import { MoodFace, faceForMood, type FaceType } from './MoodFace';
 import { useTheme } from '../../theme/ThemeProvider';
+import { useMoodPack } from '../../hooks/queries';
 import { DEFAULT_MOOD_PACK, R2_PUBLIC_URL, moodIconUrl } from '../../config';
 
 export interface PAStickerProps {
@@ -53,8 +54,13 @@ function PackOrFace({ moodId, pack, format, size }: { moodId: string; pack: stri
   );
 }
 
-export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, packFormat = 'svg', face, iconKey, emoji, size = 56, halo, discBg }: PAStickerProps) {
+export function PASticker({ color, moodId, pack, packFormat, face, iconKey, emoji, size = 56, halo, discBg }: PAStickerProps) {
   const { shadow } = useTheme();
+  // Default to the user's selected mood pack (+ its format) unless a caller passes
+  // one explicitly. Falls back to the default pack while the profile is loading.
+  const { pack: userPack, packFormat: userFormat } = useMoodPack();
+  const resolvedPack = pack ?? userPack ?? DEFAULT_MOOD_PACK;
+  const resolvedFormat = packFormat ?? userFormat ?? 'svg';
 
   const isMood = moodId != null || face != null || !!iconKey;
   let content: React.ReactNode;
@@ -63,7 +69,7 @@ export function PASticker({ color, moodId, pack = DEFAULT_MOOD_PACK, packFormat 
   } else if (face) {
     content = <MoodFace face={face} size={size * 0.84} />;
   } else if (moodId != null) {
-    content = emoji ? <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text> : <PackOrFace moodId={moodId} pack={pack} format={packFormat} size={size * 0.84} />;
+    content = emoji ? <Text style={{ fontSize: size * 0.5 }}>{emoji}</Text> : <PackOrFace moodId={moodId} pack={resolvedPack} format={resolvedFormat} size={size * 0.84} />;
   } else if (emoji) {
     content = <Text style={{ fontSize: size * 0.46 }}>{emoji}</Text>;
   } else {

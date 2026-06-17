@@ -24,7 +24,7 @@ import { CalendarIcon, ClockIcon, SparkleIcon } from '../../../src/components/ic
 import { useToast } from '../../../src/components/Toast';
 import { useGoBack } from '../../../src/hooks/useGoBack';
 import { useTheme } from '../../../src/theme/ThemeProvider';
-import { useEntry, useMoods, useUpdateEntry, useDeleteEntry, useAiRemaining } from '../../../src/hooks/queries';
+import { useEntry, useMoods, useMoodPack, useUpdateEntry, useDeleteEntry, useAiRemaining } from '../../../src/hooks/queries';
 import { analyzeSmart } from '../../../src/api/log';
 import { hasAiQuota } from '../../../src/api/ai';
 import { formatDateKey, ictClock } from '../../../src/lib/time';
@@ -45,6 +45,7 @@ export default function EditEntryScreen() {
 
   const entry = useEntry(id);
   const moods = useMoods();
+  const { pack, packFormat } = useMoodPack();
   const update = useUpdateEntry(id);
   const del = useDeleteEntry();
   const ai = useAiRemaining();
@@ -174,7 +175,7 @@ export default function EditEntryScreen() {
                   <Text variant="label" weight="bold" color={colors.ink3} style={eyebrowStyle}>
                     {t('smartlog.pickMood')}
                   </Text>
-                  <MoodPicker moods={moods.data ?? []} selectedId={moodId} onSelect={(m) => setMoodId(m.id)} />
+                  <MoodPicker moods={moods.data ?? []} selectedId={moodId} pack={pack} packFormat={packFormat} onSelect={(m) => setMoodId(m.id)} />
                 </View>
 
                 {/* date / time (read-only) */}
