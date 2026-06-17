@@ -312,6 +312,8 @@ export default function ProfileScreen() {
                 value={premium ? (u.currentPeriodEnd ? t(u.cancelAtPeriodEnd ? 'profile.expires' : 'profile.renews', { date: formatDateKey(u.currentPeriodEnd.slice(0, 10), i18n.language, { weekday: undefined, day: 'numeric', month: 'short', year: 'numeric' }) }) : t('subscription.pro')) : t('profile.freeTier')}
                 onPress={() => router.push('/profile/subscription')}
               />
+              <Divider />
+              <NavRow bg="#FCA45B" icon="🔔" title={t('settings.notifications')} onPress={() => router.push('/profile/notifications')} />
             </SettingCard>
           </Section>
 

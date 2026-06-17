@@ -63,14 +63,17 @@ export interface Profile {
     currentPeriodEnd: string | null;
     cancelAtPeriodEnd: boolean;
     planInterval: string | null;
-    // settings
-    reminderEnabled: boolean;
+    // settings — notification prefs are per-topic × per-channel (email/push)
+    reminderEmailEnabled: boolean;
+    reminderPushEnabled: boolean;
     reminderTime: string;
     reminderDays: string;
     hidePreview: boolean;
     anonymousInsights: boolean;
-    weeklyDigestEnabled: boolean;
-    aiCoachEnabled: boolean;
+    weeklyDigestEmailEnabled: boolean;
+    weeklyDigestPushEnabled: boolean;
+    aiCoachEmailEnabled: boolean;
+    aiCoachPushEnabled: boolean;
   };
   stats: {
     streak: number;
@@ -145,12 +148,15 @@ export interface UpdateProfileInput {
   bio?: string;
   accentColor?: string;
   locale?: 'th' | 'en';
-  weeklyDigestEnabled?: boolean;
-  aiCoachEnabled?: boolean;
+  reminderEmailEnabled?: boolean;
+  reminderPushEnabled?: boolean;
+  weeklyDigestEmailEnabled?: boolean;
+  weeklyDigestPushEnabled?: boolean;
+  aiCoachEmailEnabled?: boolean;
+  aiCoachPushEnabled?: boolean;
   hidePreview?: boolean;
   anonymousInsights?: boolean;
   moodPack?: string;
-  reminderEnabled?: boolean;
   reminderTime?: string;
   reminderDays?: string;
 }

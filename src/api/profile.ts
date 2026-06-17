@@ -36,7 +36,7 @@ export async function exportEntriesCsv(): Promise<string> {
   return res.text();
 }
 
-/** PATCH /api/profile — name, bio, accentColor, locale, weeklyDigestEnabled, aiCoachEnabled. */
+/** PATCH /api/profile — name, bio, accentColor, locale, notification prefs (per-topic email/push), reminderTime/Days. */
 export function updateProfile(input: UpdateProfileInput): Promise<unknown> {
   return apiFetch('/api/profile', { method: 'PATCH', body: input });
 }

@@ -230,3 +230,24 @@ export function BellIcon({ size = 24, color = INK, strokeWidth = 1.8 }: GlyphPro
     </Svg>
   );
 }
+
+/** Envelope — email channel / weekly digest. */
+export function MailIcon({ size = 24, color = INK, strokeWidth = 1.8 }: GlyphProps) {
+  return (
+    <Svg width={size} height={size} viewBox="0 0 24 24" fill="none">
+      <Path
+        d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1Z"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinejoin="round"
+      />
+      <Path
+        d="M3.6 6.4 L12 12.2 L20.4 6.4"
+        stroke={color}
+        strokeWidth={strokeWidth}
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </Svg>
+  );
+}

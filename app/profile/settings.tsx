@@ -1,7 +1,8 @@
 /**
- * Settings (/profile/settings). Language (EN/TH → PATCH locale + app switch),
- * and About links (Terms / Privacy) opened in the browser. Reminder/privacy
- * toggles are deferred (the documented PATCH covers name/bio/accent/locale).
+ * Settings (/profile/settings). Language (EN/TH → PATCH locale + app switch) and
+ * About links (Terms / Privacy). NOTE: not currently linked from the UI — the
+ * live settings (incl. the Notification section) render inline in the profile
+ * tab (`app/(tabs)/profile.tsx`).
  */
 import { View, Pressable, Linking, ActivityIndicator } from 'react-native';
 import { useTranslation } from 'react-i18next';

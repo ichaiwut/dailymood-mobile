@@ -4,8 +4,8 @@
  * Themes / Energy Clock), pattern cards, and a suggestion with feedback.
  * Non-premium → a whole-page FreeGate. POST /api/insights/feedback on react.
  *
- * Deferred vs the web spec: the Ask AI sub-tab (no Ask page yet → toast) and the
- * footer AI-Coach / Weekly-Digest toggles (need a settings-persistence contract).
+ * Deferred vs the web spec: the Ask AI sub-tab (no Ask page yet → toast). The
+ * AI-Coach / Weekly-Digest toggles now live in Settings → Notification.
  */
 import { useState, type ReactNode } from 'react';
 import { View, Pressable, Share } from 'react-native';
@@ -25,7 +25,7 @@ import { RadarChart } from '../src/components/paper/insights/RadarChart';
 import { EnergyRadial } from '../src/components/paper/insights/EnergyRadial';
 import { MoodBarChart } from '../src/components/paper/insights/MoodBarChart';
 import { useTheme } from '../src/theme/ThemeProvider';
-import { useInsightsAll, useInsightFeedback, useMoods, useProfile, useUpdateProfile } from '../src/hooks/queries';
+import { useInsightsAll, useInsightFeedback, useMoods, useProfile } from '../src/hooks/queries';
 import { useToast } from '../src/components/Toast';
 import { useGoBack } from '../src/hooks/useGoBack';
 import { findMood } from '../src/lib/mood';
@@ -63,21 +63,11 @@ export default function InsightsScreen() {
   const q = useInsightsAll(i18n.language, weekParam, premium);
   const moods = useMoods();
   const feedback = useInsightFeedback();
-  const updateProfile = useUpdateProfile();
   const [expanded, setExpanded] = useState(false);
   const [reacted, setReacted] = useState<InsightReaction | null>(null);
 
   const d = q.data;
   const goPro = () => router.push('/profile/subscription');
-
-  const toggleSetting = async (key: 'aiCoachEnabled' | 'weeklyDigestEnabled', value: boolean) => {
-    try {
-      await updateProfile.mutateAsync({ [key]: value });
-      toast.show(t('profile.saved'));
-    } catch (e) {
-      toast.show(t(errorMessageKey(e)), 'error');
-    }
-  };
 
   const react = async (r: InsightReaction) => {
     if (!d?.suggestion || reacted) return;
@@ -247,22 +237,6 @@ export default function InsightsScreen() {
             </>
           )}
 
-          {/* footer toggles */}
-          <ToggleRow
-            gradient
-            emoji="🤖"
-            title={t('insights.coachTitle')}
-            body={t('insights.coachBody')}
-            value={profile.data?.user.aiCoachEnabled ?? false}
-            onToggle={(v) => toggleSetting('aiCoachEnabled', v)}
-          />
-          <ToggleRow
-            emoji="📩"
-            title={t('insights.digestTitle')}
-            body={t('insights.digestBody')}
-            value={profile.data?.user.weeklyDigestEnabled ?? false}
-            onToggle={(v) => toggleSetting('weeklyDigestEnabled', v)}
-          />
         </>
       ) : null}
     </Screen>
@@ -357,38 +331,6 @@ export default function InsightsScreen() {
         }}
       >
         <Text variant="label" weight="bold" color={active ? brand.purpleStrong : colors.ink2}>{label}</Text>
-      </Pressable>
-    );
-  }
-
-  function ToggleRow({ emoji, title, body, value, onToggle, gradient }: { emoji: string; title: string; body: string; value: boolean; onToggle: (v: boolean) => void; gradient?: boolean }) {
-    return (
-      <View style={{ backgroundColor: colors.surface, borderRadius: radius.lg, padding: space.lg, flexDirection: 'row', alignItems: 'center', gap: space.md, boxShadow: shadow.sm }}>
-        {gradient ? (
-          <LinearGradient colors={['#FCA45B', '#A673F1']} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ width: 32, height: 32, borderRadius: 9, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 16 }}>{emoji}</Text>
-          </LinearGradient>
-        ) : (
-          <View style={{ width: 32, height: 32, borderRadius: 9, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' }}>
-            <Text style={{ fontSize: 16 }}>{emoji}</Text>
-          </View>
-        )}
-        <View style={{ flex: 1 }}>
-          <Text variant="label" weight="bold">{title}</Text>
-          <Text variant="label" color={colors.ink3} style={{ lineHeight: 20 }}>{body}</Text>
-        </View>
-        <TogglePill value={value} onToggle={onToggle} />
-      </View>
-    );
-  }
-
-  function TogglePill({ value, onToggle }: { value: boolean; onToggle: (v: boolean) => void }) {
-    return (
-      <Pressable
-        onPress={() => onToggle(!value)}
-        style={{ width: 44, height: 24, borderRadius: 12, padding: 2, backgroundColor: value ? brand.purple : colors.surface3, justifyContent: 'center', alignItems: value ? 'flex-end' : 'flex-start' }}
-      >
-        <View style={{ width: 20, height: 20, borderRadius: 10, backgroundColor: '#fff', boxShadow: shadow.sm }} />
       </Pressable>
     );
   }

@@ -13,8 +13,7 @@ import { WashiTape } from './WashiTape';
 type SheetVariant = 'paper' | 'kraft' | 'plum' | 'peach';
 
 /** A folder tab with a skewed folded corner. */
-export function FolderTab({ label, bg, fg }: { label: string; bg: string; fg?: string }) {
-  const { space } = useTheme();
+export function FolderTab({ label, bg, fg, icon }: { label: string; bg: string; fg?: string; icon?: ReactNode }) {
   return (
     <View style={{ alignSelf: 'flex-start', zIndex: 2, marginBottom: -8 }}>
       <View
@@ -25,8 +24,12 @@ export function FolderTab({ label, bg, fg }: { label: string; bg: string; fg?: s
           paddingHorizontal: 18,
           paddingTop: 8,
           paddingBottom: 11,
+          flexDirection: 'row',
+          alignItems: 'center',
+          gap: 7,
         }}
       >
+        {icon}
         <Text weight="extrabold" color={fg ?? '#fff'} style={{ fontSize: 15, letterSpacing: -0.2 }}>
           {label}
         </Text>
@@ -52,6 +55,7 @@ export function FolderTab({ label, bg, fg }: { label: string; bg: string; fg?: s
 export interface PaperSheetProps {
   children: ReactNode;
   tab?: string;
+  tabIcon?: ReactNode;
   tabColor?: string;
   tabTextColor?: string;
   variant?: SheetVariant;
@@ -66,6 +70,7 @@ export interface PaperSheetProps {
 export function PaperSheet({
   children,
   tab,
+  tabIcon,
   tabColor,
   tabTextColor,
   variant = 'paper',
@@ -90,7 +95,7 @@ export function PaperSheet({
 
   return (
     <View style={[rotate ? { transform: [{ rotate: `${rotate}deg` }] } : null, style]}>
-      {tab ? <FolderTab label={tab} bg={tabColor ?? colors.primary} fg={tabTextColor} /> : null}
+      {tab ? <FolderTab label={tab} bg={tabColor ?? colors.primary} fg={tabTextColor} icon={tabIcon} /> : null}
       <View
         style={{
           backgroundColor: bg,

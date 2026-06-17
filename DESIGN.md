@@ -5,6 +5,10 @@
 > the **same commit**. This is the design source of truth for future sessions.
 > Incoming references (do not edit): `handover-doc/mobile-handoff/` and
 > `doc/design_handoff_paper_landing/`. **This file** records what is actually built.
+>
+> **System-level reference:** `DESIGN-SYSTEM.md` holds the foundations (tokens, type,
+> colour, shadow), the Paper Desk language, and the primitive catalogue — this file is the
+> per-screen detail, that one is the system behind it.
 
 The aesthetic is **"Paper Desk"**: a kraft-cream desk, white paper sheets with an
 asymmetric folder-seam radius, washi tape, paperclips, mood-face stickers, soft
@@ -385,9 +389,8 @@ peak), each → a "✨ generating…" placeholder when its datum is null; up to 
 card (warm gradient + washi, 💡 SUGGESTION badge, 👍/👎 `FeedbackPill`s → `/api/insights/feedback`,
 one-shot then disabled). New viz live in `src/components/paper/insights/`. **States:** loading
 skeleton, error (😵 + retry), and `status.ready === false` → TooFew (📝, <7 entries) / Empty (🔮).
-**Footer toggles** (`ToggleRow` + `TogglePill` 44×24): 🤖 AI Coach (gradient icon tile) + 📩 Weekly
-Digest, bound to `profile.aiCoachEnabled` / `weeklyDigestEnabled` and persisted via
-`PATCH /api/profile` (`useUpdateProfile`, toast on save). The Ask-AI tab routes to `/ask-ai` (§4i).
+The Ask-AI tab routes to `/ask-ai` (§4i). (The former footer 🤖 AI Coach / 📩 Weekly Digest toggles
+moved to Settings → Notification — see §4j-b.)
 
 ## 4i. Ask AI chat — `app/ask-ai.tsx` (Pro, `/api/ask-ai/*`)
 
@@ -443,6 +446,23 @@ with delete; **PersonalEventsManager** — emoji (12 presets) + name + month/day
 `POST /api/events`, list with delete, Free capped at 3 then a Pro teaser (`limit_reached`). Native
 color picker → palette swatches; native date picker → chip rows. **Deferred vs web:** theme picker
 (dark mode is `FORCE_LIGHT`).
+
+## 4j-b. Notification settings — `app/profile/notifications.tsx` (`NotificationSection`)
+
+Dedicated screen reached from a 🔔 **การแจ้งเตือน** `NavRow` in the profile tab's Account card (keeps
+that hub short; `app/profile/settings.tsx` stays an unlinked legacy route). Header (`useGoBack` back +
+title) + intro line, then `NotificationSection` (`src/components/NotificationSection.tsx`) renders three
+**Paper Desk folders** (`PaperSheet` — color-coded `FolderTab` + paperclip + warm shadow), each with a
+custom SVG glyph in the tab (our own, never system emoji): Daily reminder (`BellIcon`, purple tab), Weekly
+digest (`MailIcon`, peach), AI coach (`SparkleIcon`, mint/dark text). Each folder has an **Email** (`MailIcon`)
++ **Push** (`BellIcon`) channel row (44×24 pill toggle, hairline between), bound to the per-channel profile flags (`reminderEmailEnabled`/
+`reminderPushEnabled`, `weeklyDigest…`, `aiCoach…`) and saved optimistically via `PATCH /api/profile`
+(toast on save, revert on error). Enabling **Push** runs the OS permission flow (`push.ts`): prompts
+when `undetermined`, and when `denied` keeps the intent + opens a native `Alert` →
+`Linking.openSettings()` (the `notifications.deniedHint` line shows below the folders). The **Daily
+reminder** folder reveals a schedule when either channel is on: a `reminderTime` stepper that **snaps
+to `:00`/`:30`** + a 7-button day row (`reminderDays`, **0=Sun…6=Sat**, comma list) — both match the
+backend reminders cron. Copy: `settings.*` (topics/channels/`weekdaysShort`) + `notifications.push*`.
 
 ## 4m. Saved articles + reactions — `app/profile/saved-articles.tsx`, `app/profile/article-reactions.tsx`
 
