@@ -42,6 +42,16 @@ export async function appendImagePart(form: FormData, field: string, uri: string
     const blob = await (await fetch(uri)).blob();
     form.append(field, blob, 'photo.jpg');
   } else {
-    form.append(field, { uri, name: 'photo.jpg', type: 'image/jpeg' } as unknown as Blob);
+    // Expo SDK 56 installs WinterCG fetch/FormData/Blob as the global impls. Their
+    // FormData rejects React Native's legacy `{ uri }` file part ("Unsupported
+    // FormDataPart implementation") and their Blob can't be built from an
+    // ArrayBuffer. But expo's multipart converter accepts a part exposing async
+    // `bytes()` — and `fetch('file://').arrayBuffer()` reads the local file fine
+    // (only `.blob()` is unsupported). So hand over the raw bytes + name/type.
+    const bytes = new Uint8Array(await (await fetch(uri)).arrayBuffer());
+    form.append(
+      field,
+      { name: 'photo.jpg', type: 'image/jpeg', bytes: async () => bytes } as unknown as Blob,
+    );
   }
 }
