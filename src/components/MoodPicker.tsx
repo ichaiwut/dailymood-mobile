@@ -3,6 +3,7 @@
  *  - 'scroll' (default): horizontal rounded-square tiles (Smart Log, Edit).
  *  - 'grid': wrapping circular sticker discs + labels (Today greeting, web-style).
  */
+import { useEffect, useRef, useState } from 'react';
 import { ScrollView, Pressable, View } from 'react-native';
 import { useTranslation } from 'react-i18next';
 import { Text } from './Text';
@@ -23,6 +24,20 @@ export interface MoodPickerProps {
 export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pack, packFormat }: MoodPickerProps) {
   const { i18n } = useTranslation();
   const { colors, radius, space, shadow } = useTheme();
+  const scrollRef = useRef<ScrollView>(null);
+  const [viewW, setViewW] = useState(0);
+
+  const TILE = 74; // scroll-tile width (must match the Pressable below)
+  const GAP = space.md;
+  // Center the selected mood when it changes — e.g. the AI picks one that's
+  // scrolled off-screen to the right. Scroll layout only.
+  useEffect(() => {
+    if (layout !== 'scroll' || !viewW || !selectedId) return;
+    const i = moods.findIndex((m) => m.id === selectedId);
+    if (i < 0) return;
+    const x = i * (TILE + GAP) + TILE / 2 - viewW / 2;
+    scrollRef.current?.scrollTo({ x: Math.max(0, x), animated: true });
+  }, [selectedId, moods, viewW, layout, GAP]);
 
   if (layout === 'grid') {
     // 5-column, row-major grid → row 2 fills from the left (matches design).
@@ -58,7 +73,7 @@ export function MoodPicker({ moods, selectedId, onSelect, layout = 'scroll', pac
   }
 
   return (
-    <ScrollView horizontal showsHorizontalScrollIndicator={false}>
+    <ScrollView ref={scrollRef} horizontal showsHorizontalScrollIndicator={false} onLayout={(e) => setViewW(e.nativeEvent.layout.width)}>
       <View style={{ flexDirection: 'row', gap: space.md, paddingVertical: 2 }}>
         {moods.map((m) => {
           const selected = m.id === selectedId;
