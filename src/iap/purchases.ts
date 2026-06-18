@@ -80,14 +80,6 @@ export function packageForPlan(
   return (plan === 'yearly' ? offering.annual : offering.monthly) ?? null;
 }
 
-/** Localized store price string for a plan (e.g. "฿99/mo"), or null. */
-export function priceStringForPlan(
-  offering: PurchasesOffering | null,
-  plan: PlanInterval,
-): string | null {
-  return packageForPlan(offering, plan)?.product.priceString ?? null;
-}
-
 /** Buy a package. Throws on failure (incl. user cancellation — see isUserCancelled). */
 export async function purchase(pkg: PurchasesPackage): Promise<void> {
   await Purchases.purchasePackage(pkg);

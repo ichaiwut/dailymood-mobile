@@ -26,6 +26,7 @@ import { EnergyRadial } from '../src/components/paper/insights/EnergyRadial';
 import { MoodBarChart } from '../src/components/paper/insights/MoodBarChart';
 import { useTheme } from '../src/theme/ThemeProvider';
 import { useInsightsAll, useInsightFeedback, useMoods, useProfile } from '../src/hooks/queries';
+import { useMonthlyPriceLabel } from '../src/hooks/useBilling';
 import { useToast } from '../src/components/Toast';
 import { useGoBack } from '../src/hooks/useGoBack';
 import { findMood } from '../src/lib/mood';
@@ -58,6 +59,7 @@ export default function InsightsScreen() {
 
   const profile = useProfile();
   const premium = profile.data?.user.isPremium ?? false;
+  const monthlyPrice = useMonthlyPriceLabel();
   const [weekOffset, setWeekOffset] = useState(0);
   const weekParam = weekOffset === 0 ? undefined : isoWeekKey(new Date(Date.now() + weekOffset * 7 * 86400000));
   const q = useInsightsAll(i18n.language, weekParam, premium);
@@ -397,7 +399,7 @@ export default function InsightsScreen() {
               <Pressable onPress={goPro} style={{ backgroundColor: colors.surface, borderRadius: radius.md, paddingVertical: 14, alignItems: 'center', marginTop: space.xs }}>
                 <Text variant="label" weight="extrabold" color={brand.purpleStrong}>{t('insights.freeSubscribe')}</Text>
               </Pressable>
-              <Text variant="label" weight="bold" color="rgba(255,255,255,0.9)" center>{t('insights.freePrice')}</Text>
+              <Text variant="label" weight="bold" color="rgba(255,255,255,0.9)" center>{t('insights.freePrice', { price: monthlyPrice })}</Text>
             </LinearGradient>
           </View>
         </View>

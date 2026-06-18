@@ -20,6 +20,7 @@ import { useTheme } from '../src/theme/ThemeProvider';
 import { useToast } from '../src/components/Toast';
 import { useGoBack } from '../src/hooks/useGoBack';
 import { useProfile, useAskThreads, useAskSuggested } from '../src/hooks/queries';
+import { useMonthlyPriceLabel } from '../src/hooks/useBilling';
 import { sendAskMessage, sendAskFeedback, fetchAskMessages, createAskThread } from '../src/api/askai';
 import { errorMessageKey } from '../src/api/errors';
 import { APP_TIMEZONE } from '../src/config';
@@ -39,6 +40,7 @@ export default function AskAiScreen() {
 
   const profile = useProfile();
   const premium = profile.data?.user.isPremium ?? false;
+  const monthlyPrice = useMonthlyPriceLabel();
   const threadsQ = useAskThreads(premium);
   const suggestedQ = useAskSuggested(locale, premium);
 
@@ -347,7 +349,7 @@ export default function AskAiScreen() {
               <Pressable onPress={() => router.push('/profile/subscription')} style={{ backgroundColor: colors.surface, borderRadius: radius.md, paddingVertical: 14, alignItems: 'center', marginTop: space.xs }}>
                 <Text variant="label" weight="extrabold" color={brand.purpleStrong}>{t('insights.freeSubscribe')}</Text>
               </Pressable>
-              <Text variant="label" weight="bold" color="rgba(255,255,255,0.9)" center>{t('askai.freePrice')}</Text>
+              <Text variant="label" weight="bold" color="rgba(255,255,255,0.9)" center>{t('askai.freePrice', { price: monthlyPrice })}</Text>
             </LinearGradient>
           </View>
         </View>

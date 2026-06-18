@@ -146,7 +146,7 @@ export default function SubscriptionScreen() {
             <View style={{ position: 'absolute', top: -22, right: 26, zIndex: 6 }}><PAClip /></View>
             <LinearGradient colors={['#F9A870', '#D4A0E8', '#C89BF5']} locations={[0, 0.5, 1]} start={{ x: 0, y: 0 }} end={{ x: 1, y: 1 }} style={{ borderRadius: 18, padding: space.xl, gap: space.sm, boxShadow: shadow.md }}>
               <Text weight="extrabold" style={{ fontSize: 26, color: '#fff' }}>Pro</Text>
-              <Text variant="label" weight="bold" style={{ color: '#fff' }}>{t('pricing.perMonth')}</Text>
+              <Text variant="label" weight="bold" style={{ color: '#fff' }}>{t('pricing.perMonth', { price: billing.prices.monthly ?? '฿49' })}</Text>
               <View style={{ gap: 6, marginTop: 4 }}>
                 {t('subscription.proBullets').split('|').map((b, i) => (
                   <View key={i} style={{ flexDirection: 'row', gap: 8, alignItems: 'center' }}>
@@ -196,7 +196,10 @@ export default function SubscriptionScreen() {
 
   function ActiveState() {
     const planLabel = d!.planInterval === 'year' ? t('subscription.proYearly') : d!.planInterval === 'month' ? t('subscription.proMonthly') : 'Pro';
-    const priceLabel = d!.planInterval === 'year' ? t('pricing.perYear') : t('pricing.perMonth');
+    const priceLabel =
+      d!.planInterval === 'year'
+        ? t('pricing.perYear', { price: billing.prices.yearly ?? '฿390' })
+        : t('pricing.perMonth', { price: billing.prices.monthly ?? '฿49' });
     const isIap = d!.hasIapSubscription;
     const isStripe = d!.hasStripeCustomer && !isIap; // IAP wins if both are flagged (it's the active store sub)
     const comped = !isStripe && !isIap; // truly comped only when neither source owns it

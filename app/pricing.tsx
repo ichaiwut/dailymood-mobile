@@ -146,8 +146,8 @@ export default function PricingScreen() {
 
       {/* plan picker — show live store prices on native, fall back to copy */}
       <View style={{ flexDirection: 'row', gap: space.md }}>
-        <PlanCard kind="monthly" price={billing.prices.monthly ?? t('pricing.perMonth')} label={t('pricing.planMonthly')} selected={plan === 'monthly'} onPress={() => setPlan('monthly')} />
-        <PlanCard kind="yearly" price={billing.prices.yearly ?? t('pricing.perYear')} label={t('pricing.planYearly')} selected={plan === 'yearly'} onPress={() => setPlan('yearly')} sub={t('pricing.perMonthYearly')} badge={t('pricing.save33')} />
+        <PlanCard kind="monthly" price={billing.prices.monthly ?? '฿49'} label={t('pricing.planMonthly')} selected={plan === 'monthly'} onPress={() => setPlan('monthly')} />
+        <PlanCard kind="yearly" price={billing.prices.yearly ?? '฿390'} label={t('pricing.planYearly')} selected={plan === 'yearly'} onPress={() => setPlan('yearly')} sub={t('pricing.perMonthYearly', { price: billing.prices.yearlyPerMonth ?? '฿33' })} badge={t('pricing.savePercent', { pct: billing.prices.savePct ?? 34 })} />
       </View>
 
       {/* main CTA */}

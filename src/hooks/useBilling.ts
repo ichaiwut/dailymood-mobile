@@ -19,7 +19,7 @@ import { useToast } from '../components/Toast';
 import { useAuth } from '../auth/AuthContext';
 import { ApiError, errorMessageKey } from '../api/errors';
 import { useOfferings, usePurchase, useRestore } from '../iap/hooks';
-import { getManagementUrl, isIapSupported, packageForPlan, priceStringForPlan } from '../iap/purchases';
+import { getManagementUrl, isIapSupported, packageForPlan } from '../iap/purchases';
 
 /** Map any thrown billing error to a friendly i18n key (RC errors aren't ApiErrors). */
 function billingErrorKey(e: unknown): string {
@@ -116,15 +116,25 @@ export function useBilling() {
     }
   };
 
+  const monthlyPkg = packageForPlan(offerings.data ?? null, 'monthly');
+  const yearlyPkg = packageForPlan(offerings.data ?? null, 'yearly');
+
   return {
     subscribe,
     openPortal,
     openStoreSubscription,
     restore,
-    /** Live localized store prices (native); null on web or while loading. */
+    /** Live store prices (native); null on web or while still loading. */
     prices: {
-      monthly: priceStringForPlan(offerings.data ?? null, 'monthly'),
-      yearly: priceStringForPlan(offerings.data ?? null, 'yearly'),
+      monthly: monthlyPkg?.product.priceString ?? null,
+      yearly: yearlyPkg?.product.priceString ?? null,
+      // Per-month equivalent of the annual plan + the annual savings %, derived
+      // live from the store so changing a price never needs a code edit.
+      yearlyPerMonth: yearlyPkg ? `฿${Math.round(yearlyPkg.product.price / 12)}` : null,
+      savePct:
+        monthlyPkg && yearlyPkg && monthlyPkg.product.price > 0
+          ? Math.round((1 - yearlyPkg.product.price / (monthlyPkg.product.price * 12)) * 100)
+          : null,
     },
     supportsIap: native,
     busy: busy || purchaseM.isPending || restoreM.isPending,
@@ -140,3 +150,9 @@ export const PRO_FEATURES: { icon: string; title: string; desc: string }[] = [
   { icon: '📊', title: 'pricing.featYip', desc: 'pricing.featYipDesc' },
   { icon: '📤', title: 'pricing.featExport', desc: 'pricing.featExportDesc' },
 ];
+
+/** Live monthly store price (e.g. "฿49") for upsell cards outside the paywall; falls back to copy. */
+export function useMonthlyPriceLabel(fallback = '฿49'): string {
+  const offerings = useOfferings();
+  return packageForPlan(offerings.data ?? null, 'monthly')?.product.priceString ?? fallback;
+}
