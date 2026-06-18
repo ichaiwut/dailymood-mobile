@@ -220,7 +220,23 @@ export function useInsights() {
 }
 
 export function useInsightsAll(locale: string, week?: string, enabled = true) {
-  return useQuery({ queryKey: queryKeys.insightsAll(week), queryFn: () => fetchInsightsAll(locale, week), enabled });
+  return useQuery({
+    queryKey: queryKeys.insightsAll(week),
+    queryFn: () => fetchInsightsAll(locale, week),
+    enabled,
+    // The backend returns forecast/themes/dna as null on first load and generates
+    // them fire-and-forget (cached in DB for the next call). Without polling the
+    // "AI กำลังสร้าง…" cards stay stuck until a manual refresh — so poll until they
+    // land. Stop once all present, when entries are too few to ever generate them,
+    // or after ~6 attempts so a persistently-failing generator can't loop forever.
+    refetchInterval: (query) => {
+      const d = query.state.data;
+      if (!d || d.tooFewEntries) return false;
+      const pending = !d.forecast || !d.dna || !d.themes;
+      if (!pending || query.state.dataUpdateCount > 6) return false;
+      return 8000;
+    },
+  });
 }
 
 export function useAskThreads(enabled = true) {
