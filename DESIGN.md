@@ -435,7 +435,12 @@ connect and disconnect toast. The password row lives **here**, not under Privacy
 a Google-only user had no reason to look there for the one screen that lets them add a password. Apple
 appears when `Platform.OS === 'ios' && appleReady`, **or** when it is already linked (so an Apple user
 on Android can still see how they get in — the row is read-only there). An account we cannot identify
-gets one neutral line instead of a guessed brand. Language (en/th radios
+gets one neutral line instead of a guessed brand. Provider rows use real SVG marks from
+`src/components/icons/BrandMarks.tsx` (`AppleMark` monochrome, `GoogleMark` in its four brand
+colours) — kept apart from `Glyphs`, which is our own stroke-and-`currentColor` icon set, because
+a brand mark is a fixed filled silhouette we don't restyle. Not a font glyph: U+F8FF (the Apple
+mark) exists only in Apple's system fonts and renders as nothing in Urbanist / Noto Sans Thai.
+`NavRow`'s `icon` therefore takes a `ReactNode`, not just an emoji string. Language (en/th radios
 → `i18n.changeLanguage` + PATCH `locale`), Privacy (premium ToggleRow `hidePreview` PATCH / free
 teaser), **Mood-icon pack** picker (when `packs.length>1`: 2-col cards, 4 R2 preview icons via
 `PackIcon` with onError fallback + `iconFormat`; premium pack while `tier!=='premium'` → 🔒/upgrade →

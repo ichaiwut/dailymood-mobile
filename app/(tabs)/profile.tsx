@@ -37,6 +37,7 @@ import { formatDateKey } from '../../src/lib/time';
 import { clearEntries, exportEntriesCsv, fetchFeedbackStatus, submitFeedback } from '../../src/api/profile';
 import { deleteAccount, linkProvider, unlinkProvider } from '../../src/api/account';
 import { getGoogleIdToken, getAppleIdToken, isAppleAuthAvailable } from '../../src/auth/socialSignIn';
+import { AppleMark, GoogleMark } from '../../src/components/icons/BrandMarks';
 import { R2_PUBLIC_URL, API_BASE_URL } from '../../src/config';
 import { ApiError, errorMessageKey } from '../../src/api/errors';
 import type { MoodPack } from '../../src/api/types';
@@ -378,7 +379,7 @@ export default function ProfileScreen() {
               <Divider />
               <NavRow
                 bg="#4285F4"
-                icon="G"
+                icon={<GoogleMark size={20} />}
                 title="Google"
                 value={auth?.google ? t('signin.connected') : t('signin.connect')}
                 loading={linkBusy === 'google'}
@@ -389,9 +390,7 @@ export default function ProfileScreen() {
                   <Divider />
                   <NavRow
                     bg="#111111"
-                    // The Apple mark (U+F8FF) lives only in system fonts — in Urbanist /
-                    // Noto Sans Thai it renders as nothing. The row is labelled "Apple".
-                    icon="🍎"
+                    icon={<AppleMark size={20} />}
                     title="Apple"
                     value={auth?.apple ? t('signin.connected') : t('signin.connect')}
                     loading={linkBusy === 'apple'}
@@ -632,10 +631,12 @@ export default function ProfileScreen() {
     return <View style={{ height: 1, backgroundColor: colors.hairline, marginLeft: 76 }} />;
   }
 
-  function NavRow({ bg, icon, title, value, onPress, loading }: { bg: string; icon: string; title: string; value?: string; onPress: () => void; loading?: boolean }) {
+  function NavRow({ bg, icon, title, value, onPress, loading }: { bg: string; icon: ReactNode; title: string; value?: string; onPress: () => void; loading?: boolean }) {
     return (
       <Pressable onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, padding: space.lg }}>
-        <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: bg + '22', alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>{icon}</Text></View>
+        <View style={{ width: 42, height: 42, borderRadius: 14, backgroundColor: bg + '22', alignItems: 'center', justifyContent: 'center' }}>
+          {typeof icon === 'string' ? <Text style={{ fontSize: 18 }}>{icon}</Text> : icon}
+        </View>
         <Text variant="label" weight="bold" style={{ flex: 1 }}>{title}</Text>
         {value ? <Text variant="label" color={colors.ink3}>{value}</Text> : null}
         {loading ? <ActivityIndicator size="small" color={colors.ink3} /> : <Text style={{ fontSize: 18, color: colors.ink3 }}>›</Text>}
