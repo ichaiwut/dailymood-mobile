@@ -115,7 +115,11 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
   `paper`(white) / `ghost` / `purple`, each with its chunky `boxShadow`. Height 54,
   radius 14, settles `translateY(2)` on press.
 - **`PaperSheet`** — folder tab + folded corner, `sheetRadius`, soft `shadow.md`;
-  optional paperclip (`PAClip`) and washi.
+  optional paperclip (`PAClip`) and washi. The folded corner is a `skewX('20deg')`
+  slab **28px wide** behind the tab. It has to stay over-wide: RN pivots `skew` on
+  the view's centre, so the lower half slides ~7px right — at 16px the left edge
+  cleared the tab body and opened a hairline slit at the seam. Only the right edge
+  is visible (`right: -11`), so the surplus width costs nothing.
 - **`PASticker`** — mood disc: white 4px border + `shadow.sticker`. Disc background:
   emoji badges = full color; moods = **soft tint `color+'40'`** by default, but the
   `discBg` prop overrides it (used by the Smart Log tiles, see §4).

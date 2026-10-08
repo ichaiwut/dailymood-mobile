@@ -40,7 +40,11 @@ export function FolderTab({ label, bg, fg, icon }: { label: string; bg: string; 
           position: 'absolute',
           top: 0,
           right: -11,
-          width: 16,
+          // Wide enough that the skew (which pivots on the view's centre and
+          // pushes the lower half ~7px right) can't lift the left edge clear of
+          // the tab body — that gap showed as a hairline slit at the seam.
+          // The extra width sits behind the tab, so the silhouette is unchanged.
+          width: 28,
           height: '100%',
           backgroundColor: bg,
           borderTopRightRadius: 16,
