@@ -105,7 +105,7 @@ reads as a folder seam (used by every `PaperSheet`).
 | `PaperIconButton` | round paper icon button (mic / photo / location) |
 | `MoodIcon`, `MoodFace` | mood icon rendering |
 
-Screen-specific compositions live in `paper/{today,stats,insights,calendar,articles,smartlog,profile}/`.
+Screen-specific compositions live in `paper/{today,stats,insights,calendar,smartlog,profile}/`.
 
 ### Shared UI — `src/components/`
 `Text` · `Button` · `TextField` · `Screen` (scroll + safe-area wrapper) · `BottomSheet` ·

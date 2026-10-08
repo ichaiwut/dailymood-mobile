@@ -6,9 +6,10 @@
  * and about (feedback / terms / privacy). Three bottom sheets (sign out, clear,
  * feedback). Premium features are never hidden — Free sees a teaser/PRO badge.
  *
- * Deferred vs the web spec: the theme picker (dark mode is force-disabled), the
- * saved-articles / article-reactions cards, and the custom-mood / personal-event
- * managers (each needs a dedicated component or route that doesn't exist yet).
+ * Deferred vs the web spec: the theme picker (dark mode is force-disabled) and
+ * the custom-mood / personal-event managers (each needs a dedicated component or
+ * route that doesn't exist yet). Articles are web-only — the saved-articles and
+ * article-reactions cards were dropped rather than deferred.
  */
 import { useEffect, useState, type ReactNode } from 'react';
 import { View, Pressable, Image, TextInput, ActivityIndicator, Share, Platform, Linking } from 'react-native';
@@ -345,12 +346,6 @@ export default function ProfileScreen() {
             </View>
           ) : null}
 
-          {/* D. article links */}
-          <View style={{ gap: space.md }}>
-            <ArticleCard icon="♥" title={t('profile.savedArticles')} sub={t('profile.savedArticlesSub')} onPress={() => router.push('/profile/saved-articles')} />
-            <ArticleCard icon="☺" title={t('profile.articleReactions')} sub={t('profile.articleReactionsSub')} onPress={() => router.push('/profile/article-reactions')} />
-          </View>
-
           {/* E1. account / subscription */}
           <Section label={t('profile.secAccount')}>
             <SettingCard>
@@ -599,19 +594,6 @@ export default function ProfileScreen() {
           <Text variant="label" color={colors.ink2}>{text}</Text>
         </View>
         <Text variant="label" weight="bold" color={brand.purpleStrong}>{t('profile.upgrade')}</Text>
-      </Pressable>
-    );
-  }
-
-  function ArticleCard({ icon, title, sub, onPress }: { icon: string; title: string; sub: string; onPress: () => void }) {
-    return (
-      <Pressable onPress={onPress} style={{ flexDirection: 'row', alignItems: 'center', gap: space.md, backgroundColor: colors.surface, borderRadius: 16, padding: space.lg, boxShadow: shadow.sm }}>
-        <View style={{ width: 40, height: 40, borderRadius: 12, backgroundColor: colors.surface2, alignItems: 'center', justifyContent: 'center' }}><Text style={{ fontSize: 18 }}>{icon}</Text></View>
-        <View style={{ flex: 1 }}>
-          <Text variant="label" weight="bold">{title}</Text>
-          <Text variant="label" color={colors.ink3}>{sub}</Text>
-        </View>
-        <Text style={{ fontSize: 18, color: colors.ink3 }}>›</Text>
       </Pressable>
     );
   }

@@ -25,7 +25,6 @@ import {
 } from '../api/calendar';
 import { fetchStats, fetchInsights, fetchInsightsAll, sendInsightFeedback } from '../api/stats';
 import { fetchAskThreads, fetchAskSuggested } from '../api/askai';
-import { fetchBookmarks, fetchReactions } from '../api/articles';
 import { fetchPersonalEvents, createEvent, deleteEvent } from '../api/events';
 import { fetchPasswordStatus, changePassword } from '../api/account';
 import { todayKey } from '../lib/time';
@@ -53,8 +52,6 @@ export const queryKeys = {
   insightsAll: (week?: string) => ['insights-all', week ?? 'current'] as const,
   askThreads: ['ask-ai', 'threads'] as const,
   askSuggested: (locale: string) => ['ask-ai', 'suggested', locale] as const,
-  bookmarks: ['articles', 'bookmarks'] as const,
-  reactions: ['articles', 'reactions'] as const,
   personalEvents: ['personal-events'] as const,
   achievements: ['achievements'] as const,
   subscription: ['subscription'] as const,
@@ -247,10 +244,6 @@ export function useAskSuggested(locale: string, enabled = true) {
   return useQuery({ queryKey: queryKeys.askSuggested(locale), queryFn: () => fetchAskSuggested(locale), enabled, staleTime: 60 * 60_000 });
 }
 
-export function useBookmarks() {
-  return useQuery({ queryKey: queryKeys.bookmarks, queryFn: fetchBookmarks });
-}
-
 export function useCreateMood() {
   const qc = useQueryClient();
   return useMutation({
@@ -299,10 +292,6 @@ export function useDeleteEvent() {
       qc.invalidateQueries({ queryKey: ['events'] });
     },
   });
-}
-
-export function useReactions() {
-  return useQuery({ queryKey: queryKeys.reactions, queryFn: fetchReactions });
 }
 
 export function useInsightFeedback() {
