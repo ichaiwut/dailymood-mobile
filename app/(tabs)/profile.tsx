@@ -35,7 +35,8 @@ import { useToast } from '../../src/components/Toast';
 import { initials } from '../../src/lib/avatar';
 import { formatDateKey } from '../../src/lib/time';
 import { clearEntries, exportEntriesCsv, fetchFeedbackStatus, submitFeedback } from '../../src/api/profile';
-import { deleteAccount } from '../../src/api/account';
+import { deleteAccount, linkProvider, unlinkProvider } from '../../src/api/account';
+import { getGoogleIdToken, getAppleIdToken, isAppleAuthAvailable } from '../../src/auth/socialSignIn';
 import { R2_PUBLIC_URL, API_BASE_URL } from '../../src/config';
 import { ApiError, errorMessageKey } from '../../src/api/errors';
 import type { MoodPack } from '../../src/api/types';
@@ -68,6 +69,8 @@ export default function ProfileScreen() {
   const [feedbackText, setFeedbackText] = useState('');
   const [feedbackSent, setFeedbackSent] = useState(false);
   const [cooldown, setCooldown] = useState(0);
+  const [linkBusy, setLinkBusy] = useState<'google' | 'apple' | null>(null);
+  const [appleReady, setAppleReady] = useState(false);
 
   const u = profile.data?.user;
   const stats = profile.data?.stats;
@@ -75,6 +78,14 @@ export default function ProfileScreen() {
   const ach = profile.data?.achievements;
   const packs = profile.data?.packs ?? [];
   const premium = u?.isPremium ?? false;
+  const auth = u?.auth;
+  // Apple can only be connected on iOS. A user who linked it elsewhere still
+  // sees the row so they can tell how they get in — they just can't change it.
+  const appleUsable = Platform.OS === 'ios' && appleReady;
+  const showApple = appleUsable || !!auth?.apple;
+  // No password and no provider we could identify: say so plainly rather than
+  // guessing a brand. Resolves itself the next time they sign in.
+  const signInUnknown = !!auth && !auth.password && !auth.google && !auth.apple;
   const tier = profile.data?.tier;
   const accent = u?.accentColor || brand.purple;
   const grad = GRADIENTS[accent] ?? GRADIENTS['#A673F1'];
@@ -90,6 +101,43 @@ export default function ProfileScreen() {
       fetchFeedbackStatus().then((s) => setCooldown(s.cooldown ? s.remainMin : 0)).catch(() => setCooldown(0));
     }
   }, [sheet]);
+
+  useEffect(() => {
+    isAppleAuthAvailable().then(setAppleReady);
+  }, []);
+
+  // Connecting reuses the native sign-in sheet, then posts the token to the link
+  // endpoint instead of the login one. A cancelled sheet returns null — stay put,
+  // say nothing.
+  const connect = async (provider: 'google' | 'apple') => {
+    if (linkBusy) return;
+    setLinkBusy(provider);
+    try {
+      const idToken = provider === 'google' ? await getGoogleIdToken() : (await getAppleIdToken())?.idToken ?? null;
+      if (!idToken) return;
+      await linkProvider(provider, idToken);
+      await qc.invalidateQueries({ queryKey: ['profile'] });
+      toast.show(t('signin.connectedToast'));
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    } finally {
+      setLinkBusy(null);
+    }
+  };
+
+  const disconnect = async (provider: 'google' | 'apple') => {
+    if (linkBusy) return;
+    setLinkBusy(provider);
+    try {
+      await unlinkProvider(provider);
+      await qc.invalidateQueries({ queryKey: ['profile'] });
+      toast.show(t('signin.disconnectedToast'));
+    } catch (e) {
+      toast.show(t(errorMessageKey(e)), 'error');
+    } finally {
+      setLinkBusy(null);
+    }
+  };
 
   const setLocale = (loc: 'en' | 'th') => {
     if (loc === u?.locale) return;
@@ -317,6 +365,54 @@ export default function ProfileScreen() {
             </SettingCard>
           </Section>
 
+          {/* E1b. how you sign in */}
+          <Section label={t('signin.section')}>
+            <SettingCard>
+              <NavRow
+                bg="#A673F1"
+                icon="🔑"
+                title={t('signin.emailPassword')}
+                value={auth?.password ? t('signin.passwordSet') : t('signin.passwordNotSet')}
+                onPress={() => router.push('/profile/password')}
+              />
+              <Divider />
+              <NavRow
+                bg="#4285F4"
+                icon="G"
+                title="Google"
+                value={auth?.google ? t('signin.connected') : t('signin.connect')}
+                loading={linkBusy === 'google'}
+                onPress={() => (auth?.google ? disconnect('google') : connect('google'))}
+              />
+              {showApple ? (
+                <>
+                  <Divider />
+                  <NavRow
+                    bg="#111111"
+                    // The Apple mark (U+F8FF) lives only in system fonts — in Urbanist /
+                    // Noto Sans Thai it renders as nothing. The row is labelled "Apple".
+                    icon="🍎"
+                    title="Apple"
+                    value={auth?.apple ? t('signin.connected') : t('signin.connect')}
+                    loading={linkBusy === 'apple'}
+                    onPress={() => {
+                      if (!appleUsable) return; // linked on another platform — read-only here
+                      auth?.apple ? disconnect('apple') : connect('apple');
+                    }}
+                  />
+                </>
+              ) : null}
+              {signInUnknown ? (
+                <>
+                  <Divider />
+                  <View style={{ paddingHorizontal: space.lg, paddingBottom: space.lg, paddingTop: space.md }}>
+                    <Text variant="label" color={colors.ink3}>{t('signin.unknownNote')}</Text>
+                  </View>
+                </>
+              ) : null}
+            </SettingCard>
+          </Section>
+
           {/* E2. language */}
           <Section label={t('profile.secLanguage')}>
             <SettingCard>
@@ -334,8 +430,6 @@ export default function ProfileScreen() {
               ) : (
                 <View style={{ padding: space.lg }}><PremiumTeaser text={t('profile.hidePreviewTeaser')} /></View>
               )}
-              <Divider />
-              <NavRow bg="#A673F1" icon="🔑" title={t('profile.passwordRow')} onPress={() => router.push('/profile/password')} />
             </SettingCard>
           </Section>
 

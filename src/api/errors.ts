@@ -33,6 +33,9 @@ const KNOWN_CODES: ReadonlySet<string> = new Set([
   'wrong_current_password',
   'same_password',
   'iap_failed',
+  'email_mismatch',
+  'already_linked',
+  'last_sign_in_method',
 ]);
 
 /** Normalize any raw `{ error }` string from the API into a known code. */

@@ -44,6 +44,23 @@ export interface Mood {
   iconKey: string | null;
 }
 
+/**
+ * Which methods can sign this account in (GET /api/profile → user.auth).
+ * `confirmed: false` means the server inferred it for an account that has not
+ * signed in since provider recording shipped — treat it as true, not as doubt
+ * worth showing the user.
+ */
+export interface AuthProviderState {
+  linked: true;
+  confirmed: boolean;
+}
+
+export interface AuthMethods {
+  password: boolean;
+  google: AuthProviderState | null;
+  apple: AuthProviderState | null;
+}
+
 /** Subset of GET /api/profile we rely on early; extended in later milestones. */
 export interface Profile {
   user: {
@@ -54,6 +71,8 @@ export interface Profile {
     image: string | null;
     imageUrl: string | null;
     imageKey: string | null;
+    /** Absent when talking to a backend older than provider recording. */
+    auth?: AuthMethods;
     locale: 'th' | 'en';
     isPremium: boolean;
     bio: string | null;
@@ -558,5 +577,8 @@ export type ApiErrorCode =
   | 'wrong_current_password'
   | 'same_password'
   | 'iap_failed'
+  | 'email_mismatch'
+  | 'already_linked'
+  | 'last_sign_in_method'
   | 'network_error'
   | 'unknown';

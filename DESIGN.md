@@ -427,7 +427,15 @@ pill, and a 3-cell **stats row** (streak → achievements, entries → calendar,
 `distribution`-coloured stacked bar + top-3 line; premium-no-data → "ยังมีข้อมูลไม่พอ"; free →
 `PremiumTeaser`. **Achievements** row (earned badges, ≤6, `N/total →`). **Settings sections**
 (`Section` eyebrow + `SettingCard` rounded card with `NavRow`/`ToggleRow`/`RadioRow`/`Divider`):
-Account (subscription → `/profile/subscription`, value renews/expires/free), Language (en/th radios
+Account (subscription → `/profile/subscription`, value renews/expires/free), **How you sign in**
+(`signin` i18n namespace, reads `user.auth`): a password row showing ตั้งไว้แล้ว / ยังไม่ได้ตั้ง →
+`/profile/password`, then one row per provider showing เชื่อมแล้ว / เชื่อมต่อ. Tapping runs the same
+native sign-in sheet as login and posts the token to `/api/account/link/*`; cancel is silent, and both
+connect and disconnect toast. The password row lives **here**, not under Privacy where it used to sit —
+a Google-only user had no reason to look there for the one screen that lets them add a password. Apple
+appears when `Platform.OS === 'ios' && appleReady`, **or** when it is already linked (so an Apple user
+on Android can still see how they get in — the row is read-only there). An account we cannot identify
+gets one neutral line instead of a guessed brand. Language (en/th radios
 → `i18n.changeLanguage` + PATCH `locale`), Privacy (premium ToggleRow `hidePreview` PATCH / free
 teaser), **Mood-icon pack** picker (when `packs.length>1`: 2-col cards, 4 R2 preview icons via
 `PackIcon` with onError fallback + `iconFormat`; premium pack while `tier!=='premium'` → 🔒/upgrade →

@@ -36,8 +36,14 @@ function ensureConfigured() {
 /** Native sign-in succeeded but returned no usable identity token. */
 export class SocialSignInError extends Error {}
 
-/** Returns a TokenPair, or null if the user cancelled. */
-export async function signInWithGoogle(): Promise<TokenPair | null> {
+/**
+ * Run the native Google flow and hand back the raw identity token.
+ *
+ * Kept separate from signing in because the same token also connects Google to
+ * an account that is *already* signed in (profile → sign-in methods). Returns
+ * null when the user cancels.
+ */
+export async function getGoogleIdToken(): Promise<string | null> {
   ensureConfigured();
   try {
     await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true });
@@ -45,7 +51,7 @@ export async function signInWithGoogle(): Promise<TokenPair | null> {
     if (!isSuccessResponse(response)) return null; // user cancelled
     const idToken = response.data.idToken;
     if (!idToken) throw new SocialSignInError('google: missing idToken');
-    return await loginWithGoogle(idToken);
+    return idToken;
   } catch (e) {
     if (
       isErrorWithCode(e) &&
@@ -57,8 +63,8 @@ export async function signInWithGoogle(): Promise<TokenPair | null> {
   }
 }
 
-/** iOS only. Returns a TokenPair, or null if the user cancelled. */
-export async function signInWithApple(): Promise<TokenPair | null> {
+/** iOS only. The raw Apple token plus the name Apple sends only the first time. */
+export async function getAppleIdToken(): Promise<{ idToken: string; name?: string } | null> {
   try {
     const credential = await AppleAuthentication.signInAsync({
       requestedScopes: [
@@ -74,11 +80,25 @@ export async function signInWithApple(): Promise<TokenPair | null> {
         .filter(Boolean)
         .join(' ')
         .trim() || undefined;
-    return await loginWithApple(idToken, name);
+    return { idToken, name };
   } catch (e) {
     if ((e as { code?: string })?.code === 'ERR_REQUEST_CANCELED') return null;
     throw e;
   }
+}
+
+/** Returns a TokenPair, or null if the user cancelled. */
+export async function signInWithGoogle(): Promise<TokenPair | null> {
+  const idToken = await getGoogleIdToken();
+  if (!idToken) return null;
+  return await loginWithGoogle(idToken);
+}
+
+/** iOS only. Returns a TokenPair, or null if the user cancelled. */
+export async function signInWithApple(): Promise<TokenPair | null> {
+  const got = await getAppleIdToken();
+  if (!got) return null;
+  return await loginWithApple(got.idToken, got.name);
 }
 
 /** Whether Sign in with Apple can be offered (iOS 13+ on a real Apple device). */
