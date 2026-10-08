@@ -1,4 +1,7 @@
-# App Store listing — DailyMood (v1.0.0)
+# App Store listing — DailyMood (v1.0.1)
+
+> Release notes are kept newest-first. **Play Store caps them at 500 characters**
+> (App Store allows 4000), so the wording below is written to fit both.
 
 Copy-paste source for App Store Connect (and reusable for Google Play). Two
 localizations: **English (Primary)** + **Thai**. Char limits noted per field.
@@ -94,6 +97,18 @@ Privacy Policy: https://my.dailymood.me/privacy
 Terms of Use: https://my.dailymood.me/terms
 ```
 
+**What's New** (release notes, 1.0.1) — 373 chars:
+```
+What's new
+• Your profile now shows how you sign in, and you can connect Google or Apple
+• Notification settings split by topic — pick email or in-app for each
+• Your chosen mood icons now appear everywhere
+• Photos attach to entries again
+• Insights no longer sit blank while they load
+• The calendar works in months with no entries yet
+• Prices match what the store shows
+```
+
 **What's New** (release notes, 1.0.0):
 ```
 Welcome to DailyMood 💜
@@ -165,6 +180,18 @@ DailyMood Pro
 
 นโยบายความเป็นส่วนตัว: https://my.dailymood.me/privacy
 ข้อกำหนดการใช้งาน: https://my.dailymood.me/terms
+```
+
+**What's New** (1.0.1) — 370 chars:
+```
+มีอะไรใหม่
+• หน้าโปรไฟล์บอกได้แล้วว่าคุณเข้าสู่ระบบด้วยวิธีไหน และเชื่อม Google หรือ Apple เพิ่มได้
+• ตั้งค่าการแจ้งเตือนแยกเป็นรายหัวข้อ เลือกได้ว่าจะรับทางอีเมลหรือในแอป
+• ไอคอนอารมณ์ชุดที่เลือกไว้ แสดงครบทุกหน้าแล้ว
+• แนบรูปในบันทึกได้ตามปกติแล้ว
+• หน้าข้อมูลเชิงลึกไม่ค้างว่างระหว่างรอประมวลผล
+• ปฏิทินใช้งานได้ปกติในเดือนที่ยังไม่มีบันทึก
+• ราคาตรงกับที่แสดงในสโตร์
 ```
 
 **What's New** (1.0.0):
