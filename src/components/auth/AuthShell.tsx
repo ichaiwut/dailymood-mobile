@@ -8,7 +8,6 @@ import { Screen } from '../Screen';
 import { Text } from '../Text';
 import { BrandLogo } from '../BrandLogo';
 import { PaperSheet } from '../paper/PaperSheet';
-import { WashiTape } from '../paper/WashiTape';
 import { useTheme } from '../../theme/ThemeProvider';
 
 export interface AuthShellProps {
@@ -26,22 +25,20 @@ export function AuthShell({ tab, title, subtitle, children }: AuthShellProps) {
         <BrandLogo variant="wordmark" width={220} />
       </View>
 
-      <View>
-        <View style={{ alignItems: 'center', marginBottom: -13, zIndex: 1 }}>
-          <WashiTape color={brand.peach + '99'} rotate={-5} />
+      {/* The tape is PaperSheet's own, not a sibling above it: a sibling is laid
+          out against the folder tab, which stands ~30px proud of the paper, so
+          the strip floated on the desk instead of holding the slip down. */}
+      <PaperSheet tab={tab} washi washiColor={brand.peach + '99'}>
+        <View style={{ gap: space.md }}>
+          <Text variant="h2">{title}</Text>
+          {subtitle ? (
+            <Text variant="body" color={colors.ink2}>
+              {subtitle}
+            </Text>
+          ) : null}
+          <View style={{ gap: space.lg, marginTop: space.sm }}>{children}</View>
         </View>
-        <PaperSheet tab={tab}>
-          <View style={{ gap: space.md }}>
-            <Text variant="h2">{title}</Text>
-            {subtitle ? (
-              <Text variant="body" color={colors.ink2}>
-                {subtitle}
-              </Text>
-            ) : null}
-            <View style={{ gap: space.lg, marginTop: space.sm }}>{children}</View>
-          </View>
-        </PaperSheet>
-      </View>
+      </PaperSheet>
     </Screen>
   );
 }
