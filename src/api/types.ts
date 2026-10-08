@@ -235,7 +235,8 @@ export interface CalendarDay {
 }
 
 export interface CalendarStats {
-  avgMood: number;
+  /** null when the month has no scored entries. */
+  avgMood: number | null;
   avgMoodDelta: number | null;
   streak: number;
   loggedDays: number;

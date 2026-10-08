@@ -204,7 +204,7 @@ export default function CalendarScreen() {
                   <View style={{ flexDirection: 'row', gap: space.sm }}>
                     <Stat
                       label={t('calendar.avgShort')}
-                      value={cal.data.stats.avgMood.toFixed(1)}
+                      value={cal.data.stats.avgMood != null ? cal.data.stats.avgMood.toFixed(1) : '—'}
                       tab={brand.peach}
                       sub={
                         cal.data.stats.avgMoodDelta != null && cal.data.stats.avgMoodDelta !== 0
