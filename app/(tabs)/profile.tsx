@@ -373,7 +373,9 @@ export default function ProfileScreen() {
                 bg="#A673F1"
                 icon="🔑"
                 title={t('signin.emailPassword')}
-                value={auth?.password ? t('signin.passwordSet') : t('signin.passwordNotSet')}
+                // No `auth` means we haven't been told, which is not the same as
+                // "not set" — say nothing rather than something wrong.
+                value={auth ? (auth.password ? t('signin.passwordSet') : t('signin.passwordNotSet')) : undefined}
                 onPress={() => router.push('/profile/password')}
               />
               <Divider />
@@ -381,7 +383,7 @@ export default function ProfileScreen() {
                 bg="#4285F4"
                 icon={<GoogleMark size={20} />}
                 title="Google"
-                value={auth?.google ? t('signin.connected') : t('signin.connect')}
+                value={auth ? (auth.google ? t('signin.connected') : t('signin.connect')) : undefined}
                 loading={linkBusy === 'google'}
                 onPress={() => (auth?.google ? disconnect('google') : connect('google'))}
               />
@@ -392,7 +394,7 @@ export default function ProfileScreen() {
                     bg="#111111"
                     icon={<AppleMark size={20} />}
                     title="Apple"
-                    value={auth?.apple ? t('signin.connected') : t('signin.connect')}
+                    value={auth ? (auth.apple ? t('signin.connected') : t('signin.connect')) : undefined}
                     loading={linkBusy === 'apple'}
                     onPress={() => {
                       if (!appleUsable) return; // linked on another platform — read-only here
