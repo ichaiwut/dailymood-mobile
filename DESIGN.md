@@ -163,9 +163,13 @@ purple `#A673F1` · purpleStrong `#9747FF` · peach `#FCA45B` · peachShadow `#D
 - **`AiWeeklyFolder`** (`paper/today/`) — "✦ AI · สัปดาห์นี้" folder, placed **after** the
   entries list on Today. Dark **plum gradient** (`plum2 → plum`, ~155°, via
   `expo-linear-gradient`) + a soft peach corner glow, matching web. Always shown (never
-  hidden): premium sees the cached weekly `summary` (markdown stripped), free sees
-  `previewHeadline`/teaser + a PRO badge. Button → `/insights` (premium) or
-  `/profile/subscription` (free). Data from `useInsights()`.
+  hidden), in three states: free sees `previewHeadline`/teaser + a PRO badge, button →
+  `/profile/subscription`; premium with a summary sees it (markdown stripped), button →
+  `/insights`; **premium without enough entries** sees `insights.tooFewBody` / `emptyBody`
+  — the reason, not a pitch for what they already pay for — and still goes to `/insights`.
+  Summary from `useInsights()`, but the **tier comes from `useProfile()`**: `/api/insights`
+  omits `tier` on its `empty` / `tooFewEntries` replies and while the request is in flight,
+  which used to show subscribers a PRO badge and an "upgrade" button.
 - **`MiniCalendarFolder`** (`paper/today/`) — mint-tab folder at the bottom of Today: current
   month (`monthLong year`), "ดูทั้งหมด →" → `/calendar`, and a 7-col grid (Sunday-first, narrow
   weekday headers) with today ringed (`surface2` + purple border) and logged days tinted by their

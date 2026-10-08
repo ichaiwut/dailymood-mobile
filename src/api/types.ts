@@ -457,15 +457,34 @@ export interface InsightSuggestion {
   description: string;
 }
 
+/**
+ * GET /api/insights — the weekly AI summary behind the Today screen's folder.
+ *
+ * Everything is optional because the route answers in four different shapes,
+ * and the first two are nothing like the others:
+ *   - `{ empty: true }` — no entries at all in the last 30 days
+ *   - `{ tooFewEntries: true, entryCount }` — fewer than seven
+ *   - free — `headline` (already the preview wording), a clipped `summary`,
+ *     and `locked: true`; no patterns, no suggestion
+ *   - premium — the whole result
+ *
+ * **`tier` is absent in the first two**, so never decide what a user may see
+ * from it. The profile's `isPremium` is the one that always answers.
+ */
 export interface InsightsData {
-  headline: string;
-  previewHeadline: string;
-  summary: string;
-  patterns: InsightPattern[];
-  suggestion: InsightSuggestion | null;
-  tier: 'free' | 'premium' | string;
-  weekKey: string;
-  streak: number;
+  headline?: string;
+  previewHeadline?: string;
+  summary?: string;
+  patterns?: InsightPattern[];
+  suggestion?: InsightSuggestion | null;
+  tier?: 'free' | 'premium' | string;
+  weekKey?: string;
+  streak?: number;
+  locked?: boolean;
+  cached?: boolean;
+  empty?: boolean;
+  tooFewEntries?: boolean;
+  entryCount?: number;
 }
 
 export type InsightReaction = 'up' | 'down' | 'routine';
